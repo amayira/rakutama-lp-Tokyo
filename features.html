@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教室について｜楽珠そろばん教室 東京</title>
+    <meta name="description" content="楽珠そろばん教室の特徴・楽珠メソッド・先生紹介。練馬区の少人数制そろばん教室。">
+    <link rel="icon" href="Pictures/favicon.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#4A96AE', secondary: '#F59E0B', accent: '#E0F2F7', base: '#F7FBFA' },
+                    fontFamily: { sans: ['"Noto Sans JP"', 'sans-serif'], display: ['"Zen Kaku Gothic New"', 'sans-serif'], number: ['"Inter"', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans JP', sans-serif; color: #374151; background-color: #fff; }
+        .text-display { font-family: 'Zen Kaku Gothic New', sans-serif; }
+        .section-label { font-family: 'Inter', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #4A96AE; font-weight: 700; }
+        .nav-link { position: relative; padding-bottom: 2px; }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #4A96AE; transition: width 0.2s; }
+        .nav-link:hover::after { width: 100%; }
+        .fade-in { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 bg-white border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5">
+            <img src="Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain">
+            <div class="hidden sm:block border-l border-gray-200 pl-2.5">
+                <div class="text-xs text-gray-400 leading-none">東京・練馬</div>
+            </div>
+        </a>
+        <nav class="hidden md:flex items-center gap-7 text-sm text-gray-600 font-medium">
+            <a href="features.html" class="nav-link text-primary font-bold">楽珠そろばん教室の特徴</a>
+            <a href="courses.html" class="nav-link hover:text-primary transition">コース・料金</a>
+            <a href="access.html" class="nav-link hover:text-primary transition">教室案内</a>
+            <a href="faq.html" class="nav-link hover:text-primary transition">よくある質問</a>
+        </nav>
+        <div class="flex items-center gap-3">
+            <a href="trial.html" class="hidden sm:inline-flex items-center gap-2 border border-primary text-primary hover:bg-primary hover:text-white text-sm font-bold px-4 py-2 rounded-full transition">
+                <i class="fa-brands fa-line"></i>無料体験を申し込む
+            </a>
+            <button id="menuBtn" class="md:hidden text-gray-600 text-xl w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </div>
+    <div id="spMenu" class="hidden md:hidden bg-white border-t border-gray-100">
+        <nav class="flex flex-col px-5 py-4 gap-4 text-sm font-medium text-gray-700">
+            <a href="features.html">楽珠そろばん教室の特徴</a>
+            <a href="courses.html">コース・料金</a>
+            <a href="access.html">教室案内</a>
+            <a href="faq.html">よくある質問</a>
+            <a href="trial.html" class="text-primary font-bold"><i class="fa-brands fa-line mr-1"></i>無料体験を申し込む</a>
+        </nav>
+    </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="bg-base border-b border-gray-100 py-12">
+    <div class="max-w-6xl mx-auto px-5">
+        <p class="section-label mb-2">About</p>
+        <h1 class="text-display text-3xl md:text-4xl font-black text-gray-800">楽珠そろばん教室の特徴</h1>
+        <p class="text-gray-500 text-sm mt-3">楽珠メソッド・6つの特徴・先生紹介</p>
+    </div>
+</section>
+
+
+<!-- 楽珠メソッド -->
+<section class="py-20">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div class="fade-in">
+                <p class="section-label mb-3">Rakutama Method</p>
+                <h2 class="text-display text-3xl font-black text-gray-800 mb-6">楽珠メソッドとは</h2>
+                <p class="text-gray-600 leading-loose text-sm mb-4">
+                    楽珠そろばん教室は、全国展開する楽珠そろばんのFC加盟校です。独自の「楽珠メソッド」は、頭の中に珠（たま）をイメージして答えを瞬時に導き出す右脳計算法です。
+                </p>
+                <p class="text-gray-600 leading-loose text-sm mb-4">
+                    論理的に筆算するのではなく、珠のイメージで処理するため、計算ドリルとは全く異なる<strong class="text-gray-800">「圧倒的なスピードと直感力」</strong>が身につきます。
+                </p>
+                <p class="text-gray-600 leading-loose text-sm">
+                    制限時間内に集中して問題を解くトレーニングは、集中力・忍耐力・自己管理能力の向上にもつながります。
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-3 fade-in">
+                <img src="Pictures/School1.jpeg" alt="授業風景" class="w-full h-48 object-cover rounded-2xl">
+                <img src="Pictures/School2.jpeg" alt="授業風景" class="w-full h-48 object-cover rounded-2xl mt-8">
+                <img src="Pictures/School3.jpeg" alt="授業風景" class="w-full h-48 object-cover rounded-2xl -mt-4">
+                <div class="w-full h-48 bg-accent rounded-2xl flex flex-col items-center justify-center -mt-4">
+                    <i class="fa-solid fa-brain text-primary text-3xl mb-2"></i>
+                    <div class="text-xs text-center text-primary font-bold px-4">右脳を使った<br>珠イメージ計算</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- 6つの特徴 -->
+<section class="py-20 bg-base">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="text-center mb-12 fade-in">
+            <p class="section-label mb-2">Features</p>
+            <h2 class="text-display text-3xl font-black text-gray-800">6つの特徴</h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+
+            <div class="bg-white rounded-2xl p-7 border border-gray-100 flex gap-5 fade-in">
+                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-brain text-primary text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-2">右脳を使う楽珠メソッド</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">珠をイメージして瞬時に答えを出す右脳トレーニング。計算ドリルとは異なる「圧倒的な計算スピードと直感力」が身につきます。</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-7 border border-gray-100 flex gap-5 fade-in">
+                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-users text-primary text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-2">少人数制で目が行き届く</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">1クラスの人数を絞り、先生が一人ひとりの進度に合わせて指導。わからないまま置いていかれることがありません。</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-7 border border-gray-100 flex gap-5 fade-in">
+                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-seedling text-primary text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-2">自律学習スタイル</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">自分で課題を確認し、取り組み、先生にチェックしてもらう流れを繰り返します。「自分でやりきる力」が自然と育まれます。</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-7 border border-gray-100 flex gap-5 fade-in">
+                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-calendar-check text-primary text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-2">振替制度あり</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">学校行事や他の習い事と重なっても安心。振替授業に対応しているので、無理なく続けられます。</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-7 border border-gray-100 flex gap-5 fade-in">
+                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <i class="fa-brands fa-line text-primary text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-2">LINEで連絡・キャッシュレス対応</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">欠席・振替連絡はLINE公式アカウントで24時間受付。授業料の支払いも完全キャッシュレスで保護者の手間を最小化。</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-7 border border-gray-100 flex gap-5 fade-in">
+                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-trophy text-primary text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-2">段位・検定にも対応</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">珠算・暗算の検定受験をサポート。上位検定を目指す生徒も、自分のペースで着実にステップアップできます。</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- 先生紹介 -->
+<!-- ※採用後に表示する場合はこのセクションのコメントアウトを解除してください -->
+<!--
+<section class="py-20">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="text-center mb-12">
+            <p class="section-label mb-2">Teachers</p>
+            <h2 class="text-display text-3xl font-black text-gray-800">先生紹介</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+
+            <div class="text-center">
+                <img src="Pictures/t_kano.png" alt="加納先生" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
+                <h3 class="font-bold text-lg mb-1">加納 先生</h3>
+                <p class="text-primary text-xs font-bold mb-3">早宮校 担当</p>
+                <p class="text-sm text-gray-600 leading-relaxed">（プロフィール文をここに入れてください）</p>
+            </div>
+
+            <div class="text-center">
+                <img src="Pictures/t_naito.png" alt="内藤先生" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
+                <h3 class="font-bold text-lg mb-1">内藤 先生</h3>
+                <p class="text-primary text-xs font-bold mb-3">氷川台校 担当</p>
+                <p class="text-sm text-gray-600 leading-relaxed">（プロフィール文をここに入れてください）</p>
+            </div>
+
+            <div class="text-center">
+                <img src="Pictures/t_ozaki.png" alt="尾崎先生" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
+                <h3 class="font-bold text-lg mb-1">尾崎 先生</h3>
+                <p class="text-primary text-xs font-bold mb-3">中村校 担当</p>
+                <p class="text-sm text-gray-600 leading-relaxed">（プロフィール文をここに入れてください）</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+-->
+
+
+<!-- CTA -->
+<section class="py-16 bg-base border-t border-gray-100">
+    <div class="max-w-xl mx-auto px-5 text-center">
+        <h2 class="text-display text-2xl font-black text-gray-800 mb-3">まずは無料体験へ</h2>
+        <p class="text-sm text-gray-600 mb-6">教室の雰囲気や先生との相性を、実際に体験して確かめてください。</p>
+        <a href="trial.html" class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-full text-base transition shadow-md">
+            <i class="fa-brands fa-line text-lg"></i>無料体験を申し込む
+        </a>
+    </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="bg-gray-800 text-gray-400 py-12">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="flex flex-col md:flex-row justify-between gap-10 mb-10">
+            <div class="max-w-xs">
+                <img src="Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain mb-4 opacity-90">
+                <p class="text-sm leading-relaxed">東京・練馬区を中心に展開するそろばん教室です。</p>
+                <p class="text-xs mt-2 opacity-60">楽珠そろばん（FC加盟校）</p>
+            </div>
+            <div class="flex flex-wrap gap-10 text-sm">
+                <div>
+                    <h4 class="text-white font-bold mb-3">教室一覧</h4>
+                    <ul class="space-y-2">
+                        <li><a href="access.html#hayamiya" class="hover:text-white transition">早宮校</a></li>
+                        <li><a href="access.html#hikawadai" class="hover:text-white transition">氷川台校</a></li>
+                        <li><a href="access.html#nakamura" class="hover:text-white transition">中村校</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-3">サイトメニュー</h4>
+                    <ul class="space-y-2">
+                        <li><a href="features.html" class="hover:text-white transition">楽珠そろばん教室の特徴</a></li>
+                        <li><a href="courses.html" class="hover:text-white transition">コース・料金</a></li>
+                        <li><a href="access.html" class="hover:text-white transition">教室案内</a></li>
+                        <li><a href="faq.html" class="hover:text-white transition">よくある質問</a></li>
+                        <li><a href="trial.html" class="hover:text-white transition">無料体験を申し込む</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-6 text-xs text-center opacity-40">
+            &copy; 2025 楽珠そろばん教室 東京. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.getElementById('menuBtn').addEventListener('click', () => {
+        document.getElementById('spMenu').classList.toggle('hidden');
+    });
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

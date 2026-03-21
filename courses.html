@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コース・料金｜楽珠そろばん教室 東京</title>
+    <meta name="description" content="楽珠そろばん教室のコース・料金一覧。週1回6,050円〜。開校キャンペーンで入会金0円。練馬区3教室。">
+    <link rel="icon" href="Pictures/favicon.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#4A96AE', secondary: '#F59E0B', accent: '#E0F2F7', base: '#F7FBFA' },
+                    fontFamily: { sans: ['"Noto Sans JP"', 'sans-serif'], display: ['"Zen Kaku Gothic New"', 'sans-serif'], number: ['"Inter"', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans JP', sans-serif; color: #374151; background-color: #fff; }
+        .text-display { font-family: 'Zen Kaku Gothic New', sans-serif; }
+        .section-label { font-family: 'Inter', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #4A96AE; font-weight: 700; }
+        .nav-link { position: relative; padding-bottom: 2px; }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #4A96AE; transition: width 0.2s; }
+        .nav-link:hover::after { width: 100%; }
+        .fade-in { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 bg-white border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5">
+            <img src="Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain">
+            <div class="hidden sm:block border-l border-gray-200 pl-2.5">
+                <div class="text-xs text-gray-400 leading-none">東京・練馬</div>
+            </div>
+        </a>
+        <nav class="hidden md:flex items-center gap-7 text-sm text-gray-600 font-medium">
+            <a href="features.html" class="nav-link hover:text-primary transition">楽珠そろばん教室の特徴</a>
+            <a href="courses.html" class="nav-link text-primary font-bold">コース・料金</a>
+            <a href="access.html" class="nav-link hover:text-primary transition">教室案内</a>
+            <a href="faq.html" class="nav-link hover:text-primary transition">よくある質問</a>
+        </nav>
+        <div class="flex items-center gap-3">
+            <a href="trial.html" class="hidden sm:inline-flex items-center gap-2 border border-primary text-primary hover:bg-primary hover:text-white text-sm font-bold px-4 py-2 rounded-full transition">
+                <i class="fa-brands fa-line"></i>無料体験を申し込む
+            </a>
+            <button id="menuBtn" class="md:hidden text-gray-600 text-xl w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </div>
+    <div id="spMenu" class="hidden md:hidden bg-white border-t border-gray-100">
+        <nav class="flex flex-col px-5 py-4 gap-4 text-sm font-medium text-gray-700">
+            <a href="features.html">楽珠そろばん教室の特徴</a>
+            <a href="courses.html">コース・料金</a>
+            <a href="access.html">教室案内</a>
+            <a href="faq.html">よくある質問</a>
+            <a href="trial.html" class="text-primary font-bold"><i class="fa-brands fa-line mr-1"></i>無料体験を申し込む</a>
+        </nav>
+    </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="bg-base border-b border-gray-100 py-12">
+    <div class="max-w-6xl mx-auto px-5">
+        <p class="section-label mb-2">Courses & Price</p>
+        <h1 class="text-display text-3xl md:text-4xl font-black text-gray-800">コース・料金</h1>
+        <p class="text-gray-500 text-sm mt-3">週1回から通えます。お子さまのペースに合わせてお選びください。</p>
+    </div>
+</section>
+
+
+<!-- 対象 -->
+<section class="py-16">
+    <div class="max-w-3xl mx-auto px-5">
+
+        <div class="bg-base rounded-2xl p-6 border border-gray-100 mb-12 flex gap-4 items-start fade-in">
+            <i class="fa-solid fa-child-reaching text-primary text-2xl mt-1"></i>
+            <div>
+                <h2 class="font-bold text-gray-800 mb-1">対象年齢</h2>
+                <p class="text-sm text-gray-600">年中（4歳）〜 小学生</p>
+                <p class="text-xs text-gray-400 mt-1">※授業は対面のみ。オンライン授業は実施しておりません。</p>
+            </div>
+        </div>
+
+        <!-- 初期費用 -->
+        <div class="mb-12 fade-in">
+            <h2 class="text-display text-2xl font-black text-gray-800 mb-5 flex items-center gap-2">
+                <i class="fa-solid fa-circle-dot text-primary text-lg"></i>入会時の初期費用
+            </h2>
+            <div class="border border-gray-100 rounded-2xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <tbody>
+                        <tr class="border-b border-gray-100">
+                            <td class="px-4 md:px-6 py-4 text-gray-700 font-medium">入会金</td>
+                            <td class="px-4 md:px-6 py-4 text-right">
+                                <div class="flex flex-col items-end gap-1">
+                                    <div class="whitespace-nowrap">
+                                        <span class="line-through text-gray-400 mr-1">5,500円</span>
+                                        <span class="text-green-600 font-bold text-base">0円</span>
+                                    </div>
+                                    <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">開校キャンペーン</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100">
+                            <td class="px-4 md:px-6 py-4 text-gray-700 font-medium">データ登録料</td>
+                            <td class="px-4 md:px-6 py-4 text-right font-medium whitespace-nowrap">1,100円（税込）</td>
+                        </tr>
+                        <tr class="border-b border-gray-100">
+                            <td class="px-4 md:px-6 py-4 text-gray-700 font-medium">初期教材費</td>
+                            <td class="px-4 md:px-6 py-4 text-right font-medium whitespace-nowrap">3,300円（税込）</td>
+                        </tr>
+                        <tr class="bg-primary/5">
+                            <td class="px-4 md:px-6 py-4 font-bold text-gray-800 leading-snug">
+                                <span class="block">初期合計</span>
+                                <span class="block text-xs font-normal text-gray-500 whitespace-nowrap">（キャンペーン適用時）</span>
+                            </td>
+                            <td class="px-4 md:px-6 py-4 text-right font-black text-primary text-xl font-number whitespace-nowrap">4,400<span class="text-sm font-normal text-gray-500">円</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 月額 -->
+        <div class="fade-in">
+            <h2 class="text-display text-2xl font-black text-gray-800 mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-circle-dot text-primary text-lg"></i>月額料金
+            </h2>
+            <p class="text-xs text-gray-400 mb-5">すべて税込。</p>
+
+            <div class="space-y-4">
+
+                <!-- 週1 -->
+                <div class="border border-gray-100 rounded-2xl p-6 fade-in">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <h3 class="font-black text-xl text-display text-gray-800 mb-1">週1回コース</h3>
+                            <p class="text-sm text-gray-500">月4回授業</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="text-3xl font-black font-number text-gray-800">6,050<span class="text-sm font-normal text-gray-500">円/月</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 週2 -->
+                <div class="border-2 border-primary rounded-2xl p-6 relative fade-in">
+                    <div class="absolute -top-3 left-5">
+                        <span class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">人気コース</span>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <h3 class="font-black text-xl text-display text-gray-800 mb-1">週2回コース</h3>
+                            <p class="text-sm text-gray-500">月8回授業</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="text-3xl font-black font-number text-primary">7,700<span class="text-sm font-normal text-gray-500">円/月</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 週3 -->
+                <div class="border border-gray-100 rounded-2xl p-6 fade-in">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <h3 class="font-black text-xl text-display text-gray-800 mb-1">週3回コース</h3>
+                            <p class="text-sm text-gray-500">月12回授業</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="text-3xl font-black font-number text-gray-800">8,800<span class="text-sm font-normal text-gray-500">円/月</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 事務教材費（共通） -->
+                <div class="border border-dashed border-gray-200 rounded-2xl p-5 bg-gray-50 fade-in">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <h3 class="font-bold text-base text-gray-700">事務教材費（全コース共通）</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">テキスト・教材費として毎月加算されます</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="text-xl font-black font-number text-gray-600">550<span class="text-sm font-normal text-gray-500">円/月</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="text-xs text-gray-400 mt-4">
+                <i class="fa-solid fa-circle-info mr-1"></i>
+                月謝はキャッシュレス決済（口座振替・カード等）にて承ります。
+            </p>
+        </div>
+    </div>
+</section>
+
+
+<!-- CTA -->
+<section class="py-16 bg-base border-t border-gray-100">
+    <div class="max-w-xl mx-auto px-5 text-center">
+        <h2 class="text-display text-2xl font-black text-gray-800 mb-3">まずは無料体験へ</h2>
+        <p class="text-sm text-gray-600 mb-6">体験当日に入会を決める必要はありません。お気軽にどうぞ。</p>
+        <a href="trial.html" class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-full text-base transition shadow-md">
+            <i class="fa-brands fa-line text-lg"></i>無料体験を申し込む
+        </a>
+    </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="bg-gray-800 text-gray-400 py-12">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="flex flex-col md:flex-row justify-between gap-10 mb-10">
+            <div class="max-w-xs">
+                <img src="Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain mb-4 opacity-90">
+                <p class="text-sm leading-relaxed">東京・練馬区を中心に展開するそろばん教室です。</p>
+                <p class="text-xs mt-2 opacity-60">楽珠そろばん（FC加盟校）</p>
+            </div>
+            <div class="flex flex-wrap gap-10 text-sm">
+                <div>
+                    <h4 class="text-white font-bold mb-3">教室一覧</h4>
+                    <ul class="space-y-2">
+                        <li><a href="access.html#hayamiya" class="hover:text-white transition">早宮校</a></li>
+                        <li><a href="access.html#hikawadai" class="hover:text-white transition">氷川台校</a></li>
+                        <li><a href="access.html#nakamura" class="hover:text-white transition">中村校</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-3">サイトメニュー</h4>
+                    <ul class="space-y-2">
+                        <li><a href="features.html" class="hover:text-white transition">楽珠そろばん教室の特徴</a></li>
+                        <li><a href="courses.html" class="hover:text-white transition">コース・料金</a></li>
+                        <li><a href="access.html" class="hover:text-white transition">教室案内</a></li>
+                        <li><a href="faq.html" class="hover:text-white transition">よくある質問</a></li>
+                        <li><a href="trial.html" class="hover:text-white transition">無料体験を申し込む</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-6 text-xs text-center opacity-40">
+            &copy; 2025 楽珠そろばん教室 東京. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.getElementById('menuBtn').addEventListener('click', () => {
+        document.getElementById('spMenu').classList.toggle('hidden');
+    });
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

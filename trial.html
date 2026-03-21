@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>無料体験を申し込む｜楽珠そろばん教室 東京</title>
+    <meta name="description" content="楽珠そろばん教室 東京の無料体験申込ページ。LINEで簡単に予約できます。練馬区3教室。">
+    <link rel="icon" href="Pictures/favicon.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#4A96AE', secondary: '#F59E0B', accent: '#E0F2F7', base: '#F7FBFA' },
+                    fontFamily: { sans: ['"Noto Sans JP"', 'sans-serif'], display: ['"Zen Kaku Gothic New"', 'sans-serif'], number: ['"Inter"', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans JP', sans-serif; color: #374151; background-color: #fff; }
+        .text-display { font-family: 'Zen Kaku Gothic New', sans-serif; }
+        .section-label { font-family: 'Inter', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #4A96AE; font-weight: 700; }
+        .nav-link { position: relative; padding-bottom: 2px; }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #4A96AE; transition: width 0.2s; }
+        .nav-link:hover::after { width: 100%; }
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent); animation: shine 2.5s infinite; }
+        @keyframes shine { to { left: 150%; } }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 bg-white border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5">
+            <img src="Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain">
+            <div class="hidden sm:block border-l border-gray-200 pl-2.5">
+                <div class="text-xs text-gray-400 leading-none">東京・練馬</div>
+            </div>
+        </a>
+        <nav class="hidden md:flex items-center gap-7 text-sm text-gray-600 font-medium">
+            <a href="features.html" class="nav-link hover:text-primary transition">楽珠そろばん教室の特徴</a>
+            <a href="courses.html" class="nav-link hover:text-primary transition">コース・料金</a>
+            <a href="access.html" class="nav-link hover:text-primary transition">教室案内</a>
+            <a href="faq.html" class="nav-link hover:text-primary transition">よくある質問</a>
+        </nav>
+        <div class="flex items-center gap-3">
+            <a href="trial.html" class="hidden sm:inline-flex items-center gap-2 bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-full">
+                <i class="fa-brands fa-line"></i>無料体験を申し込む
+            </a>
+            <button id="menuBtn" class="md:hidden text-gray-600 text-xl w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </div>
+    <div id="spMenu" class="hidden md:hidden bg-white border-t border-gray-100">
+        <nav class="flex flex-col px-5 py-4 gap-4 text-sm font-medium text-gray-700">
+            <a href="features.html">楽珠そろばん教室の特徴</a>
+            <a href="courses.html">コース・料金</a>
+            <a href="access.html">教室案内</a>
+            <a href="faq.html">よくある質問</a>
+            <a href="trial.html" class="text-primary font-bold"><i class="fa-brands fa-line mr-1"></i>無料体験を申し込む</a>
+        </nav>
+    </div>
+</header>
+
+
+<!-- HERO -->
+<section class="bg-base border-b border-gray-100 py-14">
+    <div class="max-w-2xl mx-auto px-5 text-center">
+        <p class="section-label mb-3">Trial Lesson</p>
+        <h1 class="text-display text-3xl md:text-4xl font-black text-gray-800 mb-4">無料体験を申し込む</h1>
+        <p class="text-gray-600 text-sm leading-loose">
+            教室の雰囲気・先生との相性をその目でご確認ください。<br>
+            当日の入会強制は一切ありません。お気軽にどうぞ。
+        </p>
+    </div>
+</section>
+
+
+<!-- 体験の流れ -->
+<section class="py-16">
+    <div class="max-w-3xl mx-auto px-5">
+        <h2 class="text-display text-2xl font-black text-gray-800 mb-8 text-center">体験の流れ</h2>
+
+        <div class="relative">
+            <!-- 縦線 -->
+            <div class="absolute left-6 top-6 bottom-6 w-0.5 bg-primary/20 hidden md:block"></div>
+
+            <div class="space-y-6">
+
+                <div class="flex gap-5 items-start">
+                    <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-black text-lg shrink-0 relative z-10">1</div>
+                    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex-1">
+                        <h3 class="font-bold text-base mb-1">LINEを友だち追加</h3>
+                        <p class="text-sm text-gray-600">下のボタンから公式LINEを友だち追加します。</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-5 items-start">
+                    <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-black text-lg shrink-0 relative z-10">2</div>
+                    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex-1">
+                        <h3 class="font-bold text-base mb-1">希望の教室・日時を送る</h3>
+                        <p class="text-sm text-gray-600">「体験希望」とメッセージし、希望の教室（早宮・氷川台・中村）と都合の良い日時をお知らせください。</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-5 items-start">
+                    <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-black text-lg shrink-0 relative z-10">3</div>
+                    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex-1">
+                        <h3 class="font-bold text-base mb-1">日時が確定したら来校</h3>
+                        <p class="text-sm text-gray-600">持ち物は不要です。手ぶらでお越しください。体験テキストはそのままお土産に。</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-5 items-start">
+                    <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-black text-lg shrink-0 relative z-10">4</div>
+                    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex-1">
+                        <h3 class="font-bold text-base mb-1">体験授業（約60分）</h3>
+                        <p class="text-sm text-gray-600">そろばんの基本から実際に体験。授業後にご希望があれば入会のご説明をします（任意）。</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- LINE ボタン -->
+<section class="py-12 bg-green-50 border-y border-green-100">
+    <div class="max-w-xl mx-auto px-5 text-center">
+        <p class="text-gray-600 text-sm mb-6">公式LINEを友だち追加してメッセージを送るだけで予約完了です。</p>
+        <a href="https://lin.ee/sFR6X8y" target="_blank" rel="noopener"
+           class="btn-shine inline-flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-black px-10 py-5 rounded-2xl text-xl transition shadow-xl w-full sm:w-auto">
+            <i class="fa-brands fa-line text-2xl"></i>LINEで無料体験を申し込む
+        </a>
+        <p class="text-xs text-gray-400 mt-4">友だち追加後、「体験希望」とメッセージしてください</p>
+    </div>
+</section>
+
+
+<!-- よくある不安 -->
+<section class="py-16">
+    <div class="max-w-3xl mx-auto px-5">
+        <h2 class="text-display text-2xl font-black text-gray-800 mb-6 text-center">体験前によくある不安</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+
+            <div class="bg-base rounded-2xl p-5 border border-gray-100">
+                <p class="font-bold text-sm text-gray-800 mb-2">「体験後に無理に勧誘されないか不安…」</p>
+                <p class="text-sm text-gray-600 leading-relaxed">当教室では勧誘は一切しておりません。体験当日はお子さまの様子を見ていただくだけでOKです。</p>
+            </div>
+
+            <div class="bg-base rounded-2xl p-5 border border-gray-100">
+                <p class="font-bold text-sm text-gray-800 mb-2">「子どもが落ち着いて座っていられるか…」</p>
+                <p class="text-sm text-gray-600 leading-relaxed">少人数制で先生がそばで見ているので安心です。スモールステップで進めるため、初めてのお子さまも楽しく取り組めます。</p>
+            </div>
+
+            <div class="bg-base rounded-2xl p-5 border border-gray-100">
+                <p class="font-bold text-sm text-gray-800 mb-2">「どの教室を選べばいいかわからない…」</p>
+                <p class="text-sm text-gray-600 leading-relaxed">LINEでお住まいのエリアをお知らせください。3教室（早宮・氷川台・中村）の中から最適な教室をご案内します。</p>
+            </div>
+
+            <div class="bg-base rounded-2xl p-5 border border-gray-100">
+                <p class="font-bold text-sm text-gray-800 mb-2">「通い続けられるか心配…」</p>
+                <p class="text-sm text-gray-600 leading-relaxed">週1回から始められ、振替制度もあります。他の習い事と両立しているご家庭がほとんどです。</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="bg-gray-800 text-gray-400 py-12">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="flex flex-col md:flex-row justify-between gap-10 mb-10">
+            <div class="max-w-xs">
+                <img src="Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain mb-4 opacity-90">
+                <p class="text-sm leading-relaxed">東京・練馬区を中心に展開するそろばん教室です。</p>
+                <p class="text-xs mt-2 opacity-60">楽珠そろばん（FC加盟校）</p>
+            </div>
+            <div class="flex flex-wrap gap-10 text-sm">
+                <div>
+                    <h4 class="text-white font-bold mb-3">教室一覧</h4>
+                    <ul class="space-y-2">
+                        <li><a href="access.html#hayamiya" class="hover:text-white transition">早宮校</a></li>
+                        <li><a href="access.html#hikawadai" class="hover:text-white transition">氷川台校</a></li>
+                        <li><a href="access.html#nakamura" class="hover:text-white transition">中村校</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-3">サイトメニュー</h4>
+                    <ul class="space-y-2">
+                        <li><a href="features.html" class="hover:text-white transition">楽珠そろばん教室の特徴</a></li>
+                        <li><a href="courses.html" class="hover:text-white transition">コース・料金</a></li>
+                        <li><a href="access.html" class="hover:text-white transition">教室案内</a></li>
+                        <li><a href="faq.html" class="hover:text-white transition">よくある質問</a></li>
+                        <li><a href="trial.html" class="hover:text-white transition">無料体験を申し込む</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-6 text-xs text-center opacity-40">
+            &copy; 2025 楽珠そろばん教室 東京. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.getElementById('menuBtn').addEventListener('click', () => {
+        document.getElementById('spMenu').classList.toggle('hidden');
+    });
+</script>
+</body>
+</html>

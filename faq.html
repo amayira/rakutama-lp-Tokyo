@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>よくある質問｜楽珠そろばん教室 東京</title>
+    <meta name="description" content="楽珠そろばん教室 東京のよくある質問。体験・入会・料金・振替などについてお答えします。">
+    <link rel="icon" href="Pictures/favicon.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#4A96AE', secondary: '#F59E0B', accent: '#E0F2F7', base: '#F7FBFA' },
+                    fontFamily: { sans: ['"Noto Sans JP"', 'sans-serif'], display: ['"Zen Kaku Gothic New"', 'sans-serif'], number: ['"Inter"', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans JP', sans-serif; color: #374151; background-color: #fff; }
+        .text-display { font-family: 'Zen Kaku Gothic New', sans-serif; }
+        .section-label { font-family: 'Inter', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #4A96AE; font-weight: 700; }
+        .nav-link { position: relative; padding-bottom: 2px; }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #4A96AE; transition: width 0.2s; }
+        .nav-link:hover::after { width: 100%; }
+        .accordion-btn { color: #1F2937; }
+        .accordion-content { transition: max-height 0.3s ease-out, opacity 0.3s ease-out; max-height: 0; opacity: 0; overflow: hidden; }
+        .accordion-content.active { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 bg-white border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5">
+            <img src="Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain">
+            <div class="hidden sm:block border-l border-gray-200 pl-2.5">
+                <div class="text-xs text-gray-400 leading-none">東京・練馬</div>
+            </div>
+        </a>
+        <nav class="hidden md:flex items-center gap-7 text-sm text-gray-600 font-medium">
+            <a href="features.html" class="nav-link hover:text-primary transition">楽珠そろばん教室の特徴</a>
+            <a href="courses.html" class="nav-link hover:text-primary transition">コース・料金</a>
+            <a href="access.html" class="nav-link hover:text-primary transition">教室案内</a>
+            <a href="faq.html" class="nav-link text-primary font-bold">よくある質問</a>
+        </nav>
+        <div class="flex items-center gap-3">
+            <a href="trial.html" class="hidden sm:inline-flex items-center gap-2 border border-primary text-primary hover:bg-primary hover:text-white text-sm font-bold px-4 py-2 rounded-full transition">
+                <i class="fa-brands fa-line"></i>無料体験を申し込む
+            </a>
+            <button id="menuBtn" class="md:hidden text-gray-600 text-xl w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </div>
+    <div id="spMenu" class="hidden md:hidden bg-white border-t border-gray-100">
+        <nav class="flex flex-col px-5 py-4 gap-4 text-sm font-medium text-gray-700">
+            <a href="features.html">楽珠そろばん教室の特徴</a>
+            <a href="courses.html">コース・料金</a>
+            <a href="access.html">教室案内</a>
+            <a href="faq.html">よくある質問</a>
+            <a href="trial.html" class="text-primary font-bold"><i class="fa-brands fa-line mr-1"></i>無料体験を申し込む</a>
+        </nav>
+    </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="bg-base border-b border-gray-100 py-12">
+    <div class="max-w-6xl mx-auto px-5">
+        <p class="section-label mb-2">FAQ</p>
+        <h1 class="text-display text-3xl md:text-4xl font-black text-gray-800">よくある質問</h1>
+    </div>
+</section>
+
+
+<!-- FAQ本文 -->
+<section class="py-16">
+    <div class="max-w-3xl mx-auto px-5">
+
+        <!-- カテゴリ：体験・入会 -->
+        <h2 class="text-display text-xl font-black text-gray-700 mb-4 flex items-center gap-2">
+            <span class="w-1 h-6 bg-primary rounded-full inline-block"></span>体験・入会について
+        </h2>
+        <div class="space-y-2 mb-10">
+
+            <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <button class="accordion-btn w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-gray-50 transition">
+                    <span class="font-bold text-sm md:text-base text-gray-800">体験後、必ず入会しないといけませんか？</span>
+                    <i class="fa-solid fa-chevron-down text-primary text-sm transition-transform shrink-0 ml-3"></i>
+                </button>
+                <div class="accordion-content bg-gray-50 px-5 text-sm text-gray-600 leading-relaxed">
+                    <div class="py-4">いいえ。体験後に入会を強制することは一切ありません。教室の雰囲気やお子さまの反応を確認していただいた上で、ご家族でゆっくりご検討ください。</div>
+                </div>
+            </div>
+
+            <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <button class="accordion-btn w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-gray-50 transition">
+                    <span class="font-bold text-sm md:text-base text-gray-800">体験当日の持ち物は何ですか？</span>
+                    <i class="fa-solid fa-chevron-down text-primary text-sm transition-transform shrink-0 ml-3"></i>
+                </button>
+                <div class="accordion-content bg-gray-50 px-5 text-sm text-gray-600 leading-relaxed">
+                    <div class="py-4">手ぶらでお越しください。そろばん・テキストはすべて教室で用意しています。体験テキストはそのままお持ち帰りいただけます。</div>
+                </div>
+            </div>
+
+            <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <button class="accordion-btn w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-gray-50 transition">
+                    <span class="font-bold text-sm md:text-base text-gray-800">何歳から通えますか？</span>
+                    <i class="fa-solid fa-chevron-down text-primary text-sm transition-transform shrink-0 ml-3"></i>
+                </button>
+                <div class="accordion-content bg-gray-50 px-5 text-sm text-gray-600 leading-relaxed">
+                    <div class="py-4">年中（4歳）〜小学生を対象としています。数字に慣れ始めた頃が始め時です。まずは無料体験でお子さまの様子をご確認ください。</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- カテゴリ：授業・通塾 -->
+        <h2 class="text-display text-xl font-black text-gray-700 mb-4 flex items-center gap-2">
+            <span class="w-1 h-6 bg-primary rounded-full inline-block"></span>授業・通塾について
+        </h2>
+        <div class="space-y-2 mb-10">
+
+            <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <button class="accordion-btn w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-gray-50 transition">
+                    <span class="font-bold text-sm md:text-base text-gray-800">そろばんと計算ドリルの違いは何ですか？</span>
+                    <i class="fa-solid fa-chevron-down text-primary text-sm transition-transform shrink-0 ml-3"></i>
+                </button>
+                <div class="accordion-content bg-gray-50 px-5 text-sm text-gray-600 leading-relaxed">
+                    <div class="py-4">最大の違いは「右脳」を使う点です。そろばんは頭の中に珠をイメージして瞬時に答えを出すため、論理的に筆算するドリルとは全く異なる圧倒的なスピードと直感力が身につきます。集中力のトレーニング効果も大きな特徴です。</div>
+                </div>
+            </div>
+
+            <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <button class="accordion-btn w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-gray-50 transition">
+                    <span class="font-bold text-sm md:text-base text-gray-800">振替はできますか？</span>
+                    <i class="fa-solid fa-chevron-down text-primary text-sm transition-transform shrink-0 ml-3"></i>
+                </button>
+                <div class="accordion-content bg-gray-50 px-5 text-sm text-gray-600 leading-relaxed">
+                    <div class="py-4">はい、振替制度があります。学校行事や他の習い事で休んでも安心です。振替の連絡はLINE公式アカウントで24時間受け付けています。</div>
+                </div>
+            </div>
+
+            <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <button class="accordion-btn w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-gray-50 transition">
+                    <span class="font-bold text-sm md:text-base text-gray-800">他の習い事と両立できますか？</span>
+                    <i class="fa-solid fa-chevron-down text-primary text-sm transition-transform shrink-0 ml-3"></i>
+                </button>
+                <div class="accordion-content bg-gray-50 px-5 text-sm text-gray-600 leading-relaxed">
+                    <div class="py-4">はい。週1回コースから選べる上に振替制度もあるため、他の習い事や学校行事と無理なく両立しているお子さまが多くいます。</div>
+                </div>
+            </div>
+
+            <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <button class="accordion-btn w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-gray-50 transition">
+                    <span class="font-bold text-sm md:text-base text-gray-800">どの教室に通えばよいですか？</span>
+                    <i class="fa-solid fa-chevron-down text-primary text-sm transition-transform shrink-0 ml-3"></i>
+                </button>
+                <div class="accordion-content bg-gray-50 px-5 text-sm text-gray-600 leading-relaxed">
+                    <div class="py-4">早宮校・氷川台校・中村校の3校がございます。お住まいや通学路に合わせてお選びください。迷われる場合はLINEでご相談いただければ、最適な校舎をご案内します。</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- カテゴリ：料金 -->
+        <h2 class="text-display text-xl font-black text-gray-700 mb-4 flex items-center gap-2">
+            <span class="w-1 h-6 bg-primary rounded-full inline-block"></span>料金について
+        </h2>
+        <div class="space-y-2 mb-10">
+
+            <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <button class="accordion-btn w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-gray-50 transition">
+                    <span class="font-bold text-sm md:text-base text-gray-800">月謝以外にかかる費用はありますか？</span>
+                    <i class="fa-solid fa-chevron-down text-primary text-sm transition-transform shrink-0 ml-3"></i>
+                </button>
+                <div class="accordion-content bg-gray-50 px-5 text-sm text-gray-600 leading-relaxed">
+                    <div class="py-4">
+                        月額は授業料＋事務教材費550円（税込）のみです。<br>
+                        入会時はデータ登録料1,100円・初期教材費3,300円がかかります。<br>
+                        入会金は開校キャンペーン中につき0円（通常5,500円）です。
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <button class="accordion-btn w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-gray-50 transition">
+                    <span class="font-bold text-sm md:text-base text-gray-800">支払い方法を教えてください。</span>
+                    <i class="fa-solid fa-chevron-down text-primary text-sm transition-transform shrink-0 ml-3"></i>
+                </button>
+                <div class="accordion-content bg-gray-50 px-5 text-sm text-gray-600 leading-relaxed">
+                    <div class="py-4">完全キャッシュレス対応です。口座振替またはカード決済にてお支払いいただけます。現金のお取り扱いはありません。</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 解決しない場合 -->
+        <div class="bg-base rounded-2xl p-6 border border-gray-100 text-center">
+            <p class="text-gray-600 text-sm mb-4">上記以外のご質問はLINEからお気軽にどうぞ。</p>
+            <a href="trial.html" class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full text-sm transition">
+                <i class="fa-brands fa-line text-base"></i>LINEで問い合わせる
+            </a>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="bg-gray-800 text-gray-400 py-12">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="flex flex-col md:flex-row justify-between gap-10 mb-10">
+            <div class="max-w-xs">
+                <img src="Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain mb-4 opacity-90">
+                <p class="text-sm leading-relaxed">東京・練馬区を中心に展開するそろばん教室です。</p>
+                <p class="text-xs mt-2 opacity-60">楽珠そろばん（FC加盟校）</p>
+            </div>
+            <div class="flex flex-wrap gap-10 text-sm">
+                <div>
+                    <h4 class="text-white font-bold mb-3">教室一覧</h4>
+                    <ul class="space-y-2">
+                        <li><a href="access.html#hayamiya" class="hover:text-white transition">早宮校</a></li>
+                        <li><a href="access.html#hikawadai" class="hover:text-white transition">氷川台校</a></li>
+                        <li><a href="access.html#nakamura" class="hover:text-white transition">中村校</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-3">サイトメニュー</h4>
+                    <ul class="space-y-2">
+                        <li><a href="features.html" class="hover:text-white transition">楽珠そろばん教室の特徴</a></li>
+                        <li><a href="courses.html" class="hover:text-white transition">コース・料金</a></li>
+                        <li><a href="access.html" class="hover:text-white transition">教室案内</a></li>
+                        <li><a href="faq.html" class="hover:text-white transition">よくある質問</a></li>
+                        <li><a href="trial.html" class="hover:text-white transition">無料体験を申し込む</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-6 text-xs text-center opacity-40">
+            &copy; 2025 楽珠そろばん教室 東京. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.getElementById('menuBtn').addEventListener('click', () => {
+        document.getElementById('spMenu').classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('.accordion-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('i');
+            const isOpen = content.classList.contains('active');
+            document.querySelectorAll('.accordion-content').forEach(c => { c.classList.remove('active'); c.style.maxHeight = '0'; });
+            document.querySelectorAll('.accordion-btn i').forEach(i => { i.style.transform = 'rotate(0deg)'; });
+            if (!isOpen) { content.classList.add('active'); content.style.maxHeight = content.scrollHeight + 'px'; icon.style.transform = 'rotate(180deg)'; }
+        });
+    });
+</script>
+</body>
+</html>
