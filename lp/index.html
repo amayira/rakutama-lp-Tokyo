@@ -10,579 +10,763 @@
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>楽珠そろばん教室｜練馬エリアの無料体験会受付中</title>
-    <meta name="description" content="練馬区で展開中の「楽珠そろばん教室」。年中〜小学生対象、週1回から通える少人数制。自律学習で計算力と集中力を育みます。無料体験会実施中。">
-    
-    <!-- ファビコン設定 -->
+    <title>楽珠そろばん教室｜練馬3校 新規オープン 先行登録受付中</title>
+    <meta name="description" content="【4月末まで限定】楽珠そろばん教室が練馬区に3校同時オープン！LINE先行登録で入会金0円＋初月月謝0円のダブル特典。早宮校・氷川台校・中村校。年中〜小学生対象。">
     <link rel="icon" href="../Pictures/favicon.jpeg">
-    
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS (Design Framework) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Zen+Kaku+Gothic+New:wght@700;900&family=Inter:wght@300;700;900&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome (Icons) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#4A96AE',   /* New Brand Color - 指定色 */
-                        secondary: '#F59E0B', /* Amber - 活気・CV */
-                        accent: '#E0F2F7',    /* Pale Blue - 安心（Primaryに合わせて調整） */
-                        base: '#F7FBFA',      /* Off-white Mint - 背景 */
-                        text: '#374151',      /* Dark Gray - 本文 */
+                        primary:  '#4A96AE',
+                        secondary:'#F59E0B',
+                        accent:   '#E0F2F7',
+                        base:     '#F7FBFA',
                     },
                     fontFamily: {
-                        sans: ['"Noto Sans JP"', 'sans-serif'],
+                        sans:    ['"Noto Sans JP"', 'sans-serif'],
                         display: ['"Zen Kaku Gothic New"', 'sans-serif'],
-                        number: ['"Inter"', 'sans-serif'],
+                        number:  ['"Inter"', 'sans-serif'],
                     },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(74, 150, 174, 0.15)', /* Primary色に合わせた影 */
-                    }
                 }
             }
         }
     </script>
 
     <style>
-        /* Custom Styles for smoothness and specifics */
-        html {
-            scroll-behavior: smooth;
-        }
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            color: #374151;
-            background-color: #F7FBFA;
-        }
-        .text-display {
-            font-family: 'Zen Kaku Gothic New', sans-serif;
-        }
-        .text-number {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        /* Hero Gradient & New Image */
-        .hero-bg {
-            background-image: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5)), url('../Pictures/fv.jpg');
-            background-size: cover;
-            background-position: center;
-        }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans JP', sans-serif; color: #374151; background: #E0F2F7; overflow-x: hidden; }
 
-        /* Accordion Transition */
-        .accordion-content {
-            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
+        /* ── ボタン ── */
+        .btn-line {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #06C755;
+            color: #fff;
+            font-weight: 900;
+            border-radius: 9999px;
+            box-shadow: 0 6px 0 #0a8a3a;
+            transition: transform .1s, box-shadow .1s;
+            text-decoration: none;
         }
-        .accordion-content.active {
-            opacity: 1;
-        }
+        .btn-line:hover  { background: #05b34b; }
+        .btn-line:active { transform: translateY(3px); box-shadow: 0 3px 0 #0a8a3a; }
 
-        /* Shiny Button Effect */
-        .btn-shine {
+        /* ── FV ページカール風 ── */
+        .fv-page {
             position: relative;
-            overflow: hidden;
+            filter: drop-shadow(0 12px 35px rgba(0,0,0,0.14)) drop-shadow(0 3px 10px rgba(0,0,0,0.07));
         }
-        .btn-shine::after {
-            content: '';
+        .fv-page img {
+            width: 100%;
+            display: block;
+            border-radius: 6px;
+        }
+        .fv-fade {
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
-            transform: skewX(-25deg);
-            animation: shine 3s infinite;
+            top: 0; bottom: 0;
+            width: 15%;
+            z-index: 2;
+            pointer-events: none;
         }
-        @keyframes shine {
-            0% { left: -100%; }
-            20% { left: 200%; }
-            100% { left: 200%; }
+        .fv-fade-l {
+            left: 0;
+            background: linear-gradient(to right, rgba(255,255,255,.85) 0%, transparent 100%);
+            border-radius: 6px 0 0 6px;
+        }
+        .fv-fade-r {
+            right: 0;
+            background: linear-gradient(to left, rgba(255,255,255,.85) 0%, transparent 100%);
+            border-radius: 0 6px 6px 0;
+        }
+        .fv-overlay {
+            position: absolute;
+            top: clamp(14px, 5%, 36px);
+            left: clamp(14px, 6%, 48px);
+            z-index: 5;
+        }
+        .fv-script {
+            font-style: italic;
+            font-weight: 700;
+            font-size: clamp(.8rem, 2.2vw, 1.05rem);
+            color: #fff;
+            text-shadow: 0 1px 6px rgba(0,0,0,.45);
+            letter-spacing: .06em;
+            margin-bottom: .45rem;
+        }
+        .fv-script .spark { color: #F59E0B; font-style: normal; margin-right: 2px; }
+        .fv-strip {
+            display: table;
+            background: rgba(74,150,174,.9);
+            backdrop-filter: blur(2px);
+            color: #fff;
+            font-weight: 900;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            font-size: clamp(1.1rem, 4vw, 2rem);
+            padding: 5px 18px 6px 14px;
+            line-height: 1.3;
+            margin-bottom: .35rem;
+            letter-spacing: .03em;
         }
 
-        /* Mobile Sticky Footer Padding */
-        .has-sticky-footer {
-            padding-bottom: 80px;
+        /* ── アコーディオン ── */
+        .faq-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .3s ease, opacity .3s ease;
+            opacity: 0;
         }
+        .faq-body.open { opacity: 1; }
+
+        /* ── スパークル badge ── */
+        .badge-limit {
+            background: linear-gradient(135deg, #F59E0B, #ef8c00);
+            color: #fff;
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 9999px;
+            padding: 6px 18px;
+            font-size: .75rem;
+            letter-spacing: .05em;
+        }
+
+        /* ── Step connector ── */
+        .step-line::after {
+            content: '';
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .step-line::after {
+                content: '';
+                display: block;
+                position: absolute;
+                top: 28px;
+                left: calc(50% + 36px);
+                width: calc(100% - 72px);
+                height: 2px;
+                background: rgba(255,255,255,0.4);
+            }
+        }
+
+        /* ── 数字カウンター ── */
+        .big-zero {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 3.5rem;
+            line-height: 1;
+            color: #4A96AE;
+        }
+
+        /* モバイル余白 */
+        .pb-safe { padding-bottom: 80px; }
     </style>
 </head>
-<body class="has-sticky-footer">
+<body class="pb-safe">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K7GZCTN"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+
+
+    <!-- ══════════════════════════════════════════
+         HEADER
+    ══════════════════════════════════════════ -->
+    <header class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <h1 class="flex items-center gap-2">
-                <!-- ロゴ画像に差し替え -->
+            <a href="../index.html" class="flex items-center gap-2">
                 <img src="../Pictures/title.png" alt="楽珠そろばん教室" class="h-8 md:h-10 w-auto object-contain">
-                <span class="text-xs text-gray-500 font-normal mt-1 hidden sm:inline-block">練馬エリア</span>
-            </h1>
-            <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
-                <a href="#features" class="hover:text-primary transition">特徴</a>
-                <a href="#flow" class="hover:text-primary transition">体験の流れ</a>
-                <a href="#faq" class="hover:text-primary transition">Q&A</a>
-                <a href="#classroom" class="hover:text-primary transition">教室一覧</a>
-            </nav>
-            <a href="https://lin.ee/ryT5Vyl" target="_blank" class="hidden md:flex bg-[#06C755] hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full transition shadow-md items-center gap-2">
-                <i class="fa-brands fa-line"></i> 無料体験を申し込む
+                <span class="hidden sm:block text-xs text-gray-400 font-bold">東京・練馬</span>
+            </a>
+            <a href="https://lin.ee/ryT5Vyl" target="_blank"
+               class="btn-line text-xs sm:text-sm px-4 py-2.5 whitespace-nowrap">
+                <i class="fa-brands fa-line text-base"></i>
+                LINEで先行登録
             </a>
         </div>
     </header>
 
-    <!-- FV (Hero) -->
-    <section class="hero-bg relative pt-12 pb-20 md:py-32 overflow-hidden">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 relative z-10 text-center">
 
-            <div class="flex flex-wrap justify-center gap-2 mb-6">
-                <div class="inline-block bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full border border-primary/20 shadow-sm">
-                    <span class="text-primary font-bold text-sm"><i class="fa-solid fa-location-dot mr-1"></i>練馬区に3教室展開中</span>
-                </div>
-            </div>
+    <!-- ══════════════════════════════════════════
+         1. ファーストビュー
+    ══════════════════════════════════════════ -->
+    <section class="pt-3 overflow-hidden bg-white">
 
-            <h2 class="text-3xl md:text-5xl font-bold text-gray-800 leading-tight text-display mb-6">
-                一生モノの<br>
-                <span class="text-primary">集中力</span>と<span class="text-primary">計算力</span>。<br>
-                そろばんで、考える力が育つ。
-            </h2>
-
-            <p class="text-lg text-gray-600 leading-relaxed font-bold mb-6">
-                「できた！」が増える、楽珠式
-            </p>
-
-            <!-- 対象年齢バッジ -->
-            <div class="flex justify-center mb-6">
-                <span class="bg-secondary/15 text-amber-700 px-4 py-1.5 rounded-full text-sm font-bold border border-secondary/40"><i class="fa-solid fa-child-reaching mr-1.5"></i>年中(4歳)〜小学生対象・週1回から</span>
-            </div>
-
-            <!-- Badges -->
-            <div class="flex flex-wrap justify-center gap-3 mb-8">
-                <span class="bg-white/80 text-primary px-3 py-1 rounded-md text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>通い始めて3ヶ月で変化が出る</span>
-                <span class="bg-white/80 text-primary px-3 py-1 rounded-md text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>他の習い事と両立できる</span>
-                <span class="bg-white/80 text-primary px-3 py-1 rounded-md text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>検定で自信がつく</span>
-            </div>
-
-            <!-- CTA -->
-            <a href="https://lin.ee/ryT5Vyl" target="_blank" class="btn-shine bg-[#06C755] hover:bg-green-600 text-white text-lg md:text-xl font-bold py-4 px-8 rounded-full shadow-lg transition transform hover:-translate-y-1 inline-block text-center">
-                <i class="fa-brands fa-line mr-2 text-xl"></i>LINEで無料体験を申し込む
-                <span class="block text-xs font-normal mt-1 opacity-90">手ぶらでOK・無理な勧誘はありません</span>
-            </a>
-        </div>
-    </section>
-
-    <!-- 実績・規模感バナー（信頼の根拠） -->
-    <section class="py-6 bg-white border-b border-gray-100">
-        <div class="max-w-4xl mx-auto px-4 text-center">
-            <p class="text-primary font-bold text-xs md:text-sm tracking-wide flex flex-wrap justify-center items-center gap-x-2">
-                <span class="whitespace-nowrap">練馬区3教室</span>
-                <span class="text-gray-300">｜</span>
-                <span class="whitespace-nowrap font-extrabold text-secondary">全国31教室展開中</span>
-            </p>
-        </div>
-    </section>
-
-    <!-- Empathy (Pain Points) -->
-    <section class="py-16 bg-white">
-        <div class="max-w-4xl mx-auto px-4">
-            <div class="text-center mb-10">
-                <span class="text-primary font-bold tracking-widest text-sm uppercase">CHECK LIST</span>
-                <h3 class="text-2xl md:text-3xl font-bold mt-2 text-display">そろばん、こんなお悩みありませんか？</h3>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-4">
-                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex items-center gap-3">
-                    <div class="bg-orange-100 text-orange-400 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <h4 class="font-bold text-gray-800 leading-snug">小学校の算数についていけるか不安</h4>
-                </div>
-                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex items-center gap-3">
-                    <div class="bg-orange-100 text-orange-400 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <h4 class="font-bold text-gray-800 leading-snug">指を使って計算している</h4>
-                </div>
-                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex items-center gap-3">
-                    <div class="bg-orange-100 text-orange-400 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <h4 class="font-bold text-gray-800 leading-snug">計算に時間がかかっている・スピードが遅い</h4>
-                </div>
-                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex items-center gap-3">
-                    <div class="bg-orange-100 text-orange-400 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <h4 class="font-bold text-gray-800 leading-snug">集中が続かない・学習習慣がまだない</h4>
-                </div>
-            </div>
-
-            <div class="mt-8 text-center bg-accent/50 p-6 rounded-3xl">
-                <p class="text-base md:text-lg font-bold text-primary leading-relaxed">
-                    そのお悩み、楽珠で解決できます。<br>
-                    <span class="text-sm font-normal text-gray-600 mt-1 block">まずは無料体験会で、お子さまの反応を見てみてください。</span>
+            <!-- グリッド上キャプション -->
+            <div class="text-center mb-3 py-2 px-4">
+                <p class="font-bold text-gray-700 leading-snug">
+                    <span class="block text-sm md:text-base" style="color:#374151;">全国に30教室以上、約700名が通う楽珠が、</span>
+                    <span class="block text-xl md:text-2xl text-primary">東京・練馬に3校同時オープン！</span>
                 </p>
             </div>
+
+            <!-- 写真（2×2タイル）+ 中央サークルバッジ -->
+            <div class="mb-7 md:mb-9 relative">
+                <!-- グリッド -->
+                <div style="overflow:hidden; box-shadow:0 12px 35px rgba(0,0,0,0.14);">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+                        <div style="aspect-ratio:4/3; overflow:hidden;">
+                            <img src="../Pictures/fv.jpg" alt="授業風景" style="width:100%;height:100%;object-fit:cover;display:block;">
+                        </div>
+                        <div style="aspect-ratio:4/3; overflow:hidden; position:relative;">
+                            <img src="../Pictures/hayamiya_outside.jpg" alt="早宮校" style="width:100%;height:100%;object-fit:cover;display:block;">
+                            <span style="position:absolute;bottom:8px;right:8px;background:rgba(249,115,22,0.9);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;backdrop-filter:blur(4px);letter-spacing:.05em;">早宮校</span>
+                        </div>
+                        <div style="aspect-ratio:4/3; overflow:hidden; position:relative;">
+                            <img src="../Pictures/hikawadai_outside.jpg" alt="氷川台校" style="width:100%;height:100%;object-fit:cover;display:block;">
+                            <span style="position:absolute;bottom:8px;left:8px;background:rgba(249,115,22,0.9);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;backdrop-filter:blur(4px);letter-spacing:.05em;">氷川台校</span>
+                        </div>
+                        <div style="aspect-ratio:4/3; overflow:hidden; position:relative;">
+                            <img src="../Pictures/nakamura_outside.jpg" alt="中村校" style="width:100%;height:100%;object-fit:cover;display:block;">
+                            <span style="position:absolute;bottom:8px;right:8px;background:rgba(249,115,22,0.9);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;backdrop-filter:blur(4px);letter-spacing:.05em;">中村校</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- サークルバッジ（中央絶対配置） -->
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:58%; max-width:320px; min-width:160px; z-index:10; pointer-events:none;">
+                    <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;" overflow="visible">
+                        <defs>
+                            <filter id="cs" x="-30%" y="-30%" width="160%" height="160%">
+                                <feDropShadow dx="0" dy="4" stdDeviation="12" flood-opacity="0.45"/>
+                            </filter>
+                            <clipPath id="circleClip">
+                                <circle cx="150" cy="150" r="138"/>
+                            </clipPath>
+                        </defs>
+
+                        <!-- 背景円（シャドウ用） -->
+                        <circle cx="150" cy="150" r="138" fill="#4A96AE" filter="url(#cs)"/>
+                        <!-- テキスト用円（クリップなし） -->
+                        <circle cx="150" cy="150" r="138" fill="#4A96AE"/>
+
+                        <!-- 上ラベル：楽珠そろばん教室 -->
+                        <text x="150" y="68" text-anchor="middle"
+                              fill="rgba(255,255,255,0.9)"
+                              font-size="17" font-family="'Zen Kaku Gothic New','Noto Sans JP',sans-serif"
+                              font-weight="700" letter-spacing="3">楽珠そろばん教室</text>
+
+                        <!-- セパレーター -->
+                        <line x1="110" y1="80" x2="190" y2="80"
+                              stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+
+                        <!-- "new" Dancing Script -->
+                        <text x="150" y="122" text-anchor="middle"
+                              fill="rgba(255,255,255,0.95)"
+                              font-size="44" font-family="'Dancing Script',cursive"
+                              font-weight="700">new</text>
+
+                        <!-- "Open!" Dancing Script 最大化 -->
+                        <text x="150" y="178" text-anchor="middle"
+                              fill="white"
+                              font-size="96" font-family="'Dancing Script',cursive"
+                              font-weight="700">Open!</text>
+
+                        <!-- セパレーター -->
+                        <line x1="90" y1="212" x2="210" y2="212"
+                              stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+
+                        <!-- "2026年" + "6" + "月予定" — 横並び、ベースライン揃え -->
+                        <text x="104" y="247" text-anchor="middle"
+                              dominant-baseline="central"
+                              fill="rgba(255,255,255,0.85)"
+                              font-size="11" font-family="'Zen Kaku Gothic New','Noto Sans JP',sans-serif"
+                              font-weight="300" letter-spacing="1">2026年</text>
+
+                        <!-- 大きな "6"（中央揃え） -->
+                        <text x="143" y="247" text-anchor="middle"
+                              dominant-baseline="central"
+                              fill="white"
+                              font-size="46" font-family="'Inter',sans-serif"
+                              font-weight="300">6</text>
+
+                        <!-- "月予定"（中央揃え） -->
+                        <text x="165" y="247" text-anchor="start"
+                              dominant-baseline="central"
+                              fill="rgba(255,255,255,0.9)"
+                              font-size="16" font-family="'Zen Kaku Gothic New','Noto Sans JP',sans-serif"
+                              font-weight="300" letter-spacing="1">月予定</text>
+                    </svg>
+                </div>
+            </div>
+
+    </section>
+
+
+
+    <!-- ══════════════════════════════════════════
+         2. キャンペーン概要・特典
+    ══════════════════════════════════════════ -->
+    <section class="pt-16 md:pt-20 pb-4 md:pb-6">
+        <div class="max-w-3xl mx-auto px-4">
+
+            <div class="text-center mb-10">
+                <span class="inline-block bg-white text-primary text-xs font-bold px-4 py-1.5 rounded-full border border-primary/30 mb-3">
+                    キャンペーン詳細
+                </span>
+                <h2 class="font-display text-2xl md:text-3xl font-black text-gray-800 leading-snug">
+                    お得な<span class="text-primary">先行登録キャンペーン</span>実施中！
+                </h2>
+            </div>
+
+            <!-- 特典3枚 -->
+            <div class="grid md:grid-cols-3 gap-5 mb-8">
+
+                <!-- 特典① -->
+                <div class="relative bg-white rounded-3xl border-2 border-primary/20 p-7 text-center">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-black px-4 py-1.5 rounded-full shadow">
+                        特典①
+                    </div>
+                    <i class="fa-solid fa-star text-4xl text-primary mt-3 mb-4 block"></i>
+                    <h3 class="font-display font-black text-xl text-gray-800 mb-3 leading-snug">
+                        体験会への<br><span class="text-primary">先行招待</span>
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        少人数制のため、各回定員は<strong>5名</strong>。枠がすぐ埋まる可能性があります。先行登録の方から優先的に日程をご案内します。
+                    </p>
+                    <p class="text-xs font-bold text-primary mt-3">体験会：5月中旬〜下旬予定</p>
+                    <p class="text-xs text-gray-400 mt-1">※一般受付より先に日程をご案内</p>
+                </div>
+
+                <!-- 特典② -->
+                <div class="relative bg-gradient-to-br from-amber-50 to-yellow-50 rounded-3xl border-2 border-secondary/40 p-7 text-center">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-white text-xs font-black px-4 py-1.5 rounded-full shadow">
+                        特典②
+                    </div>
+                    <i class="fa-solid fa-gift text-4xl text-secondary mt-3 mb-4 block"></i>
+                    <h3 class="font-display font-black text-xl text-gray-800 mb-3 leading-snug">
+                        初月月謝が<br><span class="text-secondary">「無料」</span>に！
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        4月末までに先行登録を行い、体験会当日にご入会いただいた方限定の特別特典です。
+                    </p>
+                    <p class="text-xs text-gray-400 mt-4">※入会の強制は一切ありません</p>
+                </div>
+
+                <!-- 特典③ -->
+                <div class="relative bg-white rounded-3xl border-2 border-gray-200 p-7 text-center">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gray-500 text-white text-xs font-black px-4 py-1.5 rounded-full shadow">
+                        特典③
+                    </div>
+                    <i class="fa-solid fa-tag text-4xl text-gray-400 mt-3 mb-4 block"></i>
+                    <h3 class="font-display font-black text-xl text-gray-800 mb-3 leading-snug">
+                        入会金が<br><span class="text-gray-600">「無料」</span>に！
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        開校キャンペーンにより、通常5,500円の入会金が0円になります。
+                    </p>
+                    <p class="text-xs text-gray-400 mt-4">※期間限定で全員に適用されます</p>
+                </div>
+            </div>
+
+            <!-- 3大特典まとめ -->
+            <div class="bg-gray-800 text-white rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4">
+                <i class="fa-solid fa-circle-plus text-secondary text-3xl shrink-0"></i>
+                <div>
+                    <p class="text-xs text-gray-400 mb-1">3大特典をすべて適用すると…</p>
+                    <p class="font-display font-black text-lg leading-snug">
+                        入会金<span class="text-secondary text-2xl"> 0円</span>
+                        <span class="text-gray-500 text-sm mx-2">＋</span>
+                        初月月謝<span class="text-secondary text-2xl"> 0円</span>
+                        <span class="text-sm font-normal text-gray-400 ml-1">でスタートできる！</span>
+                        <span class="block text-secondary text-xl font-black mt-2">13,200円お得！<span class="text-gray-400 text-sm font-normal ml-1">※週2回コースの場合</span></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- 締め切り -->
+            <div class="mt-5 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
+                <i class="fa-solid fa-calendar-xmark text-red-400 text-xl shrink-0"></i>
+                <p class="text-sm font-bold text-red-700">
+                    受付期限：<span class="text-base text-red-700">2026年4月30日(木) 23:59 まで</span>
+                </p>
+            </div>
+            <div class="mt-3 bg-secondary/10 border border-secondary/30 rounded-2xl p-4 flex items-center gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-secondary text-xl shrink-0"></i>
+                <p class="text-sm font-bold text-secondary">
+                    定員に達し次第、先行案内は締め切ります。お早めにご登録ください。
+                </p>
+            </div>
+
         </div>
     </section>
 
-    <!-- Features (merged) -->
-    <section id="features" class="py-20 bg-base">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6">
-            <div class="text-center mb-12">
-                <span class="text-secondary font-bold tracking-widest text-sm uppercase">FEATURES</span>
-                <h3 class="text-3xl font-bold mt-2 text-display">楽珠式が選ばれる理由</h3>
-                <p class="text-gray-600 mt-3 max-w-2xl mx-auto">「やり抜く力」「集中力」「自分で考える力」—— そろばんを通じて、お子さまの可能性を伸ばします。</p>
-            </div>
 
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- 1: 個別指導 -->
-                <div class="bg-white p-6 rounded-2xl shadow-soft hover:shadow-lg transition flex gap-5">
-                    <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-primary text-xl border-2 border-primary flex-shrink-0">
-                        <i class="fa-solid fa-user-check"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold mb-2">個別指導で、ひとりひとりに合わせて</h4>
-                        <p class="text-sm text-gray-600 leading-relaxed">一斉授業ではなく、その子の理解に合わせて進みます。初めてのお子さまも、得意なお子さまも安心して通えます。</p>
-                    </div>
-                </div>
-
-                <!-- 2: 検定 -->
-                <div class="bg-white p-6 rounded-2xl shadow-soft hover:shadow-lg transition flex gap-5">
-                    <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-primary text-xl border-2 border-primary flex-shrink-0">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold mb-2">3つの検定で「できた！」を積み上げる</h4>
-                        <p class="text-sm text-gray-600 leading-relaxed">日珠連・日計連・フラッシュ暗算の3検定に年6回挑戦。合格の積み重ねが「やり抜く力」と自信を育てます。</p>
-                    </div>
-                </div>
-
-                <!-- 3: 振替・通いやすさ -->
-                <div class="bg-white p-6 rounded-2xl shadow-soft hover:shadow-lg transition flex gap-5">
-                    <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-primary text-xl border-2 border-primary flex-shrink-0">
-                        <i class="fa-solid fa-calendar-check"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold mb-2">週1回から・振替OKで続けやすい</h4>
-                        <p class="text-sm text-gray-600 leading-relaxed">急な体調不良や行事でも振替できます。他の習い事と両立しやすく、忙しいご家庭でも無理なく続けられます。</p>
-                    </div>
-                </div>
-
-                <!-- 4: 特別授業・大会 -->
-                <div class="bg-white p-6 rounded-2xl shadow-soft hover:shadow-lg transition flex gap-5">
-                    <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-primary text-xl border-2 border-primary flex-shrink-0">
-                        <i class="fa-solid fa-medal"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold mb-2">無料特別授業・大会で力が伸びる場</h4>
-                        <p class="text-sm text-gray-600 leading-relaxed">朝練・暗算道場・らくたまカップなど、追加費用なしで参加できる特別授業や大会が充実しています。</p>
-                    </div>
-                </div>
-
-                <!-- 5: 動画・教材 -->
-                <div class="bg-white p-6 rounded-2xl shadow-soft hover:shadow-lg transition flex gap-5">
-                    <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-primary text-xl border-2 border-primary flex-shrink-0">
-                        <i class="fa-solid fa-video"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold mb-2">指導動画で、おうち学習もサポート</h4>
-                        <p class="text-sm text-gray-600 leading-relaxed">授業に合わせた解説動画と800ページ以上の問題データで、自宅でも自然に学習習慣がつきます。</p>
-                    </div>
-                </div>
-
-                <!-- 6: LINE・キャッシュレス -->
-                <div class="bg-white p-6 rounded-2xl shadow-soft hover:shadow-lg transition flex gap-5">
-                    <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-primary text-xl border-2 border-primary flex-shrink-0">
-                        <i class="fa-solid fa-mobile-screen"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold mb-2">LINE公式で連絡もスムーズ</h4>
-                        <p class="text-sm text-gray-600 leading-relaxed">欠席・振替連絡はLINEで24時間受付。完全キャッシュレス対応で、保護者の手間を最小限に抑えています。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Why Now -->
-    <section class="py-20 bg-white">
+    <!-- ══════════════════════════════════════════
+         3. 教室案内
+    ══════════════════════════════════════════ -->
+    <section class="py-16 md:py-20">
         <div class="max-w-5xl mx-auto px-4">
-            <h3 class="text-2xl md:text-3xl font-bold text-center mb-4 text-display">なぜ「今」がチャンスなのか</h3>
-            <p class="text-center text-primary font-bold text-lg mb-12">― 年中〜小2は、特に差がつきやすい時期 ―</p>
 
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Card -->
-                <div class="text-center">
-                    <img src="../Pictures/School1.jpeg" alt="脳の成長" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md">
-                    <h4 class="font-bold text-lg text-primary mb-2">指先を動かすことが、脳の発達を加速する</h4>
-                    <p class="text-sm text-gray-600">デジタル時代だからこそ、アナログな指先トレーニングが有効。神経回路が発達するゴールデンエイジに最適です。</p>
+            <div class="text-center mb-10">
+                <span class="inline-block bg-white text-primary text-xs font-bold px-4 py-1.5 rounded-full border border-primary/30 mb-3">
+                    2026年6月 同時オープン
+                </span>
+                <h2 class="font-display text-2xl md:text-3xl font-black text-gray-800">
+                    練馬区3校 教室案内
+                </h2>
+                <p class="text-gray-500 text-sm mt-2">お住まいのエリアに合わせてお選びいただけます</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+
+                <!-- 早宮校 -->
+                <div class="rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow bg-white">
+                    <div class="grid grid-cols-2 gap-0.5 bg-gray-100">
+                        <div class="aspect-video overflow-hidden">
+                            <img src="../Pictures/hayamiya_outside.jpg" alt="早宮校 外観" class="w-full h-full object-cover">
+                        </div>
+                        <div class="aspect-video overflow-hidden">
+                            <img src="../Pictures/hayamiya_inside.jpg" alt="早宮校 内観" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-black text-gray-800 text-lg">早宮校</h3>
+                            <span class="text-xs text-gray-400">はやみや</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3">
+                            <i class="fa-solid fa-map-pin text-primary mr-1"></i>練馬区早宮４丁目　リトルッカ内
+                        </p>
+                        <div class="bg-white/80 rounded-xl p-3 mb-3">
+                            <p class="text-xs font-bold text-primary mb-2">
+                                <i class="fa-solid fa-calendar-days mr-1"></i>開講日時
+                            </p>
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">水曜</span>
+                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">金曜</span>
+                                <span class="text-xs text-primary font-bold">16:00〜 / 17:00〜</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="bg-gray-50 border border-gray-200 text-gray-500 text-xs px-2 py-1 rounded-full">早宮小 徒歩2分</span>
+                            <span class="bg-gray-50 border border-gray-200 text-gray-500 text-xs px-2 py-1 rounded-full">練馬東小 徒歩4分</span>
+                        </div>
+                    </div>
                 </div>
-                <!-- Card -->
-                <div class="text-center">
-                    <img src="../Pictures/School2.jpeg" alt="数へのイメージ" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md">
-                    <h4 class="font-bold text-lg text-primary mb-2">「数」のイメージ定着</h4>
-                    <p class="text-sm text-gray-600">算数が本格的に難しくなる前に、量としての数の感覚（暗算力）を身につけ、苦手意識を防ぎます。</p>
+
+                <!-- 氷川台校 -->
+                <div class="rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow bg-white">
+                    <div class="grid grid-cols-2 gap-0.5 bg-gray-100">
+                        <div class="aspect-video overflow-hidden">
+                            <img src="../Pictures/hikawadai_outside.jpg" alt="氷川台校 外観" class="w-full h-full object-cover">
+                        </div>
+                        <div class="aspect-video overflow-hidden">
+                            <img src="../Pictures/hikawadai_inside.jpg" alt="氷川台校 内観" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-black text-gray-800 text-lg">氷川台校</h3>
+                            <span class="text-xs text-gray-400">ひかわだい</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3">
+                            <i class="fa-solid fa-map-pin text-primary mr-1"></i>練馬区氷川台３丁目　井垣ビル1F
+                        </p>
+                        <div class="bg-white/80 rounded-xl p-3 mb-3">
+                            <p class="text-xs font-bold text-primary mb-2">
+                                <i class="fa-solid fa-calendar-days mr-1"></i>開講日時
+                            </p>
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">火曜</span>
+                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">木曜</span>
+                                <span class="text-xs text-primary font-bold">16:00〜 / 17:00〜</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="bg-gray-50 border border-gray-200 text-gray-500 text-xs px-2 py-1 rounded-full">開進第四小 徒歩7分</span>
+                            <span class="bg-gray-50 border border-gray-200 text-gray-500 text-xs px-2 py-1 rounded-full">氷川台駅 徒歩5分</span>
+                        </div>
+                    </div>
                 </div>
-                <!-- Card -->
-                <div class="text-center">
-                    <img src="../Pictures/School3.jpeg" alt="学習姿勢" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md">
-                    <h4 class="font-bold text-lg text-primary mb-2">学習姿勢の確立</h4>
-                    <p class="text-sm text-gray-600">宿題が増える前に「机に向かって集中する時間」を習慣にすることで、自ら学ぶ姿勢が身につきます。</p>
+
+                <!-- 中村校 -->
+                <div class="rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow bg-white">
+                    <div class="grid grid-cols-2 gap-0.5 bg-gray-100">
+                        <div class="aspect-video overflow-hidden">
+                            <img src="../Pictures/nakamura_outside.jpg" alt="中村校 外観" class="w-full h-full object-cover">
+                        </div>
+                        <div class="aspect-video overflow-hidden">
+                            <img src="../Pictures/nakamura_inside.jpg" alt="中村校 内観" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-black text-gray-800 text-lg">中村校</h3>
+                            <span class="text-xs text-gray-400">なかむら</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3">
+                            <i class="fa-solid fa-map-pin text-primary mr-1"></i>練馬区中村１丁目　ASOBINA Living内
+                        </p>
+                        <div class="bg-white/80 rounded-xl p-3 mb-3">
+                            <p class="text-xs font-bold text-primary mb-2">
+                                <i class="fa-solid fa-calendar-days mr-1"></i>開講日時
+                            </p>
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">月曜</span>
+                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">木曜</span>
+                                <span class="text-xs text-primary font-bold">16:00〜 / 17:00〜</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="bg-gray-50 border border-gray-200 text-gray-500 text-xs px-2 py-1 rounded-full">中村小 徒歩6分</span>
+                            <span class="bg-gray-50 border border-gray-200 text-gray-500 text-xs px-2 py-1 rounded-full">豊玉小 徒歩4分</span>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Experience Points (Points to see) -->
-    <section class="py-20 bg-accent/30">
-        <div class="max-w-4xl mx-auto px-4">
-            <h3 class="text-2xl md:text-3xl font-bold text-center mb-10 text-display">無料体験で、<br class="md:hidden">お子さまの<span class="text-primary">「目の輝き」</span>を見てください</h3>
-            
-            <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-2 h-full bg-secondary"></div>
-                <p class="mb-8 text-center">体験会では、そろばんの弾き方はもちろん、<br class="hidden md:inline">教室の雰囲気や先生との相性を確認していただけます。</p>
 
-                <ul class="space-y-6">
-                    <li class="flex items-start gap-4">
-                        <div class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
-                        <div>
-                            <h5 class="font-bold text-lg">先生の関わり方</h5>
-                            <p class="text-sm text-gray-600">お子さまの良いところを見つけ、褒めて伸ばす指導を体感してください。</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start gap-4">
-                        <div class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
-                        <div>
-                            <h5 class="font-bold text-lg">集中できる環境</h5>
-                            <p class="text-sm text-gray-600">周りのお友達が真剣に取り組む姿を見て、自然と背筋が伸びる瞬間があります。</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start gap-4">
-                        <div class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
-                        <div>
-                            <h5 class="font-bold text-lg">「できた！」の笑顔</h5>
-                            <p class="text-sm text-gray-600">簡単な問題からスタートし、解けた時の喜びを一緒に分かち合います。</p>
-                        </div>
-                    </li>
-                </ul>
+    <!-- ══════════════════════════════════════════
+         4. 楽珠が選ばれる理由
+    ══════════════════════════════════════════ -->
+    <section class="py-16 md:py-20 bg-white/50">
+        <div class="max-w-5xl mx-auto px-4">
+
+            <div class="text-center mb-10">
+                <span class="inline-block bg-white text-primary text-xs font-bold px-4 py-1.5 rounded-full border border-primary/30 mb-3">
+                    楽珠の強み
+                </span>
+                <h2 class="font-display text-2xl md:text-3xl font-black text-gray-800">
+                    楽珠そろばん教室が選ばれる理由
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-5">
+
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex gap-4">
+                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-brain text-primary text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-base mb-2">右脳を使う楽珠メソッド</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">珠をイメージして瞬時に答えを出す右脳トレーニング。計算ドリルとは異なる「圧倒的な計算スピードと直感力」が身につきます。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex gap-4">
+                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-users text-primary text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-base mb-2">少人数制で目が行き届く</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">1クラスの人数を絞り、先生が一人ひとりの進度に合わせて指導。わからないまま置いていかれることがありません。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex gap-4">
+                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-seedling text-primary text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-base mb-2">自律学習スタイル</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">自分で課題を確認し、取り組み、先生にチェックしてもらう流れを繰り返します。「自分でやりきる力」が自然と育まれます。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex gap-4">
+                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-calendar-check text-primary text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-base mb-2">振替制度あり</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">学校行事や他の習い事と重なっても安心。振替授業に対応しているので、無理なく続けられます。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex gap-4">
+                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                        <i class="fa-brands fa-line text-primary text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-base mb-2">LINEで連絡・キャッシュレス対応</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">欠席・振替連絡はLINE公式アカウントで24時間受付。授業料の支払いも完全キャッシュレスで保護者の手間を最小化。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex gap-4">
+                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-trophy text-primary text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-base mb-2">段位・検定にも対応</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">珠算・暗算の検定受験をサポート。上位検定を目指す生徒も、自分のペースで着実にステップアップできます。</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Flow -->
-    <section id="flow" class="py-20 bg-white">
-        <div class="max-w-4xl mx-auto px-4">
-            <h3 class="text-2xl md:text-3xl font-bold text-center mb-12 text-display">お申し込みは簡単3ステップ</h3>
 
-            <div class="grid md:grid-cols-3 gap-8 relative">
-                <!-- Connector (Desktop only) -->
-                <div class="hidden md:block absolute top-8 h-0.5 bg-gray-300 z-0" style="left: calc(100% / 6); right: calc(100% / 6);"></div>
+    <!-- ══════════════════════════════════════════
+         5. 先行登録から入会までの流れ
+    ══════════════════════════════════════════ -->
+    <section class="py-16 md:py-20 bg-primary">
+        <div class="max-w-5xl mx-auto px-4">
+
+            <div class="text-center mb-10">
+                <span class="inline-block bg-white/15 text-white text-xs font-bold px-4 py-1.5 rounded-full border border-white/20 mb-3">
+                    先行登録から入会まで
+                </span>
+                <h2 class="font-display text-2xl md:text-3xl font-black text-white">
+                    かんたん5ステップ
+                </h2>
+                <p class="text-white/60 text-sm mt-2">LINEを友だち追加するだけ。あとはお任せください。</p>
+            </div>
+
+            <!-- ステップグリッド -->
+            <div class="grid sm:grid-cols-3 md:grid-cols-5 gap-4">
 
                 <!-- Step 1 -->
-                <div class="text-center relative z-10">
-                    <div class="w-16 h-16 mx-auto bg-base border-2 border-primary text-primary rounded-full flex items-center justify-center text-xl font-bold mb-4">1</div>
-                    <h4 class="font-bold text-lg mb-2">LINEで申し込み</h4>
-                    <p class="text-sm text-gray-600">公式LINEを友だち追加して、<br>希望の教室・日時を送るだけ。</p>
+                <div class="relative step-line bg-white/10 rounded-2xl p-5 text-center text-white">
+                    <p class="text-xs font-black text-secondary tracking-widest mb-3">STEP 01</p>
+                    <div class="w-14 h-14 mx-auto bg-[#06C755] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                        <i class="fa-brands fa-line text-white text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-sm mb-1">LINE友だち追加</h3>
+                    <p class="text-xs text-white/55 leading-relaxed">下記ボタンから公式LINEを追加。</p>
                 </div>
 
                 <!-- Step 2 -->
-                <div class="text-center relative z-10">
-                    <div class="w-16 h-16 mx-auto bg-base border-2 border-primary text-primary rounded-full flex items-center justify-center text-xl font-bold mb-4">2</div>
-                    <h4 class="font-bold text-lg mb-2">教室案内・日程調整</h4>
-                    <p class="text-sm text-gray-600">担当よりご連絡。<br>最寄りの教室をご案内します。</p>
+                <div class="relative step-line bg-white/10 rounded-2xl p-5 text-center text-white">
+                    <p class="text-xs font-black text-secondary tracking-widest mb-3">STEP 02</p>
+                    <div class="w-14 h-14 mx-auto bg-white/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                        <i class="fa-solid fa-check text-white text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-sm mb-1">先行登録完了</h3>
+                    <p class="text-xs text-white/55 leading-relaxed">アンケートに回答して完了。</p>
                 </div>
 
                 <!-- Step 3 -->
-                <div class="text-center relative z-10">
-                    <div class="w-16 h-16 mx-auto bg-secondary text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 shadow-lg">3</div>
-                    <h4 class="font-bold text-lg mb-2">手ぶらで体験できます</h4>
-                    <p class="text-sm text-gray-600">持ち物は一切不要です。<br>体験テキストはそのままお土産に。</p>
+                <div class="relative step-line bg-white/10 rounded-2xl p-5 text-center text-white">
+                    <p class="text-xs font-black text-secondary tracking-widest mb-3">STEP 03</p>
+                    <div class="w-14 h-14 mx-auto bg-white/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                        <i class="fa-solid fa-star text-secondary text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-sm mb-1">体験会 先行予約</h3>
+                    <p class="text-xs text-white/55 leading-relaxed">LINEに届く専用フォームから希望日時を選択（先行案内）。</p>
                 </div>
+
+                <!-- Step 4 -->
+                <div class="relative step-line bg-white/10 rounded-2xl p-5 text-center text-white">
+                    <p class="text-xs font-black text-secondary tracking-widest mb-3">STEP 04</p>
+                    <div class="w-14 h-14 mx-auto bg-white/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                        <i class="fa-solid fa-school text-white text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-sm mb-1">体験会に参加</h3>
+                    <p class="text-xs text-white/55 leading-relaxed">約60分の無料体験。手ぶらでOK。</p>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="bg-secondary/20 border-2 border-secondary/60 rounded-2xl p-5 text-center text-white">
+                    <p class="text-xs font-black text-secondary tracking-widest mb-3">STEP 05</p>
+                    <div class="w-14 h-14 mx-auto bg-secondary rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                        <i class="fa-solid fa-gift text-white text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-sm mb-1">当日入会で特典適用</h3>
+                    <p class="text-xs text-white/70 leading-relaxed font-bold">初月月謝0円＋入会金0円！</p>
+                </div>
+
             </div>
 
-            <div class="text-center mt-12">
-                <a href="https://lin.ee/ryT5Vyl" target="_blank" class="btn-shine bg-[#06C755] hover:bg-green-600 text-white font-bold py-4 px-10 rounded-full shadow-lg transition inline-block">
-                    <i class="fa-brands fa-line mr-2"></i>LINEで無料体験を申し込む
+            <div class="text-center mt-10">
+                <a href="https://lin.ee/ryT5Vyl" target="_blank"
+                   class="btn-line px-8 py-4 text-base inline-flex">
+                    <i class="fa-brands fa-line text-xl"></i>
+                    <span>LINEで先行登録<span class="block text-xs font-normal opacity-75 mt-0.5">体験会の先行予約案内が届きます</span></span>
                 </a>
             </div>
+
         </div>
     </section>
 
-    <!-- Voices（Before→After・通塾期間で信頼性強化） -->
-    <section class="py-20 bg-base">
-        <div class="max-w-5xl mx-auto px-4">
-            <h3 class="text-2xl md:text-3xl font-bold text-center mb-12 text-display">保護者さまからの嬉しいお声</h3>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Voice 1 -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
-                    <div class="absolute -top-3 left-6 text-4xl text-accent opacity-50"><i class="fa-solid fa-quote-left"></i></div>
-                    <span class="inline-block text-xs font-bold text-primary bg-accent/50 px-2 py-0.5 rounded mb-2 mt-2">通塾5ヶ月</span>
-                    <p class="font-bold text-primary mb-3">集中できない子 → 座って「できた！」と報告してくれるように</p>
-                    <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                        最初は座っていられるか不安でしたが、先生が優しく、スモールステップで進めてくれるので、嬉しそうに報告してくれます。
-                    </p>
-                    <div class="flex items-center gap-3 border-t pt-3">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500"><i class="fa-regular fa-user"></i></div>
-                        <span class="text-xs text-gray-500">小1 女の子の母</span>
-                    </div>
-                </div>
-
-                <!-- Voice 2 -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
-                    <div class="absolute -top-3 left-6 text-4xl text-accent opacity-50"><i class="fa-solid fa-quote-left"></i></div>
-                    <span class="inline-block text-xs font-bold text-primary bg-accent/50 px-2 py-0.5 rounded mb-2 mt-2">通塾4ヶ月</span>
-                    <p class="font-bold text-primary mb-3">指で数えていた → 暗算できるように</p>
-                    <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                        買い物に行くと合計金額を計算しようとしたり、遊び感覚で数字に親しめています。振替ができるので他の習い事と両立しやすいです。
-                    </p>
-                    <div class="flex items-center gap-3 border-t pt-3">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500"><i class="fa-regular fa-user"></i></div>
-                        <span class="text-xs text-gray-500">年長 男の子の母</span>
-                    </div>
-                </div>
-
-                <!-- Voice 3 -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
-                    <div class="absolute -top-3 left-6 text-4xl text-accent opacity-50"><i class="fa-solid fa-quote-left"></i></div>
-                    <span class="inline-block text-xs font-bold text-primary bg-accent/50 px-2 py-0.5 rounded mb-2 mt-2">通塾8ヶ月</span>
-                    <p class="font-bold text-primary mb-3">目標がなかった → 検定合格で「次もっと上を！」と意欲に</p>
-                    <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                        合格するたびに目標を持つようになりました。週1回でも着実に力がついているのを実感します。
-                    </p>
-                    <div class="flex items-center gap-3 border-t pt-3">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500"><i class="fa-regular fa-user"></i></div>
-                        <span class="text-xs text-gray-500">小3 女の子の母</span>
-                    </div>
-                </div>
-
-                <!-- Voice 4 -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
-                    <div class="absolute -top-3 left-6 text-4xl text-accent opacity-50"><i class="fa-solid fa-quote-left"></i></div>
-                    <span class="inline-block text-xs font-bold text-primary bg-accent/50 px-2 py-0.5 rounded mb-2 mt-2">通塾3ヶ月</span>
-                    <p class="font-bold text-primary mb-3">算数が苦手そうで心配 → 数字に触れるのが楽しそうに</p>
-                    <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                        習い事デビューとして楽珠を選びました。少人数で先生の目が行き届き、家でも「今日は〇ができた」と話してくれます。
-                    </p>
-                    <div class="flex items-center gap-3 border-t pt-3">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500"><i class="fa-regular fa-user"></i></div>
-                        <span class="text-xs text-gray-500">年長 女の子の母</span>
-                    </div>
-                </div>
-
-                <!-- Voice 5 -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
-                    <div class="absolute -top-3 left-6 text-4xl text-accent opacity-50"><i class="fa-solid fa-quote-left"></i></div>
-                    <span class="inline-block text-xs font-bold text-primary bg-accent/50 px-2 py-0.5 rounded mb-2 mt-2">通塾6ヶ月</span>
-                    <p class="font-bold text-primary mb-3">計算に時間がかかっていた → スピードと正確さがアップ</p>
-                    <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                        宿題の計算も以前よりスムーズに。検定に合格したときの笑顔が忘れられません。続けてよかったです。
-                    </p>
-                    <div class="flex items-center gap-3 border-t pt-3">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500"><i class="fa-regular fa-user"></i></div>
-                        <span class="text-xs text-gray-500">小2 男の子の母</span>
-                    </div>
-                </div>
-
-                <!-- Voice 6 -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
-                    <div class="absolute -top-3 left-6 text-4xl text-accent opacity-50"><i class="fa-solid fa-quote-left"></i></div>
-                    <span class="inline-block text-xs font-bold text-primary bg-accent/50 px-2 py-0.5 rounded mb-2 mt-2">通塾7ヶ月</span>
-                    <p class="font-bold text-primary mb-3">机に座る習慣がなかった → 週1回の教室が生活のリズムに</p>
-                    <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                        同じ時間に通うことで「そろばんの日」ができ、家庭学習のきっかけにもなっています。
-                    </p>
-                    <div class="flex items-center gap-3 border-t pt-3">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500"><i class="fa-regular fa-user"></i></div>
-                        <span class="text-xs text-gray-500">小1 男の子の父</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ -->
-    <section id="faq" class="py-20 bg-white">
+    <!-- ══════════════════════════════════════════
+         6. FAQ
+    ══════════════════════════════════════════ -->
+    <section class="py-16 md:py-20 bg-white/50">
         <div class="max-w-3xl mx-auto px-4">
-            <h3 class="text-2xl md:text-3xl font-bold text-center mb-10 text-display">よくある質問・費用について</h3>
 
-            <div class="space-y-4">
-                <!-- Item: 体験後の入会強制（心理的障壁の解消） -->
-                <div class="border border-gray-200 rounded-xl overflow-hidden">
-                    <button class="w-full text-left p-5 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-bold focus:outline-none" aria-expanded="false" onclick="toggleAccordion(this)">
-                        <span>Q. 体験会に参加したら、入会しなければなりませんか？</span>
-                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+            <h2 class="font-display text-2xl md:text-3xl font-black text-center text-gray-800 mb-8">
+                よくある質問
+            </h2>
+
+            <div class="space-y-3">
+
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <button onclick="toggleFaq(this)"
+                            class="w-full text-left px-5 py-4 flex items-center justify-between gap-3 font-bold text-gray-800 text-sm hover:bg-gray-50 transition-colors">
+                        <span>Q. そろばんが初めてですが大丈夫ですか？</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 shrink-0 transition-transform duration-200"></i>
                     </button>
-                    <div class="accordion-content bg-white">
-                        <div class="p-5 text-sm text-gray-600 leading-relaxed border-t">
-                            A. いいえ。体験当日は教室の雰囲気や先生との相性を確認していただくだけでOKです。ただし、体験後にその場でご入会いただける場合は、<strong>入会特典</strong>をご用意しています。もちろん無理な勧誘は一切ありませんので、お気軽にお越しください。
+                    <div class="faq-body">
+                        <div class="px-5 pb-5 pt-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100">
+                            A. まったく問題ありません。0〜9の数字が書ければスタートできます。足し算・引き算ができなくても、年中（4歳）から始めているお子さまが多数います。楽珠では一人ひとりのペースに合わせて丁寧に指導いたします。
                         </div>
                     </div>
                 </div>
 
-                <!-- Item: 学習塾との違い -->
-                <div class="border border-gray-200 rounded-xl overflow-hidden">
-                    <button class="w-full text-left p-5 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-bold focus:outline-none" aria-expanded="false" onclick="toggleAccordion(this)">
-                        <span>Q. 学習塾との違いは何ですか？</span>
-                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <button onclick="toggleFaq(this)"
+                            class="w-full text-left px-5 py-4 flex items-center justify-between gap-3 font-bold text-gray-800 text-sm hover:bg-gray-50 transition-colors">
+                        <span>Q. 先行登録したら必ず入会しないといけませんか？</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 shrink-0 transition-transform duration-200"></i>
                     </button>
-                    <div class="accordion-content bg-white">
-                        <div class="p-5 text-sm text-gray-600 leading-relaxed border-t">
-                            A. 最大の違いは「右脳」を使うことです。論理的に計算するのではなく、頭の中で珠（たま）をイメージして処理するため、「圧倒的な計算スピード」と「直感力」が身につきます。また、制限時間内に集中して問題を解くトレーニングも、そろばん特有の能力開発効果です。
+                    <div class="faq-body">
+                        <div class="px-5 pb-5 pt-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100">
+                            A. いいえ。まずは体験会でお子さまの反応を見てから判断いただけます。先行登録は「特典を受け取る権利の確保」です。無理な勧誘は一切行いませんので、お気軽にご登録ください。
                         </div>
                     </div>
                 </div>
 
-                <!-- Item: 開始年齢 -->
-                <div class="border border-gray-200 rounded-xl overflow-hidden">
-                    <button class="w-full text-left p-5 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-bold focus:outline-none" aria-expanded="false" onclick="toggleAccordion(this)">
-                        <span>Q. いつから習えますか？</span>
-                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <button onclick="toggleFaq(this)"
+                            class="w-full text-left px-5 py-4 flex items-center justify-between gap-3 font-bold text-gray-800 text-sm hover:bg-gray-50 transition-colors">
+                        <span>Q. 対象年齢は？</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 shrink-0 transition-transform duration-200"></i>
                     </button>
-                    <div class="accordion-content bg-white">
-                        <div class="p-5 text-sm text-gray-600 leading-relaxed border-t">
-                            A. 0〜9の数字が書ければ、スタートできます。足し算・引き算ができなくても問題ありません。年中さんごろから、数字に親しみながら少しずつ進めていきますので、初めての習い事でも安心して始めていただけます。
+                    <div class="faq-body">
+                        <div class="px-5 pb-5 pt-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100">
+                            A. 年中さん（4歳）〜小学生が対象です。数字に興味が出てきたお子さまであれば、無理なく楽しくスタートできます。
                         </div>
                     </div>
                 </div>
 
-                <!-- Item: 教室選び -->
-                <div class="border border-gray-200 rounded-xl overflow-hidden">
-                    <button class="w-full text-left p-5 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-bold focus:outline-none" aria-expanded="false" onclick="toggleAccordion(this)">
-                        <span>Q. 練馬区のどの教室に通えばいいですか？</span>
-                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
-                    </button>
-                    <div class="accordion-content bg-white">
-                        <div class="p-5 text-sm text-gray-600 leading-relaxed border-t">
-                            A. 現在は練馬区東部エリア（早宮・氷川台・中村周辺）を中心に3教室を展開しています。お住まいのエリアが対応しているかはLINEよりお気軽にご確認ください。
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item: 費用 -->
-                <div class="border border-gray-200 rounded-xl overflow-hidden">
-                    <button class="w-full text-left p-5 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-bold focus:outline-none" aria-expanded="false" onclick="toggleAccordion(this)">
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <button onclick="toggleFaq(this)"
+                            class="w-full text-left px-5 py-4 flex items-center justify-between gap-3 font-bold text-gray-800 text-sm hover:bg-gray-50 transition-colors">
                         <span>Q. 費用はどれくらいかかりますか？</span>
-                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                        <i class="fa-solid fa-chevron-down text-gray-400 shrink-0 transition-transform duration-200"></i>
                     </button>
-                    <div class="accordion-content bg-white">
-                        <div class="p-5 text-sm text-gray-600 leading-relaxed border-t">
-                            A. コースや教室により異なりますが、目安は以下の通りです。<br><br>
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li><strong>入会時：</strong>入会金 5,500円 / データ登録料 1,100円 / 初期教材費 3,300円</li>
-                                <li><strong>月謝例：</strong>
-                                    <ul class="list-none pl-2 mt-1 space-y-1 text-gray-500 text-xs sm:text-sm">
-                                        <li>・週1コース：4,400円〜</li>
-                                        <li>・週2コース：6,160円〜</li>
-                                        <li>・週3コース：7,920円〜</li>
-                                        <li>・無制限コース：9,900円〜</li>
-                                    </ul>
-                                </li>
-                                <li class="text-xs text-gray-500 mt-1">※事務教材費 550円/月 が別途かかります</li>
-                            </ul>
-                            <br>詳細な料金プランは、体験会にてご説明いたします。
+                    <div class="faq-body">
+                        <div class="px-5 pb-5 pt-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100">
+                            A. 通常の入会費用の目安：入会金5,500円（<strong class="text-primary">開校キャンペーンで0円</strong>）、データ登録料1,100円、初期教材費3,300円。月謝は週1コース4,400円〜。先行登録特典で初月月謝も0円になります。詳細は体験会にてご説明いたします。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <button onclick="toggleFaq(this)"
+                            class="w-full text-left px-5 py-4 flex items-center justify-between gap-3 font-bold text-gray-800 text-sm hover:bg-gray-50 transition-colors">
+                        <span>Q. 他の習い事と両立できますか？</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 shrink-0 transition-transform duration-200"></i>
+                    </button>
+                    <div class="faq-body">
+                        <div class="px-5 pb-5 pt-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100">
+                            A. はい。週1回から通えるコースをご用意しており、振替制度もあります。急な体調不良や学校行事にも柔軟に対応しますので、他の習い事と無理なく両立していただけます。
                         </div>
                     </div>
                 </div>
@@ -591,179 +775,86 @@
         </div>
     </section>
 
-    <!-- Classroom List (Osaka Area) -->
-    <section id="classroom" class="py-20 bg-base">
-        <div class="max-w-6xl mx-auto px-4">
-            <h3 class="text-2xl md:text-3xl font-bold text-center mb-6 text-display">練馬エリアの教室一覧</h3>
-            <p class="text-center text-gray-600 mb-12">
-                まずはフォームよりご連絡ください。担当者が最寄りの教室をご案内します。
+
+    <!-- ══════════════════════════════════════════
+         7. 最終CTA
+    ══════════════════════════════════════════ -->
+    <section class="py-16 md:py-20 text-center">
+        <div class="max-w-2xl mx-auto px-4">
+
+            <div class="inline-flex items-center gap-2 bg-red-50 text-red-600 text-xs font-bold px-4 py-2 rounded-full border border-red-200 mb-6">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                定員に達し次第、受付終了となります
+            </div>
+
+            <h2 class="font-display text-2xl md:text-4xl font-black text-gray-800 mb-4 leading-snug">
+                新しい教室で、新しい学びを。<br>
+                <span class="text-primary">お子さまの可能性を広げる一歩を、今すぐ。</span>
+            </h2>
+            <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+                入会金0円＋初月月謝0円のダブル特典は<br>
+                先行登録をされた方だけの限定特典です。
             </p>
 
-            <!-- 練馬区エリア -->
-            <div class="flex items-center gap-3 mb-5">
-                <span class="bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-full"><i class="fa-solid fa-building mr-1"></i>練馬区エリア</span>
-                <div class="flex-1 h-px bg-primary/20"></div>
-            </div>
-            <div class="grid md:grid-cols-1 lg:grid-cols-3 gap-8">
-
-                <!-- 早宮教室 -->
-                <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition border-l-4 border-primary overflow-hidden">
-                    <!-- 写真エリア（外観・内観） -->
-                    <div class="grid grid-cols-2 gap-1 bg-gray-100">
-                        <div class="aspect-video overflow-hidden">
-                            <img src="../Pictures/hayamiya_outside.jpg" alt="早宮教室 外観" class="w-full h-full object-cover">
-                        </div>
-                        <div class="aspect-video overflow-hidden">
-                            <img src="../Pictures/hayamiya_inside.jpg" alt="早宮教室 内観" class="w-full h-full object-cover">
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-start justify-between mb-2">
-                            <h4 class="font-bold text-xl">早宮教室</h4>
-                            <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded">はやみや</span>
-                        </div>
-                        <p class="text-xs text-gray-500 mb-4"><i class="fa-solid fa-map-pin mr-1"></i>〒179-0085 東京都練馬区早宮４丁目２７−１０−５<br>（リトルッカ内）</p>
-                        <div class="bg-primary/5 rounded-xl p-3 mb-4">
-                            <p class="text-xs font-bold text-primary mb-2"><i class="fa-solid fa-calendar-days mr-1"></i>開講日時</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">水曜日</span>
-                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">金曜日</span>
-                                <span class="text-xs text-primary font-bold pt-1">16:00〜 / 17:00〜</span>
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="bg-gray-50 border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full"><i class="fa-solid fa-school mr-1 text-primary"></i>早宮小 徒歩2分</span>
-                            <span class="bg-gray-50 border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full"><i class="fa-solid fa-school mr-1 text-primary"></i>練馬東小 徒歩4分</span>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-4">リトルッカ内に併設された、アットホームな雰囲気の教室です。落ち着いた環境で集中して学習に取り組めます。</p>
-                        <a href="https://www.google.com/maps/search/?api=1&query=東京都練馬区早宮4丁目27-10-5" target="_blank" class="text-primary text-sm font-bold hover:underline inline-block"><i class="fa-solid fa-location-arrow mr-1"></i>地図を見る</a>
-                    </div>
-                </div>
-
-                <!-- 氷川台教室 -->
-                <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition border-l-4 border-primary overflow-hidden">
-                    <!-- 写真エリア（外観・内観） -->
-                    <div class="grid grid-cols-2 gap-1 bg-gray-100">
-                        <div class="aspect-video overflow-hidden">
-                            <img src="../Pictures/hikawadai_outside.jpg" alt="氷川台教室 外観" class="w-full h-full object-cover">
-                        </div>
-                        <div class="aspect-video overflow-hidden">
-                            <img src="../Pictures/hikawadai_inside.jpg" alt="氷川台教室 内観" class="w-full h-full object-cover">
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-start justify-between mb-2">
-                            <h4 class="font-bold text-xl">氷川台教室</h4>
-                            <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded">ひかわだい</span>
-                        </div>
-                        <p class="text-xs text-gray-500 mb-4"><i class="fa-solid fa-map-pin mr-1"></i>〒179-0084 東京都練馬区氷川台３丁目１９−７<br>井垣ビル 1F（だるまちゃんち・てんぐちゃんち内）</p>
-                        <div class="bg-primary/5 rounded-xl p-3 mb-4">
-                            <p class="text-xs font-bold text-primary mb-2"><i class="fa-solid fa-calendar-days mr-1"></i>開講日時</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">火曜日</span>
-                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">木曜日</span>
-                                <span class="text-xs text-primary font-bold pt-1">16:00〜 / 17:00〜</span>
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="bg-gray-50 border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full"><i class="fa-solid fa-school mr-1 text-primary"></i>開進4小 徒歩7分</span>
-                            <span class="bg-gray-50 border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full"><i class="fa-solid fa-train mr-1 text-primary"></i>氷川台駅 徒歩5分</span>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-4">地域に愛されるだるまちゃんち・てんぐちゃんちに併設。子どもたちが安心して通える明るい雰囲気の教室です。</p>
-                        <a href="https://www.google.com/maps/search/?api=1&query=東京都練馬区氷川台3丁目19-7" target="_blank" class="text-primary text-sm font-bold hover:underline inline-block"><i class="fa-solid fa-location-arrow mr-1"></i>地図を見る</a>
-                    </div>
-                </div>
-
-                <!-- 中村教室 -->
-                <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition border-l-4 border-primary overflow-hidden">
-                    <!-- 写真エリア（外観・内観） -->
-                    <div class="grid grid-cols-2 gap-1 bg-gray-100">
-                        <div class="aspect-video overflow-hidden">
-                            <img src="../Pictures/nakamura_outside.jpg" alt="中村教室 外観" class="w-full h-full object-cover">
-                        </div>
-                        <div class="aspect-video overflow-hidden">
-                            <img src="../Pictures/nakamura_inside.jpg" alt="中村教室 内観" class="w-full h-full object-cover">
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-start justify-between mb-2">
-                            <h4 class="font-bold text-xl">中村教室</h4>
-                            <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded">なかむら</span>
-                        </div>
-                        <p class="text-xs text-gray-500 mb-4"><i class="fa-solid fa-map-pin mr-1"></i>〒176-0024 東京都練馬区中村１丁目５−３<br>（ASOBINA Living内）</p>
-                        <div class="bg-primary/5 rounded-xl p-3 mb-4">
-                            <p class="text-xs font-bold text-primary mb-2"><i class="fa-solid fa-calendar-days mr-1"></i>開講日時</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">月曜日</span>
-                                <span class="bg-primary text-white text-xs px-3 py-1 rounded-full font-bold">木曜日</span>
-                                <span class="text-xs text-primary font-bold pt-1">16:00〜 / 17:00〜</span>
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="bg-gray-50 border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full"><i class="fa-solid fa-school mr-1 text-primary"></i>中村小 徒歩6分</span>
-                            <span class="bg-gray-50 border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full"><i class="fa-solid fa-school mr-1 text-primary"></i>豊玉小 徒歩4分</span>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-4">ASOBINA Livingに併設された、開放感あふれる学習空間。子どもたちの好奇心を育む環境が整っています。</p>
-                        <a href="https://www.google.com/maps/search/?api=1&query=東京都練馬区中村1丁目5-3" target="_blank" class="text-primary text-sm font-bold hover:underline inline-block"><i class="fa-solid fa-location-arrow mr-1"></i>地図を見る</a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA -->
-    <section id="contact" class="py-20 hero-bg text-center relative">
-        <div class="max-w-3xl mx-auto px-4 bg-white/95 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl border border-white">
-            <h2 class="text-2xl md:text-4xl font-bold mb-4 text-display">「できた！」の数だけ、<br>子どもは伸びる。</h2>
-            <p class="text-gray-600 mb-8">
-                そろばんを通じて手に入れた「自信」と「集中力」は、<br class="hidden md:inline">お子さまの一生の財産になります。<br>
-                席数には限りがありますので、お早めにお申し込みください。
-            </p>
-            
-            <a href="https://lin.ee/ryT5Vyl" target="_blank" class="btn-shine bg-[#06C755] hover:bg-green-600 text-white text-xl md:text-2xl font-bold py-5 px-10 rounded-full shadow-lg transition transform hover:-translate-y-1 block w-full md:w-auto mb-4">
-                <i class="fa-brands fa-line mr-2"></i>LINEで無料体験を申し込む
-                <span class="block text-sm font-normal mt-1 opacity-90">練馬区東部エリア3教室 ・ 手ぶらでOK</span>
+            <a href="https://lin.ee/ryT5Vyl" target="_blank"
+               class="btn-line px-8 py-5 text-lg mb-4 block sm:inline-flex">
+                <i class="fa-brands fa-line text-2xl"></i>
+                <span>LINEで先行登録<span class="block text-xs font-normal opacity-75 mt-1">初月無料特典を確保する・手ぶらでOK</span></span>
             </a>
 
-            <p class="text-xs text-gray-400 mt-4">公式LINEを友だち追加後、体験希望の教室・日時をお送りください</p>
+            <p class="text-gray-300 text-xs mt-4">
+                公式LINEを友だち追加後、「先行登録」とお送りください
+            </p>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-primary text-white py-8 text-center text-sm">
-        <p class="mb-2 font-bold tracking-wider">楽珠そろばん教室</p>
-        <p class="opacity-70">&copy; 2026 Alpha-Brain LLC All Rights Reserved.</p>
+
+    <!-- ══════════════════════════════════════════
+         FOOTER
+    ══════════════════════════════════════════ -->
+    <footer class="bg-gray-800 text-white py-8 text-center">
+        <a href="../index.html" class="inline-block mb-3">
+            <img src="../Pictures/title.png" alt="楽珠そろばん教室" class="h-7 w-auto object-contain opacity-80 mx-auto">
+        </a>
+        <p class="text-gray-500 text-xs">&copy; 2026 Alpha-Brain LLC All Rights Reserved.</p>
     </footer>
 
-    <!-- Mobile Fixed Bottom CTA -->
-    <div class="fixed bottom-0 left-0 w-full bg-white border-t p-3 md:hidden z-50 flex items-center justify-between shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-        <div class="text-xs font-bold text-primary pl-2">
-            まずは体験！<br>
-            <span class="text-[10px] text-gray-500 font-normal">練馬区内3教室</span>
+
+    <!-- ══════════════════════════════════════════
+         モバイルスティッキーCTA
+    ══════════════════════════════════════════ -->
+    <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 px-4 py-3 md:hidden z-50 flex items-center justify-between shadow-[0_-4px_12px_rgba(0,0,0,0.07)]">
+        <div class="leading-tight pl-1">
+            <p class="text-xs font-black text-primary">先行登録</p>
+            <p class="text-[10px] text-gray-400">4月末まで限定特典あり</p>
         </div>
-        <a href="https://lin.ee/ryT5Vyl" target="_blank" class="bg-[#06C755] text-white font-bold py-3 px-5 rounded-full shadow-md text-sm flex items-center gap-1.5">
-            <i class="fa-brands fa-line text-base"></i> LINEで申し込む
+        <a href="https://lin.ee/ryT5Vyl" target="_blank"
+           class="btn-line text-sm px-5 py-3">
+            <i class="fa-brands fa-line text-base"></i>LINEで先行登録
         </a>
     </div>
 
-    <!-- Scripts -->
-    <script>
-        function toggleAccordion(button) {
-            const content = button.nextElementSibling;
-            const icon = button.querySelector('.fa-chevron-down');
-            const isOpen = !!content.style.maxHeight;
 
-            if (isOpen) {
-                content.style.maxHeight = null;
-                content.classList.remove('active');
-                icon.style.transform = 'rotate(0deg)';
-                button.setAttribute('aria-expanded', 'false');
-            } else {
-                content.style.maxHeight = content.scrollHeight + "px";
-                content.classList.add('active');
+    <!-- ══════════════════════════════════════════
+         SCRIPTS
+    ══════════════════════════════════════════ -->
+    <script>
+        function toggleFaq(btn) {
+            const body = btn.nextElementSibling;
+            const icon = btn.querySelector('.fa-chevron-down');
+            const isOpen = body.classList.contains('open');
+
+            // 全部閉じる
+            document.querySelectorAll('.faq-body.open').forEach(el => {
+                el.style.maxHeight = null;
+                el.classList.remove('open');
+                el.previousElementSibling.querySelector('.fa-chevron-down').style.transform = '';
+            });
+
+            if (!isOpen) {
+                body.style.maxHeight = body.scrollHeight + 'px';
+                body.classList.add('open');
                 icon.style.transform = 'rotate(180deg)';
-                button.setAttribute('aria-expanded', 'true');
             }
         }
     </script>
