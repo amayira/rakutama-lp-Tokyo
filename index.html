@@ -145,6 +145,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .fade-in { opacity: 0; transform: translateY(16px); transition: opacity 0.55s ease, transform 0.55s ease; }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
 
+        /* ---- hero text shadow ---- */
+        .hero-text h1 { text-shadow: 0 2px 8px rgba(0,0,0,0.45); }
+        .hero-text p  { text-shadow: 0 1px 5px rgba(0,0,0,0.4); }
+
         /* ---- wave ---- */
         .wave-bottom { display: block; width: 100%; }
     </style>
@@ -196,18 +200,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
 <!-- ========== HERO ========== -->
-<section class="relative pb-0" style="background-image: url('Pictures/background.png'); background-size: cover; background-position: center;">
+<section class="relative pb-0" style="background-image: url('Pictures/background3.png'); background-size: cover; background-position: center;">
     <div class="max-w-6xl mx-auto px-5 pt-14 pb-8 md:pt-20 md:pb-12">
         <div class="grid md:grid-cols-2 gap-10 items-center">
 
             <!-- テキスト -->
-            <div class="fade-in text-white">
+            <div class="fade-in text-white hero-text">
                 <div class="inline-block bg-secondary text-white text-xs font-black px-4 py-1.5 rounded-full mb-5 shadow-md">
                     ✨ 開校キャンペーン実施中 ✨
                 </div>
                 <h1 class="font-display text-4xl md:text-5xl font-black leading-snug mb-5">
                     そろばんで、<br>
-                    <span class="text-secondary">考える子</span>を育てる。
+                    <span class="text-secondary" style="-webkit-text-stroke: 0.5px rgba(255,255,255,0.7);">考える子</span>を育てる。
                 </h1>
                 <p class="text-white/85 leading-loose text-sm md:text-base mb-8">
                     楽珠そろばん教室は、練馬区で展開する少人数制のそろばん教室。<br>
@@ -368,7 +372,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
                     <div class="absolute top-3 left-3 flex gap-1">
                         <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">火</span>
-                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">水</span>
+                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">金</span>
                     </div>
                     <div class="absolute bottom-3 left-4 text-white font-display font-black text-xl drop-shadow">早宮校</div>
                 </div>
@@ -388,7 +392,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
                     <div class="absolute top-3 left-3 flex gap-1">
                         <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">月</span>
-                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">木</span>
+                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">水</span>
                     </div>
                     <div class="absolute bottom-3 left-4 text-white font-display font-black text-xl drop-shadow">氷川台校</div>
                 </div>
@@ -408,7 +412,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
                     <div class="absolute top-3 left-3 flex gap-1">
                         <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">火</span>
-                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">金</span>
+                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">木</span>
                     </div>
                     <div class="absolute bottom-3 left-4 text-white font-display font-black text-xl drop-shadow">中村校</div>
                 </div>
@@ -591,7 +595,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <li><a href="access.html" class="hover:text-white transition">教室案内</a></li>
                         <li><a href="faq.html" class="hover:text-white transition">よくある質問</a></li>
                         <li><a href="trial.html" class="hover:text-white transition">無料体験を申し込む</a></li>
-                        <li><a href="lp/" class="hover:text-white transition opacity-50 text-xs">体験会LP</a></li>
                     </ul>
                 </div>
             </div>
