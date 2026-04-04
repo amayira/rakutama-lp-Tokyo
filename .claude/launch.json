@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "静的サーバー (Python)",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "3000"],
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": ["-c", "PATH=/usr/local/bin:$PATH /usr/local/bin/npx -y serve '/Users/ariyama/Library/CloudStorage/OneDrive-個人用/そろばん教室事業/rakutama-lp-Tokyo-main' -p 3000 --no-clipboard"],
       "port": 3000
     },
     {
