@@ -387,7 +387,7 @@
         <!-- キャンペーン見出し -->
         <div class="text-center mb-4">
           <div class="font-display font-black text-gray-800 text-xl leading-snug">
-            【無料体験受付中】<br>
+            【期間限定・4/20まで】<br>
             <span class="text-primary">公式LINE</span>から先行登録で
           </div>
           <div class="mt-2 inline-block bg-secondary text-white font-black text-lg px-4 py-1 rounded-full">
@@ -398,7 +398,7 @@
         <div class="bg-accent rounded-2xl p-4 mb-5 space-y-2">
           <div class="flex items-center gap-3">
             <span class="benefit-num bg-primary text-white" style="width:34px;height:34px;font-size:0.95rem;">①</span>
-            <span class="font-bold text-sm text-gray-800">体験会への<span class="text-primary">先行招待</span></span>
+            <span class="font-bold text-sm text-gray-800"><span class="text-primary">無料</span>体験会への<span class="text-primary">先行招待</span></span>
           </div>
           <div class="flex items-center gap-3">
             <span class="benefit-num bg-secondary text-white" style="width:34px;height:34px;font-size:0.95rem;">②</span>
@@ -421,12 +421,37 @@
 
     <!-- スクロール促進 -->
     <div class="bg-white pb-4 flex justify-center fv-scroll-hint">
-      <div class="text-primary/50 text-xs flex flex-col items-center gap-1 animate-bounce">
-        <span>詳しく見る</span>
+      <div class="text-gray-400 text-xs flex items-center gap-1">
+        <span>詳細</span>
         <i class="fas fa-chevron-down"></i>
       </div>
     </div>
   </section>
+
+  <!-- ========== カウントダウン ========== -->
+  <div class="bg-red-600 text-white text-center py-3 px-4">
+    <p class="font-display font-black text-sm" id="countdown-bar">
+      ⏰ キャンペーン終了まで あと <span id="countdown-days" class="text-xl mx-1">--</span>日
+    </p>
+    <p class="text-xs text-red-200 mt-0.5">4月20日（日）締切 ※定員に達し次第終了</p>
+  </div>
+  <script>
+    (function() {
+      var deadline = new Date('2026-04-20T23:59:59+09:00');
+      function updateCountdown() {
+        var now = new Date();
+        var diff = deadline - now;
+        if (diff <= 0) {
+          document.getElementById('countdown-bar').textContent = 'キャンペーンは終了しました';
+          return;
+        }
+        var days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        document.getElementById('countdown-days').textContent = days;
+      }
+      updateCountdown();
+      setInterval(updateCountdown, 60000);
+    })();
+  </script>
 
   <!-- ========== 3大特典 ========== -->
   <section class="py-16 px-4 lp-bg">
@@ -448,7 +473,7 @@
             <div class="flex-1">
               <div class="text-xs text-primary font-bold mb-1">BENEFIT 01</div>
               <h3 class="font-display font-black text-lg text-gray-800 mb-2">
-                体験会への<span class="text-primary">先行招待</span>
+                <span class="text-primary">無料</span>体験会への<span class="text-primary">先行招待</span>
               </h3>
               <div class="inline-flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-full px-3 py-1 mb-2">
                 <span class="text-red-500 font-black text-xs">🔥</span>
@@ -543,7 +568,7 @@
             <div class="flex items-center gap-2 mb-1 md:justify-center">
               <span class="text-xs font-bold text-primary bg-accent rounded-full px-3 py-0.5">STEP 1</span>
             </div>
-            <div class="font-display font-black text-base text-gray-800">公式LINEを友達追加</div>
+            <div class="font-display font-black text-[1rem] text-gray-800">公式LINEを友達追加</div>
             <p class="text-xs text-gray-500 mt-1">下のボタンからすぐに追加できます。スマホでもPCでもOK。</p>
           </div>
         </div>
@@ -557,7 +582,7 @@
             <div class="flex items-center gap-2 mb-1 md:justify-center">
               <span class="text-xs font-bold text-primary bg-accent rounded-full px-3 py-0.5">STEP 2</span>
             </div>
-            <div class="font-display font-black text-base text-gray-800">先行登録バナーをタップ＆情報送信</div>
+            <div class="font-display font-black text-[1rem] text-gray-800">先行登録バナーをタップ＆情報送信</div>
             <p class="text-xs text-gray-500 mt-1">LINEで届く先行登録バナーをタップして、希望の教室等をお送りください</p>
           </div>
         </div>
@@ -571,7 +596,7 @@
             <div class="flex items-center gap-2 mb-1 md:justify-center">
               <span class="text-xs font-bold text-secondary bg-yellow-50 rounded-full px-3 py-0.5">STEP 3</span>
             </div>
-            <div class="font-display font-black text-base text-gray-800">先行招待 &amp; 特典が自動適用</div>
+            <div class="font-display font-black text-[1rem] text-gray-800">先行招待 &amp; 特典が自動適用</div>
             <p class="text-xs text-gray-500 mt-1">体験会の先行案内をお送りします。ご入会時に3つの特典が自動で適用されます。</p>
           </div>
         </div>
@@ -606,7 +631,7 @@
             <span class="text-2xl">🏆</span>
           </div>
           <div>
-            <div class="font-display font-black text-base text-gray-800 mb-1">らくたまカップ</div>
+            <div class="font-display font-black text-[1rem] text-gray-800 mb-1">らくたまカップ</div>
             <p class="text-xs text-gray-500 leading-relaxed">年に2回のそろばん大会。目標を持って練習することで上達が加速します。</p>
           </div>
         </div>
@@ -616,7 +641,7 @@
             <span class="text-2xl">🌅</span>
           </div>
           <div>
-            <div class="font-display font-black text-base text-gray-800 mb-1">本気の朝練</div>
+            <div class="font-display font-black text-[1rem] text-gray-800 mb-1">本気の朝練</div>
             <p class="text-xs text-gray-500 leading-relaxed">月曜朝のオンライン練習会。授業日以外も継続できる環境を用意しています。</p>
           </div>
         </div>
@@ -626,7 +651,7 @@
             <span class="text-2xl">⚡</span>
           </div>
           <div>
-            <div class="font-display font-black text-base text-gray-800 mb-1">フラッシュ暗算も！暗算道場</div>
+            <div class="font-display font-black text-[1rem] text-gray-800 mb-1">フラッシュ暗算も！暗算道場</div>
             <p class="text-xs text-gray-500 leading-relaxed">土曜の暗算練習会。スピードと正確性を磨く特別トレーニングです。</p>
           </div>
         </div>
@@ -636,7 +661,7 @@
             <span class="text-2xl">🔬</span>
           </div>
           <div>
-            <div class="font-display font-black text-base text-gray-800 mb-1">そろばん研究所</div>
+            <div class="font-display font-black text-[1rem] text-gray-800 mb-1">そろばん研究所</div>
             <p class="text-xs text-gray-500 leading-relaxed">月1回の上級者練習会。高いレベルを目指す子のための特別セッション。</p>
           </div>
         </div>
@@ -646,7 +671,7 @@
             <span class="text-2xl">🎬</span>
           </div>
           <div>
-            <div class="font-display font-black text-base text-gray-800 mb-1">解説動画配信</div>
+            <div class="font-display font-black text-[1rem] text-gray-800 mb-1">解説動画配信</div>
             <p class="text-xs text-gray-500 leading-relaxed">練習用プリントも公開中。家庭学習もサポートします。</p>
           </div>
         </div>
@@ -685,7 +710,7 @@
       </div>
       <!-- 初月無料バナー（1回のみ） -->
       <div class="flex items-center justify-center gap-3 bg-red-50 border-2 border-red-400 rounded-2xl px-5 py-4 mb-6">
-        <span class="text-red-500 font-black text-base">先行登録で初月</span>
+        <span class="text-red-600 font-black text-[1rem]">先行登録で初月</span>
         <span class="text-red-500 font-black text-3xl font-number leading-none">→ ¥0</span>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -693,7 +718,7 @@
         <!-- 週1回 -->
         <div class="price-card p-6">
           <div class="flex items-center justify-between mb-3">
-            <div class="font-display font-black text-base text-gray-700">週1回コース</div>
+            <div class="font-display font-black text-[1rem] text-gray-700">週1回コース</div>
           </div>
           <div class="flex items-baseline gap-1">
             <span class="font-number font-black text-3xl text-gray-800">6,050</span>
@@ -708,7 +733,7 @@
             <span class="shimmer-badge text-white font-display font-black text-xs px-4 py-1 rounded-full shadow">人気 No.1</span>
           </div>
           <div class="flex items-center justify-between mb-3">
-            <div class="font-display font-black text-base text-gray-700">週2回コース</div>
+            <div class="font-display font-black text-[1rem] text-gray-700">週2回コース</div>
           </div>
           <div class="flex items-baseline gap-1">
             <span class="font-number font-black text-3xl text-gray-800">7,700</span>
@@ -720,7 +745,7 @@
         <!-- 週3回 -->
         <div class="price-card p-6">
           <div class="flex items-center justify-between mb-3">
-            <div class="font-display font-black text-base text-gray-700">週3回コース</div>
+            <div class="font-display font-black text-[1rem] text-gray-700">週3回コース</div>
           </div>
           <div class="flex items-baseline gap-1">
             <span class="font-number font-black text-3xl text-gray-800">8,800</span>
@@ -964,6 +989,9 @@
         <i class="fab fa-line text-xl"></i>
       </a>
     </div>
+    <div class="mb-4">
+      <a href="https://rakutama-tokyo.com/" target="_blank" rel="noopener" class="text-gray-400 hover:text-gray-200 text-xs underline">楽珠そろばん教室 公式サイト →</a>
+    </div>
     <div class="border-t border-gray-700 pt-4">
       &copy; 2026 楽珠そろばん教室. All rights reserved.
     </div>
@@ -971,7 +999,7 @@
 
   <!-- ========== スティッキーCTA ========== -->
   <div id="sticky-cta">
-    <a href="https://lin.ee/oW7wspr" class="btn-line w-full max-w-lg mx-auto py-4 text-base" onclick="gtag && gtag('event','click_line_sticky'); fbq && fbq('track','Lead');">
+    <a href="https://lin.ee/oW7wspr" class="btn-line w-full max-w-lg mx-auto py-4 text-[1rem]" onclick="gtag && gtag('event','click_line_sticky'); fbq && fbq('track','Lead');">
       <i class="fab fa-line text-xl"></i>
       先行登録して特典をもらう
     </a>
