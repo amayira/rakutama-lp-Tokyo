@@ -2,15 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "静的サーバー (Python)",
-      "runtimeExecutable": "/bin/sh",
-      "runtimeArgs": ["-c", "PATH=/usr/local/bin:$PATH /usr/local/bin/npx -y serve '/Users/ariyama/Library/CloudStorage/OneDrive-個人用/そろばん教室事業/rakutama-lp-Tokyo-main' -p 3000 --no-clipboard"],
-      "port": 3000
-    },
-    {
-      "name": "静的サーバー (npx serve)",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "-l", "3001", "."],
+      "name": "静的サーバー (Node)",
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": [".claude/server.js"],
       "port": 3001
     }
   ]
