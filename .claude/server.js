@@ -22,7 +22,7 @@ const mime = {
 
 http.createServer((req, res) => {
   let filePath = path.join(ROOT, decodeURIComponent(req.url.split('?')[0]));
-  if (filePath === ROOT || filePath === ROOT + '/') filePath = path.join(ROOT, 'LP/coupon.html');
+  if (filePath === ROOT || filePath === ROOT + '/') filePath = path.join(ROOT, 'index.html');
   if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
     filePath = path.join(filePath, 'index.html');
   }
