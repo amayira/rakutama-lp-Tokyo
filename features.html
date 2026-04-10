@@ -38,6 +38,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .nav-link:hover::after { width: 100%; }
         .fade-in { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent); animation: shine 2.5s infinite; }
+        @keyframes shine { to { left: 150%; } }
     </style>
 </head>
 <body>
@@ -240,8 +243,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="max-w-xl mx-auto px-5 text-center">
         <h2 class="text-display text-2xl font-black text-gray-800 mb-3">まずは無料体験へ</h2>
         <p class="text-sm text-gray-600 mb-6">教室の雰囲気や先生との相性を、実際に体験して確かめてください。</p>
-        <a href="trial.html" class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-full text-base transition shadow-md">
-            <i class="fa-brands fa-line text-lg"></i>無料体験を申し込む
+        <a href="trial.html" class="btn-shine inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold px-8 py-4 rounded-full text-base transition shadow-md">
+            無料体験を申し込む
         </a>
     </div>
 </section>

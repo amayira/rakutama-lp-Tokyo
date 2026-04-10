@@ -40,6 +40,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .accordion-btn span { color: #1F2937 !important; }
         .accordion-content { transition: max-height 0.3s ease-out, opacity 0.3s ease-out; max-height: 0; opacity: 0; overflow: hidden; }
         .accordion-content.active { opacity: 1; }
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent); animation: shine 2.5s infinite; }
+        @keyframes shine { to { left: 150%; } }
     </style>
 </head>
 <body>
@@ -216,9 +219,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <!-- 解決しない場合 -->
         <div class="bg-base rounded-2xl p-6 border border-gray-100 text-center">
-            <p class="text-gray-600 text-sm mb-4">上記以外のご質問はLINEからお気軽にどうぞ。</p>
-            <a href="trial.html" class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full text-sm transition">
-                <i class="fa-brands fa-line text-base"></i>LINEで問い合わせる
+            <p class="text-gray-600 text-sm mb-4">上記以外のご質問は体験申込フォームの備考欄からお気軽にどうぞ。</p>
+            <a href="trial.html" class="btn-shine inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-full text-sm transition">
+                お問い合わせ・体験申込
             </a>
         </div>
 

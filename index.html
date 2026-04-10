@@ -114,6 +114,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .btn-pop-yellow:active { box-shadow: 0 2px 0 #B45309; }
         .btn-pop-white { background: #fff; color: #4A96AE; box-shadow: 0 5px 0 rgba(0,0,0,0.15); }
         .btn-pop-white:active { box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent); animation: shine 2.5s infinite; }
+        @keyframes shine { to { left: 150%; } }
 
         /* ---- circle photo ---- */
         .circle-photo {
@@ -219,8 +222,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     集中力・判断力をバランスよく育てます。
                 </p>
                 <div class="flex flex-wrap gap-3">
-                    <a href="trial.html" class="btn-pop btn-pop-green text-base">
-                        <i class="fa-brands fa-line text-lg"></i>無料体験を申し込む
+                    <a href="trial.html" class="btn-pop btn-pop-yellow btn-shine text-base">
+                        無料体験を申し込む
                     </a>
                     <a href="features.html" class="btn-pop btn-pop-white text-sm px-6 py-3.5">
                         楽珠そろばん教室の特徴 <i class="fa-solid fa-arrow-right text-xs"></i>
@@ -295,7 +298,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <ul class="flex-1 text-sm space-y-2">
                 <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                     <span class="text-gray-400 font-number text-xs shrink-0">2026.04.08</span>
-                    <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded shrink-0">採用</span>
+                    <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded shrink-0">採用</span>
                     <span class="text-gray-700">講師の採用が完了しました</span>
                 </li>
                 <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
@@ -542,14 +545,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </h2>
             <p class="text-white/80 text-sm leading-loose mb-8">
                 当日の入会強制は一切ありません。<br>
-                LINEで友だち追加 → 希望日時を送るだけ！
+                フォームに入力 → 担当者からご連絡します！
             </p>
 
             <div class="grid sm:grid-cols-3 gap-4 mb-10 text-left">
                 <div class="bg-white/15 backdrop-blur-sm rounded-2xl p-5">
                     <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-black text-lg mb-3">1</div>
-                    <h3 class="font-black text-white text-sm mb-1">LINEを友だち追加</h3>
-                    <p class="text-white/70 text-xs">公式LINEを追加します</p>
+                    <h3 class="font-black text-white text-sm mb-1">フォームに入力</h3>
+                    <p class="text-white/70 text-xs">お子様の情報・希望日時を入力</p>
                 </div>
                 <div class="bg-white/15 backdrop-blur-sm rounded-2xl p-5">
                     <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-black text-lg mb-3">2</div>
@@ -563,8 +566,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
 
-            <a href="trial.html" class="btn-pop btn-pop-green text-lg px-10 py-5">
-                <i class="fa-brands fa-line text-xl"></i>LINEで無料体験を申し込む
+            <a href="trial.html" class="btn-pop btn-pop-yellow btn-shine text-lg px-10 py-5">
+                無料体験を申し込む
             </a>
         </div>
     </div>
