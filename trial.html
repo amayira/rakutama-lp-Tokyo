@@ -64,8 +64,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <a href="https://form.rakutama-tokyo.com/" target="_blank" class="nav-link hover:text-primary transition">各種フォーム</a>
         </nav>
         <div class="flex items-center gap-3">
-            <a href="trial.html" class="hidden sm:inline-flex items-center gap-2 bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-full">
-                <i class="fa-brands fa-line"></i>無料体験を申し込む
+            <a href="trial.html" class="hidden sm:inline-flex items-center gap-2 border border-primary text-primary hover:bg-primary hover:text-white text-sm font-bold px-4 py-2 rounded-full transition">
+                無料体験を申し込む
             </a>
             <button id="menuBtn" class="md:hidden text-gray-600 text-xl w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-bars"></i></button>
         </div>
@@ -77,7 +77,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <a href="access.html">教室案内</a>
             <a href="faq.html">よくある質問</a>
             <a href="https://form.rakutama-tokyo.com/" target="_blank">各種フォーム</a>
-            <a href="trial.html" class="text-primary font-bold"><i class="fa-brands fa-line mr-1"></i>無料体験を申し込む</a>
+            <a href="trial.html" class="text-primary font-bold">無料体験を申し込む</a>
         </nav>
     </div>
 </header>
@@ -148,12 +148,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- LINE ボタン -->
 <section class="py-12 bg-green-50 border-y border-green-100">
     <div class="max-w-xl mx-auto px-5 text-center">
-        <p class="text-gray-600 text-sm mb-6">公式LINEを友だち追加してメッセージを送るだけで予約完了です。</p>
-        <a href="https://lin.ee/sFR6X8y" target="_blank" rel="noopener"
+        <p class="text-gray-600 text-sm mb-6">下のフォームから必要事項をご記入いただくか、LINEからもお申し込みいただけます。</p>
+        <a href="#form-card"
            class="btn-shine inline-flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-black px-10 py-5 rounded-2xl text-xl transition shadow-xl w-full sm:w-auto">
-            <i class="fa-brands fa-line text-2xl"></i>LINEで無料体験を申し込む
+            フォームで申し込む
         </a>
-        <p class="text-xs text-gray-400 mt-4">友だち追加後、「体験希望」とメッセージしてください</p>
+        <p class="text-xs text-gray-400 mt-4">またはLINEからも受け付けています →
+            <a href="https://lin.ee/sFR6X8y" target="_blank" rel="noopener" class="underline hover:text-gray-600">友だち追加</a>
+        </p>
     </div>
 </section>
 
@@ -185,6 +187,186 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
 
         </div>
+    </div>
+</section>
+
+
+<!-- 申込フォーム -->
+<section class="py-16 bg-[#F7FBFA]">
+    <div class="max-w-2xl mx-auto px-5">
+
+        <h2 class="text-display text-2xl font-black text-gray-800 mb-8 text-center">フォームからも申し込めます</h2>
+
+        <!-- Form Card -->
+        <div id="form-card" class="bg-white rounded-2xl shadow-md p-6 md:p-8">
+            <div class="mb-6">
+                <h3 class="text-xl font-black text-gray-800 text-display mb-2">体験授業 申込フォーム</h3>
+                <p class="text-sm text-gray-500">無料体験授業のお申し込みです。ご記入後、担当者よりご連絡いたします。</p>
+            </div>
+
+            <!-- Error Box -->
+            <div id="error-box" class="hidden mb-4 bg-red-50 border border-red-300 text-red-700 rounded-xl px-4 py-3 text-sm"></div>
+
+            <form id="taiken-form" novalidate>
+
+                <!-- Section: お子様の情報 -->
+                <div class="mb-8">
+                    <div class="mb-4">
+                        <span class="text-xs font-black border-2 border-primary text-primary rounded-full px-4 py-1 text-display">お子様の情報</span>
+                    </div>
+
+                    <!-- 氏名 -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">お子様のお名前 <span class="text-red-500">*</span></label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="family-name" placeholder="氏（姓）" required
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
+                            <input type="text" id="given-name" placeholder="名（名）" required
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
+                        </div>
+                    </div>
+
+                    <!-- フリガナ -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">フリガナ</label>
+                        <input type="text" id="furigana" placeholder="カタカナでご入力ください"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
+                    </div>
+
+                    <!-- 学年 -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">学年</label>
+                        <select id="grade"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white">
+                            <option value="">選択してください</option>
+                            <option>年少</option>
+                            <option>年中</option>
+                            <option>年長</option>
+                            <option>小1</option>
+                            <option>小2</option>
+                            <option>小3</option>
+                            <option>小4</option>
+                            <option>小5</option>
+                            <option>小6</option>
+                            <option>中1</option>
+                            <option>中2</option>
+                            <option>中3</option>
+                            <option>その他</option>
+                        </select>
+                    </div>
+
+                    <!-- そろばん経験 -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">そろばん経験</label>
+                        <div class="flex gap-6">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="experience" value="なし" checked class="accent-green-500" />
+                                <span class="text-sm">なし</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="experience" value="あり" class="accent-green-500" />
+                                <span class="text-sm">あり</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 級・段 -->
+                    <div id="level-field" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">級・段</label>
+                        <input type="text" id="level" placeholder="例：8級"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
+                    </div>
+                </div>
+
+                <!-- Section: 保護者・連絡先 -->
+                <div class="mb-8">
+                    <div class="mb-4">
+                        <span class="text-xs font-black border-2 border-primary text-primary rounded-full px-4 py-1 text-display">保護者・連絡先</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">電話番号 <span class="text-red-500">*</span></label>
+                        <input type="tel" id="tel" placeholder="例：090-1234-5678" required
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">メールアドレス <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" placeholder="例：example@email.com" required
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">住所 <span class="text-gray-400 text-xs font-normal">任意</span></label>
+                        <input type="text" id="address" placeholder="例：東京都練馬区早宮1-1-1"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
+                    </div>
+                </div>
+
+                <!-- Section: 体験希望 -->
+                <div class="mb-8">
+                    <div class="mb-4">
+                        <span class="text-xs font-black border-2 border-primary text-primary rounded-full px-4 py-1 text-display">体験希望</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">希望教室 <span class="text-red-500">*</span></label>
+                        <select id="classroom" required
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white">
+                            <option value="">選択してください</option>
+                            <option>早宮校</option>
+                            <option>中村校</option>
+                            <option>氷川台校</option>
+                        </select>
+                    </div>
+
+                    <!-- 開講クラス一覧 -->
+                    <div id="schedule-section" class="hidden mb-4">
+                        <div class="text-xs font-medium text-gray-500 mb-2">この教室の開講クラス</div>
+                        <div id="schedule-spinner" class="hidden text-sm text-gray-400 flex items-center gap-2 py-1">
+                            <i class="fa-solid fa-spinner fa-spin"></i> 読み込み中...
+                        </div>
+                        <div id="schedule-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">希望日時 <span class="text-red-500">*</span></label>
+                        <textarea id="preferred-datetime" rows="3" required
+                            placeholder="例：4月15日(火) 16:00〜、4月17日(木) 16:00〜 など、ご都合のよい日時を複数お書きください"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 resize-y"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">備考 <span class="text-gray-400 text-xs font-normal">任意</span></label>
+                        <textarea id="notes" rows="3"
+                            placeholder="ご質問・その他お気軽にどうぞ"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 resize-y"></textarea>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn"
+                    class="w-full bg-green-500 hover:bg-green-600 text-white font-black text-base py-3 rounded-full shadow-md transition text-display flex items-center justify-center gap-2">
+                    <span id="submit-text">送信する</span>
+                    <i id="submit-spinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+                </button>
+
+            </form>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden bg-white rounded-2xl shadow-md p-8 text-center">
+            <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-check text-green-500 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-black text-gray-800 text-display mb-3">送信が完了しました</h2>
+            <p class="text-sm text-gray-500 mb-6">体験授業のお申し込みを受け付けました。担当者よりご連絡いたします。</p>
+            <a href="/"
+                class="inline-block bg-green-500 hover:bg-green-600 text-white font-black text-sm py-2.5 px-8 rounded-full shadow-md transition text-display">
+                トップに戻る
+            </a>
+        </div>
+
     </div>
 </section>
 
@@ -233,6 +415,134 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script>
     document.getElementById('menuBtn').addEventListener('click', () => {
         document.getElementById('spMenu').classList.toggle('hidden');
+    });
+
+    // ---- フォーム ----
+    const API_BASE = 'https://rakutama-kintone.k-ariyama.workers.dev';
+
+    // 希望教室 → 開講クラス一覧
+    document.getElementById('classroom').addEventListener('change', async function () {
+        const classroom = this.value;
+        const section = document.getElementById('schedule-section');
+        const spinner = document.getElementById('schedule-spinner');
+        const list = document.getElementById('schedule-list');
+
+        list.innerHTML = '';
+        section.classList.add('hidden');
+        if (!classroom) return;
+
+        section.classList.remove('hidden');
+        spinner.classList.remove('hidden');
+
+        try {
+            const res = await fetch(`${API_BASE}/api/jugyo?classroom=${encodeURIComponent(classroom)}`);
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error();
+            data.classes.forEach(cls => {
+                const badge = document.createElement('span');
+                badge.className = 'inline-block bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium rounded-full px-3 py-1';
+                badge.textContent = cls.name;
+                list.appendChild(badge);
+            });
+            if (data.classes.length === 0) {
+                list.innerHTML = '<span class="text-xs text-gray-400">開講中のクラスが見つかりませんでした</span>';
+            }
+        } catch {
+            list.innerHTML = '<span class="text-xs text-red-400">クラス情報の取得に失敗しました</span>';
+        } finally {
+            spinner.classList.add('hidden');
+        }
+    });
+
+    // 級・段 フィールドの表示切替
+    document.querySelectorAll('input[name="experience"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            const levelField = document.getElementById('level-field');
+            levelField.classList.toggle('hidden', radio.value !== 'あり' || !radio.checked);
+        });
+    });
+
+    // フォーム送信
+    document.getElementById('taiken-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const errorBox = document.getElementById('error-box');
+        errorBox.classList.add('hidden');
+        errorBox.textContent = '';
+
+        const familyName = document.getElementById('family-name').value.trim();
+        const givenName = document.getElementById('given-name').value.trim();
+        const furigana = document.getElementById('furigana').value.trim();
+        const grade = document.getElementById('grade').value;
+        const experience = document.querySelector('input[name="experience"]:checked').value;
+        const levelIfAny = experience === 'あり' ? document.getElementById('level').value.trim() : '';
+        const tel = document.getElementById('tel').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const classroom = document.getElementById('classroom').value;
+        const preferredDatetime = document.getElementById('preferred-datetime').value.trim();
+        const notes = document.getElementById('notes').value.trim();
+
+        const errors = [];
+        if (!familyName) errors.push('姓をご入力ください');
+        if (!givenName) errors.push('名をご入力ください');
+        if (!tel) errors.push('電話番号をご入力ください');
+        if (!email) errors.push('メールアドレスをご入力ください');
+        if (!classroom) errors.push('希望教室を選択してください');
+        if (!preferredDatetime) errors.push('希望日時をご入力ください');
+
+        if (errors.length > 0) {
+            errorBox.textContent = errors.join(' / ');
+            errorBox.classList.remove('hidden');
+            errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        const submitText = document.getElementById('submit-text');
+        const submitSpinner = document.getElementById('submit-spinner');
+        submitBtn.disabled = true;
+        submitText.textContent = '送信中...';
+        submitSpinner.classList.remove('hidden');
+
+        try {
+            const response = await fetch(`${API_BASE}/api/taiken`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    氏: familyName,
+                    名: givenName,
+                    フリガナ: furigana,
+                    学年: grade,
+                    電話番号: tel,
+                    メールアドレス: email,
+                    住所: address,
+                    そろばん経験: experience,
+                    '級・段': levelIfAny,
+                    教室名: classroom,
+                    希望日時: preferredDatetime,
+                    備考: notes,
+                }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.error || data.message || `送信に失敗しました（${response.status}）`);
+            }
+
+            document.getElementById('form-card').classList.add('hidden');
+            document.getElementById('success-screen').classList.remove('hidden');
+            document.getElementById('success-screen').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        } catch (err) {
+            errorBox.textContent = err.message || '送信中にエラーが発生しました。しばらく経ってから再度お試しください。';
+            errorBox.classList.remove('hidden');
+            errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } finally {
+            submitBtn.disabled = false;
+            submitText.textContent = '送信する';
+            submitSpinner.classList.add('hidden');
+        }
     });
 </script>
 </body>
