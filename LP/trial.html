@@ -76,8 +76,8 @@
         .fv-sub {
             font-family: 'Zen Kaku Gothic New', sans-serif;
             font-weight: 900;
-            font-size: clamp(0.8rem, 2.2vw, 1rem);
-            line-height: 1.9;
+            font-size: clamp(0.75rem, 2vw, 0.95rem);
+            line-height: 1.55;
             color: #fff;
             -webkit-text-stroke: 1.2px #374151;
             paint-order: stroke fill;
@@ -136,16 +136,27 @@
     </header>
 
     <!-- FV (Hero) -->
-    <section class="hero-bg relative pt-12 pb-20 md:py-32 overflow-hidden">
+    <section class="hero-bg relative pt-6 pb-12 md:pt-10 md:pb-16 overflow-hidden">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-            <div class="space-y-5 text-left">
-                <div class="flex flex-wrap justify-start gap-2 mb-2">
-                    <div class="inline-block bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full border border-primary/20 shadow-sm">
-                        <span class="text-primary font-bold text-sm"><i class="fa-solid fa-location-dot mr-1"></i>練馬区に3教室（早宮・氷川台・中村）</span>
+            <div class="space-y-3 md:space-y-4 text-left">
+                <div class="flex flex-wrap justify-start gap-2">
+                    <div class="inline-block bg-white/90 backdrop-blur-sm px-3 py-0.5 md:px-4 md:py-1 rounded-full border border-primary/20 shadow-sm">
+                        <span class="text-primary font-bold text-xs md:text-sm"><i class="fa-solid fa-location-dot mr-1"></i>練馬区に3教室（早宮・氷川台・中村）</span>
                     </div>
                 </div>
 
-                <h2 class="flex flex-col gap-3 md:gap-4 font-bold text-display text-3xl md:text-4xl">
+                <div class="max-w-xl">
+                    <div class="rounded-2xl border-2 border-secondary bg-gradient-to-br from-amber-50 via-white to-orange-50 shadow-xl px-4 py-3.5 md:px-6 md:py-4 ring-4 ring-secondary/25">
+                        <p class="text-[10px] md:text-xs font-black text-secondary tracking-widest uppercase mb-1 text-display flex items-center gap-1.5">
+                            <i class="fa-solid fa-gift" aria-hidden="true"></i>開校記念キャンペーン
+                        </p>
+                        <p class="text-lg md:text-2xl font-black text-gray-900 text-display leading-tight">
+                            先着10名様<span class="text-primary">・</span>月謝1ヶ月無料！
+                        </p>
+                    </div>
+                </div>
+
+                <h2 class="flex flex-col gap-1.5 md:gap-2.5 font-bold text-display text-2xl md:text-4xl leading-tight">
                     <span class="block"><span class="fv-hl">一生モノの</span></span>
                     <span class="block"><span class="fv-hl"><span class="text-primary">集中力</span>と<span class="text-primary">計算力</span>。</span></span>
                     <span class="block md:hidden"><span class="fv-hl">そろばんで、</span></span>
@@ -153,22 +164,22 @@
                     <span class="hidden md:block"><span class="fv-hl">そろばんで、考える力が育つ。</span></span>
                 </h2>
 
-                <p class="fv-sub">珠算式あんざんで、計算力だけでなく集中力・判断力をバランスよく育てます。</p>
+                <p class="fv-sub max-w-xl">珠算式あんざんで、計算力だけでなく集中力・判断力をバランスよく育てます。</p>
 
                 <div class="flex justify-start">
-                    <span class="bg-white text-amber-700 px-4 py-1.5 rounded-full text-sm font-bold border border-secondary/60 shadow-sm"><i class="fa-solid fa-child-reaching mr-1.5 text-secondary"></i>年中(4歳)〜小学生対象・週1回から</span>
+                    <span class="bg-white text-amber-700 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs md:text-sm font-bold border border-secondary/60 shadow-sm"><i class="fa-solid fa-child-reaching mr-1 md:mr-1.5 text-secondary"></i>年中(4歳)〜小学生対象・週1回から</span>
                 </div>
 
-                <div class="flex flex-wrap justify-start gap-3">
-                    <span class="bg-white/80 text-primary px-3 py-1 rounded-md text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>通い始めて3ヶ月で変化が出る</span>
-                    <span class="bg-white/80 text-primary px-3 py-1 rounded-md text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>他の習い事と両立できる</span>
-                    <span class="bg-white/80 text-primary px-3 py-1 rounded-md text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>検定で自信がつく</span>
+                <div class="flex flex-wrap justify-start gap-2 md:gap-2.5">
+                    <span class="bg-white/80 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>通い始めて3ヶ月で変化が出る</span>
+                    <span class="bg-white/80 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>他の習い事と両立できる</span>
+                    <span class="bg-white/80 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>検定で自信がつく</span>
                 </div>
 
-                <div class="pt-4">
-                    <a href="#form" class="btn-shine bg-secondary hover:bg-yellow-500 text-white text-lg md:text-xl font-bold py-4 px-8 rounded-full shadow-lg transition transform hover:-translate-y-1 inline-block w-full md:w-auto text-center md:text-left">
+                <div class="pt-1 md:pt-2">
+                    <a href="#form" class="btn-shine bg-secondary hover:bg-yellow-500 text-white text-base md:text-lg font-bold py-3 px-6 md:py-3.5 md:px-8 rounded-full shadow-lg transition transform hover:-translate-y-1 inline-block w-full md:w-auto text-center md:text-left">
                         無料体験会に申し込む（30秒）
-                        <span class="block text-xs font-normal mt-1 opacity-90">無理な勧誘はありません・手ぶらでOK</span>
+                        <span class="block text-[11px] md:text-xs font-normal mt-0.5 opacity-90">無理な勧誘はありません・手ぶらでOK</span>
                     </a>
                 </div>
             </div>
@@ -751,14 +762,14 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">電話番号 <span class="text-red-500">*</span></label>
-                            <input type="tel" id="tel" placeholder="例：090-1234-5678" required
+                            <label class="block text-sm font-medium text-gray-700 mb-1">メールアドレス <span class="text-red-500">*</span></label>
+                            <input type="email" id="email" placeholder="例：example@email.com" required
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">メールアドレス <span class="text-red-500">*</span></label>
-                            <input type="email" id="email" placeholder="例：example@email.com" required
+                            <label class="block text-sm font-medium text-gray-700 mb-1">電話番号 <span class="text-gray-400 text-xs font-normal">任意</span></label>
+                            <input type="tel" id="tel" placeholder="例：090-1234-5678"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                         </div>
 
@@ -796,10 +807,48 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">希望日時 <span class="text-red-500">*</span></label>
-                            <textarea id="preferred-datetime" rows="3" required
-                                placeholder="例：4月15日(火) 16:00〜、4月17日(木) 16:00〜 など、ご都合のよい日時を複数お書きください"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-y"></textarea>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">体験希望日時 <span class="text-red-500">*</span></label>
+                            <p class="text-xs text-gray-500 mb-3">希望教室を選ぶと、その教室の<span class="whitespace-nowrap">開講曜日・時間</span>だけが選べます（<strong>2026年6月以降</strong>の日付のみ）。第1希望・第2希望をそれぞれお選びください。</p>
+                            <div class="space-y-4">
+                                <div class="rounded-xl border border-gray-200 p-4 bg-gray-50/60">
+                                    <p class="text-sm font-bold text-gray-800 mb-3">第1希望</p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label for="pref1-date" class="block text-xs text-gray-500 mb-1">日付</label>
+                                            <select id="pref1-date" required
+                                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                                                <option value="">選択してください</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="pref1-time" class="block text-xs text-gray-500 mb-1">時間</label>
+                                            <select id="pref1-time" required
+                                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                                                <option value="">選択してください</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rounded-xl border border-gray-200 p-4 bg-gray-50/60">
+                                    <p class="text-sm font-bold text-gray-800 mb-3">第2希望</p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label for="pref2-date" class="block text-xs text-gray-500 mb-1">日付</label>
+                                            <select id="pref2-date" required
+                                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                                                <option value="">選択してください</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="pref2-time" class="block text-xs text-gray-500 mb-1">時間</label>
+                                            <select id="pref2-time" required
+                                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                                                <option value="">選択してください</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-4">
@@ -904,7 +953,137 @@
         // ---- フォーム ----
         const API_BASE = 'https://rakutama-kintone.k-ariyama.workers.dev';
 
-        // 希望教室 → 開講クラス一覧
+        // APIと同じ内容（CORSで取得できない環境向け。form.rakutama-tokyo.com 以外で開いたときなど）
+        const FALLBACK_JUGYO_BY_CLASSROOM = {
+            '早宮校': [
+                { name: '早宮校(火)16時クラス' },
+                { name: '早宮校(火)17時クラス' },
+                { name: '早宮校(金)16時クラス' },
+                { name: '早宮校(金)17時クラス' },
+            ],
+            '氷川台校': [
+                { name: '氷川台校(月)16時クラス' },
+                { name: '氷川台校(月)17時クラス' },
+                { name: '氷川台校(水)16時クラス' },
+                { name: '氷川台校(水)17時クラス' },
+            ],
+            '中村校': [
+                { name: '中村校(火)16時クラス' },
+                { name: '中村校(火)17時クラス' },
+                { name: '中村校(木)16時クラス' },
+                { name: '中村校(木)17時クラス' },
+            ],
+        };
+
+        const JP_TO_DAY = { '日': 0, '月': 1, '火': 2, '水': 3, '木': 4, '金': 5, '土': 6 };
+
+        let lastJugyoByDay = null;
+
+        function parseJugyoClassesToSchedule(classList) {
+            const byDay = new Map();
+            (classList || []).forEach(({ name }) => {
+                const m = String(name).match(/\(([月火水木金土日])\)(\d{1,2})時/);
+                if (!m) return;
+                const day = JP_TO_DAY[m[1]];
+                const t = `${String(Number(m[2])).padStart(2, '0')}:00`;
+                if (!byDay.has(day)) byDay.set(day, new Set());
+                byDay.get(day).add(t);
+            });
+            return byDay;
+        }
+
+        function buildDateSelectForSchedule(sel, allowedDays, noClassroomYet) {
+            const wdays = ['日', '月', '火', '水', '木', '金', '土'];
+            const daysAhead = 90;
+            const earliest = new Date(2026, 5, 1);
+            earliest.setHours(0, 0, 0, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const base = today < earliest ? new Date(earliest) : new Date(today);
+            sel.innerHTML = '';
+            const ph = document.createElement('option');
+            ph.value = '';
+            if (allowedDays && allowedDays.size) ph.textContent = '選択してください';
+            else if (noClassroomYet) ph.textContent = '先に希望教室を選択してください';
+            else ph.textContent = '開講情報を取得できませんでした';
+            sel.appendChild(ph);
+            if (!allowedDays || !allowedDays.size) return;
+            for (let i = 0; i < daysAhead; i++) {
+                const d = new Date(base);
+                d.setDate(base.getDate() + i);
+                if (!allowedDays.has(d.getDay())) continue;
+                const label = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日(${wdays[d.getDay()]})`;
+                const opt = document.createElement('option');
+                opt.value = label;
+                opt.textContent = label;
+                sel.appendChild(opt);
+            }
+        }
+
+        function buildTimeSelectForChosenDate(timeSel, byDay, dateLabel) {
+            timeSel.innerHTML = '';
+            const ph = document.createElement('option');
+            ph.value = '';
+            ph.textContent = '選択してください';
+            timeSel.appendChild(ph);
+            if (!byDay || !byDay.size || !dateLabel) return;
+            const m = dateLabel.match(/\(([月火水木金土日])\)$/);
+            if (!m) return;
+            const day = JP_TO_DAY[m[1]];
+            const times = byDay.get(day);
+            if (!times || !times.size) return;
+            [...times].sort().forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t;
+                timeSel.appendChild(opt);
+            });
+        }
+
+        function applyPreferenceDropdownsForSchedule(byDay, noClassroomYet) {
+            lastJugyoByDay = (byDay && byDay.size) ? byDay : null;
+            const allowed = lastJugyoByDay ? new Set(lastJugyoByDay.keys()) : null;
+            buildDateSelectForSchedule(document.getElementById('pref1-date'), allowed, noClassroomYet);
+            buildDateSelectForSchedule(document.getElementById('pref2-date'), allowed, noClassroomYet);
+            buildTimeSelectForChosenDate(document.getElementById('pref1-time'), lastJugyoByDay, '');
+            buildTimeSelectForChosenDate(document.getElementById('pref2-time'), lastJugyoByDay, '');
+        }
+
+        function mergePreferredDatetimeForKintone() {
+            const d1 = document.getElementById('pref1-date').value.trim();
+            const t1 = document.getElementById('pref1-time').value.trim();
+            const d2 = document.getElementById('pref2-date').value.trim();
+            const t2 = document.getElementById('pref2-time').value.trim();
+            if (!d1 || !t1 || !d2 || !t2) return '';
+            return `第1希望：${d1} ${t1} ／ 第2希望：${d2} ${t2}`;
+        }
+
+        function renderJugyoBadges(listEl, classes, usedFallback) {
+            listEl.innerHTML = '';
+            classes.forEach(cls => {
+                const badge = document.createElement('span');
+                badge.className = 'inline-block bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium rounded-full px-3 py-1';
+                badge.textContent = cls.name;
+                listEl.appendChild(badge);
+            });
+            if (classes.length === 0) {
+                listEl.innerHTML = '<span class="text-xs text-gray-400">開講中のクラスが見つかりませんでした</span>';
+            } else if (usedFallback) {
+                const note = document.createElement('p');
+                note.className = 'w-full text-[11px] text-gray-400 mt-2';
+                note.textContent = '※最新の空き状況は別途ご確認ください（一覧は参考表示です）';
+                listEl.appendChild(note);
+            }
+        }
+
+        document.getElementById('pref1-date').addEventListener('change', function () {
+            buildTimeSelectForChosenDate(document.getElementById('pref1-time'), lastJugyoByDay, this.value);
+        });
+        document.getElementById('pref2-date').addEventListener('change', function () {
+            buildTimeSelectForChosenDate(document.getElementById('pref2-time'), lastJugyoByDay, this.value);
+        });
+
+        // 希望教室 → 開講クラス一覧 ＋ 希望日時プルダウン
         document.getElementById('classroom-select').addEventListener('change', async function () {
             const classroom = this.value;
             const section = document.getElementById('schedule-section');
@@ -912,8 +1091,13 @@
             const list = document.getElementById('schedule-list');
 
             list.innerHTML = '';
-            section.classList.add('hidden');
-            if (!classroom) return;
+            if (!classroom) {
+                section.classList.add('hidden');
+                applyPreferenceDropdownsForSchedule(null, true);
+                return;
+            }
+
+            let effectiveClasses = FALLBACK_JUGYO_BY_CLASSROOM[classroom] || [];
 
             section.classList.remove('hidden');
             spinner.classList.remove('hidden');
@@ -921,22 +1105,28 @@
             try {
                 const res = await fetch(`${API_BASE}/api/jugyo?classroom=${encodeURIComponent(classroom)}`);
                 const data = await res.json();
-                if (!res.ok || !data.success) throw new Error();
-                data.classes.forEach(cls => {
-                    const badge = document.createElement('span');
-                    badge.className = 'inline-block bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium rounded-full px-3 py-1';
-                    badge.textContent = cls.name;
-                    list.appendChild(badge);
-                });
-                if (data.classes.length === 0) {
-                    list.innerHTML = '<span class="text-xs text-gray-400">開講中のクラスが見つかりませんでした</span>';
-                }
+                const classes = Array.isArray(data?.classes) ? data.classes : [];
+                if (!res.ok || !data.success) throw new Error('api');
+                renderJugyoBadges(list, classes, false);
+                if (classes.length) effectiveClasses = classes;
             } catch {
-                list.innerHTML = '<span class="text-xs text-red-400">クラス情報の取得に失敗しました</span>';
+                const fb = FALLBACK_JUGYO_BY_CLASSROOM[classroom];
+                if (fb && fb.length) {
+                    renderJugyoBadges(list, fb, true);
+                    effectiveClasses = fb;
+                } else {
+                    list.innerHTML = '<span class="text-xs text-red-400">クラス情報の取得に失敗しました</span>';
+                    effectiveClasses = [];
+                }
             } finally {
                 spinner.classList.add('hidden');
             }
+
+            const byDay = parseJugyoClassesToSchedule(effectiveClasses);
+            applyPreferenceDropdownsForSchedule(byDay.size ? byDay : null, false);
         });
+
+        applyPreferenceDropdownsForSchedule(null, true);
 
         // 級・段 フィールドの表示切替
         document.querySelectorAll('input[name="experience"]').forEach(radio => {
@@ -964,16 +1154,23 @@
             const email = document.getElementById('email').value.trim();
             const address = document.getElementById('address').value.trim();
             const classroom = document.getElementById('classroom-select').value;
-            const preferredDatetime = document.getElementById('preferred-datetime').value.trim();
+            const pref1d = document.getElementById('pref1-date').value.trim();
+            const pref1t = document.getElementById('pref1-time').value.trim();
+            const pref2d = document.getElementById('pref2-date').value.trim();
+            const pref2t = document.getElementById('pref2-time').value.trim();
+            const preferredDatetime = mergePreferredDatetimeForKintone();
             const notes = document.getElementById('notes').value.trim();
 
             const errors = [];
             if (!familyName) errors.push('姓をご入力ください');
             if (!givenName) errors.push('名をご入力ください');
-            if (!tel) errors.push('電話番号をご入力ください');
             if (!email) errors.push('メールアドレスをご入力ください');
             if (!classroom) errors.push('希望教室を選択してください');
-            if (!preferredDatetime) errors.push('希望日時をご入力ください');
+            if (!pref1d || !pref1t) errors.push('第1希望の日付・時間を選択してください');
+            if (!pref2d || !pref2t) errors.push('第2希望の日付・時間を選択してください');
+            if (pref1d && pref1t && pref2d && pref2t && pref1d === pref2d && pref1t === pref2t) {
+                errors.push('第1希望と第2希望は異なる日時をお選びください');
+            }
 
             if (errors.length > 0) {
                 errorBox.textContent = errors.join(' / ');
