@@ -16,16 +16,23 @@
     <!-- ファビコン設定 -->
     <link rel="icon" href="../Pictures/favicon.jpeg">
 
-    <!-- Google Fonts -->
+    <!-- Hero image preload (LCP対策) -->
+    <link rel="preload" as="image" href="../Pictures/fv.jpg" fetchpriority="high">
+
+    <!-- Google Fonts: preconnect + 非同期読み込み -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet"></noscript>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- FontAwesome: 非同期読み込み -->
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
     <!-- Tailwind Config -->
     <script>
@@ -127,7 +134,7 @@
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <a href="../" class="flex items-center gap-2">
-                <img src="../Pictures/title.png" alt="楽珠そろばん教室" class="h-8 md:h-10 w-auto object-contain">
+                <img src="../Pictures/title.png" alt="楽珠そろばん教室" class="h-8 md:h-10 w-auto object-contain" fetchpriority="high">
                 <span class="text-xs text-gray-500 font-normal mt-1 hidden sm:inline-block">東京・練馬</span>
             </a>
             <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
@@ -341,17 +348,17 @@
 
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="text-center">
-                    <img src="../Pictures/School1.jpeg" alt="脳の成長" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md">
+                    <img src="../Pictures/School1.jpeg" alt="脳の成長" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md" loading="lazy" decoding="async">
                     <h4 class="font-bold text-lg text-primary mb-2">指先を動かすことが、脳の発達を加速する</h4>
                     <p class="text-sm text-gray-600">デジタル時代だからこそ、アナログな指先トレーニングが有効。神経回路が発達するゴールデンエイジに最適です。</p>
                 </div>
                 <div class="text-center">
-                    <img src="../Pictures/School2.jpeg" alt="数へのイメージ" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md">
+                    <img src="../Pictures/School2.jpeg" alt="数へのイメージ" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md" loading="lazy" decoding="async">
                     <h4 class="font-bold text-lg text-primary mb-2">「数」のイメージ定着</h4>
                     <p class="text-sm text-gray-600">算数が本格的に難しくなる前に、量としての数の感覚（暗算力）を身につけ、苦手意識を防ぎます。</p>
                 </div>
                 <div class="text-center">
-                    <img src="../Pictures/School3.jpeg" alt="学習姿勢" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md">
+                    <img src="../Pictures/School3.jpeg" alt="学習姿勢" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md" loading="lazy" decoding="async">
                     <h4 class="font-bold text-lg text-primary mb-2">学習姿勢の確立</h4>
                     <p class="text-sm text-gray-600">宿題が増える前に「机に向かって集中する時間」を習慣にすることで、自ら学ぶ姿勢が身につきます。</p>
                 </div>
@@ -598,7 +605,7 @@
                 <!-- 早宮校 -->
                 <div class="bg-white rounded-2xl overflow-hidden shadow-soft border-2 border-yellow-200">
                     <div class="relative h-44 overflow-hidden">
-                        <img src="../Pictures/hayamiya_outside.jpg" alt="早宮校 外観" class="w-full h-full object-cover">
+                        <img src="../Pictures/hayamiya_outside.jpg" alt="早宮校 外観" class="w-full h-full object-cover" loading="lazy" decoding="async">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
                         <div class="absolute top-3 left-3 flex gap-1">
                             <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">火</span>
@@ -620,7 +627,7 @@
                 <!-- 氷川台校 -->
                 <div class="bg-white rounded-2xl overflow-hidden shadow-soft border-2 border-yellow-200">
                     <div class="relative h-44 overflow-hidden">
-                        <img src="../Pictures/hikawadai_outside.jpg" alt="氷川台校 外観" class="w-full h-full object-cover">
+                        <img src="../Pictures/hikawadai_outside.jpg" alt="氷川台校 外観" class="w-full h-full object-cover" loading="lazy" decoding="async">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
                         <div class="absolute top-3 left-3 flex gap-1">
                             <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">月</span>
@@ -642,7 +649,7 @@
                 <!-- 中村校 -->
                 <div class="bg-white rounded-2xl overflow-hidden shadow-soft border-2 border-yellow-200">
                     <div class="relative h-44 overflow-hidden">
-                        <img src="../Pictures/nakamura_outside.jpg" alt="中村校 外観" class="w-full h-full object-cover">
+                        <img src="../Pictures/nakamura_outside.jpg" alt="中村校 外観" class="w-full h-full object-cover" loading="lazy" decoding="async">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
                         <div class="absolute top-3 left-3 flex gap-1">
                             <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">月</span>
@@ -881,7 +888,7 @@
         <div class="max-w-6xl mx-auto px-5">
             <div class="flex flex-col md:flex-row justify-between gap-10 mb-10">
                 <div class="max-w-xs">
-                    <img src="../Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain mb-4 opacity-90">
+                    <img src="../Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain mb-4 opacity-90" loading="lazy" decoding="async">
                     <p class="text-sm leading-relaxed">東京・練馬区を中心に展開するそろばん教室です。</p>
                     <p class="text-xs mt-2 opacity-60">楽珠そろばん（FC加盟校）</p>
                     <p class="text-xs mt-1 opacity-60">運営：アルファーブレイン合同会社</p>
