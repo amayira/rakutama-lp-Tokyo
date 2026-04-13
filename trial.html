@@ -731,12 +731,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 throw new Error(data.error || data.message || `送信に失敗しました（${response.status}）`);
             }
 
-            document.getElementById('form-card').classList.add('hidden');
-            document.getElementById('success-screen').classList.remove('hidden');
-            document.getElementById('success-screen').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Meta Pixel CV発火 → サンクスページへ
+            if (typeof fbq === 'function') fbq('track', 'Lead');
+            setTimeout(() => { window.location.href = 'trial-thanks.html'; }, 300);
 
         } catch (err) {
-            errorBox.textContent = err.message || '送信中にエラーが発生しました。しばらく経ってから再度お試しください。';
+            const isNetworkErr = !err.message || err.message === 'Failed to fetch' || err.message.includes('NetworkError') || err.message.includes('network');
+            errorBox.textContent = isNetworkErr
+                ? '通信エラーが発生しました。電波の良い場所で再度お試しください。解決しない場合はLINEまたはお電話でお問い合わせください。'
+                : err.message;
             errorBox.classList.remove('hidden');
             errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } finally {
