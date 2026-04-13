@@ -39,6 +39,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .btn-shine { position: relative; overflow: hidden; }
         .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent); animation: shine 2.5s infinite; }
         @keyframes shine { to { left: 150%; } }
+        @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        .shimmer-badge {
+            background: linear-gradient(90deg, #F59E0B 0%, #ffd75e 45%, #F59E0B 100%);
+            background-size: 200% auto;
+            animation: shimmer 2.4s linear infinite;
+        }
     </style>
 </head>
 <body>
@@ -88,9 +94,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="max-w-2xl mx-auto px-5 text-center">
         <p class="section-label mb-3">Trial Lesson</p>
         <h1 class="text-display text-3xl md:text-4xl font-black text-gray-800 mb-4">無料体験を申し込む</h1>
-        <div class="max-w-md mx-auto mb-5 rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-50 via-white to-orange-50 shadow-lg px-4 py-3.5 ring-2 ring-amber-200/80">
-            <p class="text-[10px] md:text-xs font-black text-amber-700 tracking-wider uppercase mb-1 text-display">開校記念キャンペーン</p>
-            <p class="text-base md:text-xl font-black text-gray-900 text-display leading-snug">先着10名様・月謝1ヶ月無料！</p>
+        <div class="flex justify-center mb-6">
+            <div class="shimmer-badge inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-md">
+                <span class="text-white text-display font-black text-xs leading-none">✨</span>
+                <span class="text-white text-display font-black text-xs md:text-sm tracking-wide whitespace-nowrap">【開校記念】先着10名・月謝1ヶ月分が0円！</span>
+                <span class="text-white text-display font-black text-xs leading-none">✨</span>
+            </div>
         </div>
         <p class="text-gray-600 text-sm leading-loose">
             教室の雰囲気・先生との相性をその目でご確認ください。<br>

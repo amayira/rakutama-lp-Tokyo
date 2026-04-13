@@ -83,6 +83,13 @@
             paint-order: stroke fill;
         }
 
+        @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        .shimmer-badge {
+            background: linear-gradient(90deg, #F59E0B 0%, #ffd75e 45%, #F59E0B 100%);
+            background-size: 200% auto;
+            animation: shimmer 2.4s linear infinite;
+        }
+
         .accordion-content {
             transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
             max-height: 0;
@@ -145,15 +152,10 @@
                     </div>
                 </div>
 
-                <div class="max-w-xl">
-                    <div class="rounded-2xl border-2 border-secondary bg-gradient-to-br from-amber-50 via-white to-orange-50 shadow-xl px-4 py-3.5 md:px-6 md:py-4 ring-4 ring-secondary/25">
-                        <p class="text-[10px] md:text-xs font-black text-secondary tracking-widest uppercase mb-1 text-display flex items-center gap-1.5">
-                            <i class="fa-solid fa-gift" aria-hidden="true"></i>開校記念キャンペーン
-                        </p>
-                        <p class="text-lg md:text-2xl font-black text-gray-900 text-display leading-tight">
-                            先着10名様<span class="text-primary">・</span>月謝1ヶ月無料！
-                        </p>
-                    </div>
+                <div class="shimmer-badge inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-md my-3">
+                    <span class="text-white text-display font-black text-xs leading-none">✨</span>
+                    <span class="text-white text-display font-black text-xs md:text-sm tracking-wide whitespace-nowrap">【開校記念】先着10名・月謝1ヶ月分が0円！</span>
+                    <span class="text-white text-display font-black text-xs leading-none">✨</span>
                 </div>
 
                 <h2 class="flex flex-col gap-1.5 md:gap-2.5 font-bold text-display text-2xl md:text-4xl leading-tight">
@@ -1216,7 +1218,10 @@
                 setTimeout(() => { window.location.href = 'trial-thanks.html'; }, 300);
 
             } catch (err) {
-                errorBox.textContent = err.message || '送信中にエラーが発生しました。しばらく経ってから再度お試しください。';
+                const isNetworkErr = !err.message || err.message === 'Failed to fetch' || err.message.includes('NetworkError') || err.message.includes('network');
+                errorBox.textContent = isNetworkErr
+                    ? '通信エラーが発生しました。電波の良い場所で再度お試しください。解決しない場合はLINEまたはお電話でお問い合わせください。'
+                    : err.message;
                 errorBox.classList.remove('hidden');
                 errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 submitBtn.disabled = false;
