@@ -40,7 +40,7 @@
         .text-display { font-family: 'Zen Kaku Gothic New', sans-serif; }
         .text-number { font-family: 'Inter', sans-serif; }
         .hero-bg { background-image: url('../Pictures/fv.jpg'); background-size: cover; background-position: center; }
-        .fv-hl { background: #fff; padding: 4px 12px 4px 8px; display: inline-block; color: #1f2937; }
+        .fv-hl { background: #fff; padding: 4px 12px 4px 8px; display: inline-block; color: #1f2937; white-space: nowrap; }
         .fv-sub { font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 900; font-size: clamp(0.75rem, 2vw, 0.95rem); line-height: 1.55; color: #fff; -webkit-text-stroke: 1.2px #374151; paint-order: stroke fill; }
         @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
         .shimmer-badge { background: linear-gradient(90deg, #F59E0B 0%, #ffd75e 45%, #F59E0B 100%); background-size: 200% auto; animation: shimmer 2.4s linear infinite; }
@@ -54,6 +54,9 @@
         .nav-link { position: relative; padding-bottom: 2px; }
         .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #4A96AE; transition: width 0.2s; }
         .nav-link:hover::after { width: 100%; }
+        @media (min-width: 768px) {
+            .fv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+        }
     </style>
 </head>
 <body class="has-sticky-footer">
@@ -85,54 +88,92 @@
     <section class="relative pt-6 pb-12 md:pt-10 md:pb-16 overflow-hidden">
         <img src="../Pictures/fv.jpg" alt="" class="absolute inset-0 w-full h-full object-cover" style="object-fit:cover" fetchpriority="high" aria-hidden="true">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-            <div class="space-y-3 md:space-y-4 text-left">
-                <div class="flex flex-wrap justify-start gap-2">
-                    <div class="inline-block bg-white/90 backdrop-blur-sm px-3 py-0.5 md:px-4 md:py-1 rounded-full border border-primary/20 shadow-sm">
-                        <span class="text-primary font-bold text-xs md:text-sm"><i class="fa-solid fa-location-dot mr-1"></i>練馬区に3教室（早宮・氷川台・中村）</span>
+
+            <!-- SP のみ：場所・キャンペーンバッジ（見出しの上） -->
+            <div class="md:hidden space-y-2 mb-3">
+                <div class="inline-block bg-white/90 backdrop-blur-sm px-3 py-0.5 rounded-full border border-primary/20 shadow-sm">
+                    <span class="text-primary font-bold text-xs"><i class="fa-solid fa-location-dot mr-1"></i>練馬区に3教室（早宮・氷川台・中村）</span>
+                </div>
+                <div class="block">
+                    <div class="shimmer-badge inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-md">
+                        <span class="text-white text-display font-black text-xs leading-none">✨</span>
+                        <span class="text-white text-display font-black text-xs tracking-wide whitespace-nowrap">【開校記念】先着10名・月謝1ヶ月分が0円！</span>
+                        <span class="text-white text-display font-black text-xs leading-none">✨</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PC: 左右2カラム / SP: 1カラム -->
+            <div class="fv-grid">
+
+                <!-- 左カラム：メインコンテンツ -->
+                <div class="space-y-3 md:space-y-4 text-left">
+                    <div class="flex items-start gap-3">
+                        <h2 class="flex flex-col gap-1.5 md:gap-2.5 font-bold text-display text-2xl md:text-4xl leading-tight">
+                            <span class="block"><span class="fv-hl">一生モノの</span></span>
+                            <span class="block"><span class="fv-hl"><span class="text-primary">集中力</span>と<span class="text-primary">計算力</span>。</span></span>
+                            <span class="block md:hidden"><span class="fv-hl">そろばんで、</span></span>
+                            <span class="block md:hidden"><span class="fv-hl">考える力が育つ。</span></span>
+                            <span class="hidden md:block"><span class="fv-hl">そろばんで、考える力が育つ。</span></span>
+                        </h2>
+                        <!-- SP のみ：ノートバッジを見出し横に -->
+                        <div class="md:hidden flex-shrink-0" style="margin-top:2px; filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.28));">
+                            <div style="position:relative; display:inline-block;">
+                                <div style="position:absolute; top:-11px; left:50%; transform:translateX(-50%) rotate(-2deg); width:56px; height:21px; background:rgba(195,188,170,0.72); z-index:10; border-left:1px solid rgba(160,153,135,0.3); border-right:1px solid rgba(160,153,135,0.3);"></div>
+                                <div style="background:#ede7d9; width:130px; padding:22px 12px 38px; text-align:center; transform:rotate(-1.5deg); clip-path: polygon(0% 0%, 100% 0%, 100% 82%, 95% 87%, 88% 81%, 81% 87%, 74% 81%, 67% 87%, 60% 81%, 53% 87%, 46% 81%, 39% 87%, 32% 81%, 25% 87%, 18% 81%, 11% 87%, 5% 82%, 0% 86%);">
+                                    <p style="font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:1rem; color:#111; line-height:1.65; margin:0; letter-spacing:0.01em;">
+                                        2026年6月<br>練馬に3教室<br>OPEN!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="fv-sub max-w-xl">年中〜小2は、特に差がつきやすい時期。<br>算数の苦手意識が芽生える前に、始めましょう。</p>
+
+                    <div class="flex justify-start">
+                        <span class="bg-white text-amber-700 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs md:text-sm font-bold border border-secondary/60 shadow-sm"><i class="fa-solid fa-child-reaching mr-1 md:mr-1.5 text-secondary"></i>年中(4歳)〜小学生対象・週1回から</span>
+                    </div>
+
+                    <div class="flex flex-wrap justify-start gap-2 md:gap-2.5">
+                        <span class="bg-white/80 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>通い始めて3ヶ月で変化が出る</span>
+                        <span class="bg-white/80 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>他の習い事と両立できる</span>
+                        <span class="bg-white/80 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>検定で自信がつく</span>
+                    </div>
+
+                    <div class="pt-1 md:pt-2">
+                        <a href="#form" class="btn-shine bg-secondary hover:bg-yellow-500 text-white text-base md:text-lg font-bold py-3 px-6 md:py-3.5 md:px-8 rounded-full shadow-lg transition transform hover:-translate-y-1 inline-block w-full md:w-auto text-center md:text-left">
+                            無料体験会に申し込む（30秒）
+                            <span class="block text-[11px] md:text-xs font-normal mt-0.5 opacity-90">無理な勧誘はありません・手ぶらでOK</span>
+                        </a>
                     </div>
                 </div>
 
-                <div class="shimmer-badge inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-md my-3">
-                    <span class="text-white text-display font-black text-xs leading-none">✨</span>
-                    <span class="text-white text-display font-black text-xs md:text-sm tracking-wide whitespace-nowrap">【開校記念】先着10名・月謝1ヶ月分が0円！</span>
-                    <span class="text-white text-display font-black text-xs leading-none">✨</span>
-                </div>
-
-                <div class="flex items-start gap-3">
-                    <h2 class="flex flex-col gap-1.5 md:gap-2.5 font-bold text-display text-2xl md:text-4xl leading-tight">
-                        <span class="block"><span class="fv-hl">一生モノの</span></span>
-                        <span class="block"><span class="fv-hl"><span class="text-primary">集中力</span>と<span class="text-primary">計算力</span>。</span></span>
-                        <span class="block md:hidden"><span class="fv-hl">そろばんで、</span></span>
-                        <span class="block md:hidden"><span class="fv-hl">考える力が育つ。</span></span>
-                        <span class="hidden md:block"><span class="fv-hl">そろばんで、考える力が育つ。</span></span>
-                    </h2>
-                    <!-- オープン告知バッジ -->
-                    <div class="flex-shrink-0 flex flex-col items-center justify-center bg-red-600 text-white rounded-full shadow-lg w-20 h-20 md:w-24 md:h-24 text-center" style="margin-top:2px">
-                        <span class="text-display font-black leading-tight" style="font-size:0.7rem">2026年6月</span>
-                        <span class="text-display font-black leading-tight" style="font-size:0.75rem">練馬に</span>
-                        <span class="text-display font-black leading-tight" style="font-size:0.75rem">3教室</span>
-                        <span class="text-display font-black leading-tight" style="font-size:0.75rem">OPEN</span>
+                <!-- 右カラム：PC のみ表示 -->
+                <div class="hidden md:flex flex-col items-center gap-6">
+                    <!-- ① ノートバッジ（OPEN） -->
+                    <div style="filter:drop-shadow(2px 4px 10px rgba(0,0,0,0.3));">
+                        <div style="position:relative; display:inline-block;">
+                            <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%) rotate(-2deg); width:64px; height:23px; background:rgba(195,188,170,0.72); z-index:10; border-left:1px solid rgba(160,153,135,0.3); border-right:1px solid rgba(160,153,135,0.3);"></div>
+                            <div style="background:#ede7d9; width:160px; padding:26px 16px 46px; text-align:center; transform:rotate(-1.5deg); clip-path: polygon(0% 0%, 100% 0%, 100% 82%, 95% 87%, 88% 81%, 81% 87%, 74% 81%, 67% 87%, 60% 81%, 53% 87%, 46% 81%, 39% 87%, 32% 81%, 25% 87%, 18% 81%, 11% 87%, 5% 82%, 0% 86%);">
+                                <p style="font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:1.2rem; color:#111; line-height:1.7; margin:0; letter-spacing:0.01em;">
+                                    2026年6月<br>練馬に3教室<br>OPEN!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ② 開校記念バッジ -->
+                    <div class="shimmer-badge inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-md">
+                        <span class="text-white text-display font-black text-xs leading-none">✨</span>
+                        <span class="text-white text-display font-black text-sm tracking-wide whitespace-nowrap">【開校記念】先着10名・月謝1ヶ月分が0円！</span>
+                        <span class="text-white text-display font-black text-xs leading-none">✨</span>
+                    </div>
+                    <!-- ③ 3教室バッジ -->
+                    <div class="inline-block bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full border border-primary/20 shadow-sm">
+                        <span class="text-primary font-bold text-sm"><i class="fa-solid fa-location-dot mr-1"></i>練馬区に3教室（早宮・氷川台・中村）</span>
                     </div>
                 </div>
 
-                <p class="fv-sub max-w-xl">年中〜小2は、特に差がつきやすい時期。<br>算数の苦手意識が芽生える前に、始めましょう。</p>
-
-                <div class="flex justify-start">
-                    <span class="bg-white text-amber-700 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs md:text-sm font-bold border border-secondary/60 shadow-sm"><i class="fa-solid fa-child-reaching mr-1 md:mr-1.5 text-secondary"></i>年中(4歳)〜小学生対象・週1回から</span>
-                </div>
-
-                <div class="flex flex-wrap justify-start gap-2 md:gap-2.5">
-                    <span class="bg-white/80 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>通い始めて3ヶ月で変化が出る</span>
-                    <span class="bg-white/80 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>他の習い事と両立できる</span>
-                    <span class="bg-white/80 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold border border-primary/20"><i class="fa-solid fa-check mr-1"></i>検定で自信がつく</span>
-                </div>
-
-                <div class="pt-1 md:pt-2">
-                    <a href="#form" class="btn-shine bg-secondary hover:bg-yellow-500 text-white text-base md:text-lg font-bold py-3 px-6 md:py-3.5 md:px-8 rounded-full shadow-lg transition transform hover:-translate-y-1 inline-block w-full md:w-auto text-center md:text-left">
-                        無料体験会に申し込む（30秒）
-                        <span class="block text-[11px] md:text-xs font-normal mt-0.5 opacity-90">無理な勧誘はありません・手ぶらでOK</span>
-                    </a>
-                </div>
             </div>
         </div>
     </section>
