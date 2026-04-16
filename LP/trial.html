@@ -108,6 +108,12 @@
 
                 <!-- 左カラム：メインコンテンツ -->
                 <div class="space-y-3 md:space-y-4 text-left">
+                    <!-- PC のみ：場所バッジ（左カラム最上部） -->
+                    <div class="hidden md:block">
+                        <div class="inline-block bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full border border-primary/20 shadow-sm">
+                            <span class="text-primary font-bold text-sm"><i class="fa-solid fa-location-dot mr-1"></i>練馬区に3教室（早宮・氷川台・中村）</span>
+                        </div>
+                    </div>
                     <div class="flex items-start gap-3">
                         <h2 class="flex flex-col gap-1.5 md:gap-2.5 font-bold text-display text-2xl md:text-4xl leading-tight">
                             <span class="block"><span class="fv-hl">一生モノの</span></span>
@@ -151,7 +157,13 @@
 
                 <!-- 右カラム：PC のみ表示 -->
                 <div class="hidden md:flex flex-col items-center gap-6">
-                    <!-- ① ノートバッジ（OPEN） -->
+                    <!-- ① 開校記念バッジ（右カラム最上部） -->
+                    <div class="shimmer-badge inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-md">
+                        <span class="text-white text-display font-black text-xs leading-none">✨</span>
+                        <span class="text-white text-display font-black text-sm tracking-wide whitespace-nowrap">【開校記念】先着10名・月謝1ヶ月分が0円！</span>
+                        <span class="text-white text-display font-black text-xs leading-none">✨</span>
+                    </div>
+                    <!-- ② ノートバッジ（OPEN） -->
                     <div style="filter:drop-shadow(2px 4px 10px rgba(0,0,0,0.3));">
                         <div style="position:relative; display:inline-block;">
                             <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%) rotate(-2deg); width:64px; height:23px; background:rgba(195,188,170,0.72); z-index:10; border-left:1px solid rgba(160,153,135,0.3); border-right:1px solid rgba(160,153,135,0.3);"></div>
@@ -161,16 +173,6 @@
                                 </p>
                             </div>
                         </div>
-                    </div>
-                    <!-- ② 開校記念バッジ -->
-                    <div class="shimmer-badge inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-md">
-                        <span class="text-white text-display font-black text-xs leading-none">✨</span>
-                        <span class="text-white text-display font-black text-sm tracking-wide whitespace-nowrap">【開校記念】先着10名・月謝1ヶ月分が0円！</span>
-                        <span class="text-white text-display font-black text-xs leading-none">✨</span>
-                    </div>
-                    <!-- ③ 3教室バッジ -->
-                    <div class="inline-block bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full border border-primary/20 shadow-sm">
-                        <span class="text-primary font-bold text-sm"><i class="fa-solid fa-location-dot mr-1"></i>練馬区に3教室（早宮・氷川台・中村）</span>
                     </div>
                 </div>
 
