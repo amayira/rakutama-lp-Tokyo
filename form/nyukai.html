@@ -551,7 +551,7 @@
       if (!address) errors.push('住所をご入力ください');
       if (!classroom) errors.push('希望教室を選択してください');
       if (jugyoIds.length === 0) errors.push('希望クラスを1つ以上選択してください');
-      if (!gakuhiId) errors.push('月謝コースを選択してください');
+      if (gakuhiSelect.selectedIndex <= 0) errors.push('月謝コースを選択してください');
 
       if (errors.length > 0) {
         errorBox.innerHTML = errors.join('<br />');
