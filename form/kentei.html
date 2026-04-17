@@ -124,35 +124,6 @@
           </div>
           <p class="text-xs text-gray-400 mb-4">少なくとも1種目を選択してください</p>
 
-          <!-- 珠算 -->
-          <div class="mb-4 border border-gray-200 rounded-xl p-4">
-            <label class="flex items-center gap-3 cursor-pointer mb-3">
-              <input type="checkbox" id="shuzan-check" class="w-4 h-4 accent-green-500 rounded" />
-              <span class="text-sm font-bold text-gray-700 font-display">珠算</span>
-            </label>
-            <div id="shuzan-grade-field" class="hidden">
-              <label class="block text-xs text-gray-500 mb-1">珠算受験級</label>
-              <select id="shuzan-grade"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white">
-                <option value="">選択してください</option>
-                <option>10級</option><option>9級</option><option>8級</option>
-                <option>7級</option><option>6級</option><option>5級</option>
-                <option>4級</option><option>準3級</option><option>3級</option>
-                <option>準2級</option><option>2級</option><option>準1級</option>
-                <option>1級</option><option>段位</option>
-              </select>
-              <label class="block text-xs text-gray-500 mt-3 mb-1">珠算受験時刻</label>
-              <select id="shuzan-time"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white">
-                <option value="">選択してください</option>
-                <option value="10:20">10時20分</option>
-                <option value="11:20">11時20分</option>
-                <option value="13:20">13時20分</option>
-                <option value="14:20">14時20分</option>
-              </select>
-            </div>
-          </div>
-
           <!-- 暗算 -->
           <div class="mb-4 border border-gray-200 rounded-xl p-4">
             <label class="flex items-center gap-3 cursor-pointer mb-3">
@@ -178,6 +149,35 @@
                 <option value="11:00">11時00分</option>
                 <option value="13:00">13時00分</option>
                 <option value="14:00">14時00分</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 珠算 -->
+          <div class="mb-4 border border-gray-200 rounded-xl p-4">
+            <label class="flex items-center gap-3 cursor-pointer mb-3">
+              <input type="checkbox" id="shuzan-check" class="w-4 h-4 accent-green-500 rounded" />
+              <span class="text-sm font-bold text-gray-700 font-display">珠算</span>
+            </label>
+            <div id="shuzan-grade-field" class="hidden">
+              <label class="block text-xs text-gray-500 mb-1">珠算受験級</label>
+              <select id="shuzan-grade"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white">
+                <option value="">選択してください</option>
+                <option>10級</option><option>9級</option><option>8級</option>
+                <option>7級</option><option>6級</option><option>5級</option>
+                <option>4級</option><option>準3級</option><option>3級</option>
+                <option>準2級</option><option>2級</option><option>準1級</option>
+                <option>1級</option><option>段位</option>
+              </select>
+              <label class="block text-xs text-gray-500 mt-3 mb-1">珠算受験時刻</label>
+              <select id="shuzan-time"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white">
+                <option value="">選択してください</option>
+                <option value="10:20">10時20分</option>
+                <option value="11:20">11時20分</option>
+                <option value="13:20">13時20分</option>
+                <option value="14:20">14時20分</option>
               </select>
             </div>
           </div>
