@@ -421,6 +421,17 @@ async function handleNyukai(body, env, origin) {
   // ── app 19 にレコード登録 ──────────────────────────────────────────────────
   const g = guardian ?? {};
   const coupon = g["クーポンコード"] ?? "";
+  const sorobanOrders = Array.isArray(body["sorobanOrders"]) ? body["sorobanOrders"] : [];
+  const userNotes = body["notes"] ?? "";
+
+  // 備考フィールドを組み立て（そろばん購入希望 → 備考 → クーポンコード）
+  const bikoLines = [];
+  if (sorobanOrders.length > 0) {
+    bikoLines.push(`【そろばん購入希望】\n${sorobanOrders.join("\n")}`);
+  }
+  if (userNotes) bikoLines.push(userNotes);
+  if (coupon) bikoLines.push(`クーポンコード：${coupon}`);
+  const biko = bikoLines.join("\n\n");
 
   const record = buildRecord({
     生徒番号: tempStudentId,
@@ -444,7 +455,7 @@ async function handleNyukai(body, env, origin) {
     郵便番号: g["郵便番号"] ?? "",
     住所: g["住所"] ?? "",
     口座名義人: g["口座名義人"] ?? "",
-    備考: coupon ? `クーポンコード：${coupon}` : "",
+    備考: biko,
   });
 
   // 所属組織フィールド（組織選択型）
