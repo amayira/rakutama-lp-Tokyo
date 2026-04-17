@@ -108,8 +108,8 @@
               <div id="info-classroom" class="text-sm font-medium text-gray-800"></div>
             </div>
             <div class="bg-gray-50 rounded-lg p-2">
-              <div class="text-xs text-gray-400 mb-0.5">お名前</div>
-              <div id="info-name" class="text-sm font-medium text-gray-800"></div>
+              <div class="text-xs text-gray-400 mb-0.5">受講中クラス</div>
+              <div id="info-jugyo" class="text-sm font-medium text-gray-800"></div>
             </div>
           </div>
         </div>
@@ -258,7 +258,7 @@
         const s = data.student;
 
         document.getElementById('info-classroom').textContent = s.classroom || '―';
-        document.getElementById('info-name').textContent = `${s.familyName} ${s.givenName}`;
+        document.getElementById('info-jugyo').textContent = s.jugyoIds && s.jugyoIds.length > 0 ? s.jugyoIds.join('、') : '―';
         studentInfo.classList.remove('hidden');
         document.getElementById('submit-btn').disabled = false;
         document.getElementById('submit-hint').classList.add('hidden');
