@@ -163,6 +163,7 @@
     const API_BASE = 'https://rakutama-kintone.k-ariyama.workers.dev';
 
     let studentData = null;
+    let ticketReqId = 0;
 
     function fmtDate(ymd) {
       if (!ymd) return '';
@@ -177,6 +178,7 @@
 
     // ── チケット取得 ──────────────────────────────────────────────────────────
     async function loadTickets() {
+      const myId = ++ticketReqId;
       const date = document.getElementById('furikae-date').value;
       const ticketSelect = document.getElementById('ticket-select');
       const ticketSpinner = document.getElementById('ticket-spinner');
@@ -198,6 +200,8 @@
           `${API_BASE}/api/furikae-tickets?studentNumber=${encodeURIComponent(studentNumber)}&date=${encodeURIComponent(date)}`
         );
         const data = await res.json();
+        if (myId !== ticketReqId) return; // 古いリクエストは破棄
+
         if (!res.ok || !data.success) throw new Error(data.error || 'チケットの取得に失敗しました');
 
         if (data.tickets.length === 0) {
@@ -218,10 +222,11 @@
           document.getElementById('submit-hint').classList.add('hidden');
         }
       } catch (err) {
+        if (myId !== ticketReqId) return;
         ticketError.textContent = err.message || 'チケット情報の取得中にエラーが発生しました。';
         ticketError.classList.remove('hidden');
       } finally {
-        ticketSpinner.classList.add('hidden');
+        if (myId === ticketReqId) ticketSpinner.classList.add('hidden');
       }
     }
 
