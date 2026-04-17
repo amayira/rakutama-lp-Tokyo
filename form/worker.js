@@ -321,13 +321,13 @@ async function handleFurikaeTickets(params, env) {
     return { success: false, error: "studentNumber と date は必須です", status: 400 };
   }
 
-  const query = [
+  const conditions = [
     `生徒番号 = "${studentNumber}"`,
     `振替受講日 = ""`,
     `振替期日_始_ <= "${date}"`,
     `振替期日_終_ >= "${date}"`,
-    `order by 欠席日 asc limit 50`,
   ].join(" and ");
+  const query = `${conditions} order by 欠席日 asc limit 50`;
 
   const data = await kintoneGet(APP.FURIKAE, query, env.TOKEN_FURIKAE);
 
