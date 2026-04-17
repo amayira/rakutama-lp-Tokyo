@@ -215,7 +215,9 @@
       placeholder.textContent = '選択してください';
       select.appendChild(placeholder);
       const now = new Date();
-      for (let i = 1; i <= 3; i++) {
+      // 締め日（10日）を過ぎていれば翌々月から、そうでなければ翌月から
+      const startOffset = now.getDate() > 10 ? 2 : 1;
+      for (let i = startOffset; i <= startOffset + 2; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
         const label = `${d.getFullYear()}年${d.getMonth() + 1}月から`;
         const option = document.createElement('option');
