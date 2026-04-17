@@ -154,11 +154,6 @@
 
           </div>
 
-          <!-- 合計金額表示 -->
-          <div id="total-display" class="hidden mt-3 bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center justify-between">
-            <span class="text-sm font-medium text-gray-700">合計金額</span>
-            <span id="total-amount" class="text-base font-black text-green-700"></span>
-          </div>
         </div>
 
         <button type="submit" id="submit-btn" disabled
@@ -195,22 +190,6 @@
 
     let studentData = null;
 
-    // ── 合計金額の更新 ────────────────────────────────────────────────────────
-    function updateTotal() {
-      const checked = [...document.querySelectorAll('input[name="item"]:checked')];
-      const total = checked.reduce((sum, cb) => sum + parseInt(cb.dataset.price || '0', 10), 0);
-      const totalDisplay = document.getElementById('total-display');
-      const totalAmount = document.getElementById('total-amount');
-      if (checked.length > 0 && total > 0) {
-        totalAmount.textContent = total.toLocaleString() + '円';
-        totalDisplay.classList.remove('hidden');
-      } else {
-        totalDisplay.classList.add('hidden');
-      }
-    }
-    document.querySelectorAll('input[name="item"]').forEach(cb => {
-      cb.addEventListener('change', updateTotal);
-    });
 
     // ── Lookup ────────────────────────────────────────────────────────────────
     document.getElementById('lookup-btn').addEventListener('click', async () => {
