@@ -306,7 +306,8 @@ async function handleFlashAnzan(body, env) {
     金額: body["金額"] ?? 0,
   });
 
-  await kintonePost(APP.SONOTA, record, env.TOKEN_SONOTA);
+  const sonotaToken = [env.TOKEN_SONOTA, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
+  await kintonePost(APP.SONOTA, record, sonotaToken);
   return { success: true };
 }
 
@@ -426,6 +427,11 @@ async function handleNyukai(body, env, origin) {
 
   // 備考フィールドを組み立て（そろばん購入希望 → 備考 → クーポンコード）
   const bikoLines = [];
+  const exp = student["そろばん経験"];
+  if (exp) {
+    const levelPart = student["級・段"] ? `（${student["級・段"]}）` : "";
+    bikoLines.push(`そろばん経験：${exp}${levelPart}`);
+  }
   if (sorobanOrders.length > 0) {
     bikoLines.push(`【そろばん購入希望】\n${sorobanOrders.join("\n")}`);
   }
