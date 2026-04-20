@@ -1256,14 +1256,14 @@
                     }),
                 });
 
-                if (!response.ok) {
-                    const data = await response.json().catch(() => ({}));
-                    throw new Error(data.error || data.message || `送信に失敗しました（${response.status}）`);
+                const resData = await response.json().catch(() => ({}));
+                if (!response.ok || resData.success === false) {
+                    throw new Error(resData.error || resData.message || `送信に失敗しました（${response.status}）`);
                 }
 
-                // Meta Pixel CV発火 → サンクスページへ
-                if (typeof fbq === 'function') fbq('track', 'Lead');
-                setTimeout(() => { window.location.href = 'trial-thanks.html'; }, 300);
+                // Meta Pixel CV発火（失敗してもリダイレクトは実行）
+                try { if (typeof fbq === 'function') fbq('track', 'Lead'); } catch (_) {}
+                window.location.href = 'trial-thanks.html';
 
             } catch (err) {
                 const isNetworkErr = !err.message || err.message === 'Failed to fetch' || err.message.includes('NetworkError') || err.message.includes('network');
