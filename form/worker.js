@@ -427,10 +427,9 @@ async function handleNyukai(body, env, origin) {
 
   // 備考フィールドを組み立て（そろばん購入希望 → 備考 → クーポンコード）
   const bikoLines = [];
-  const exp = student["そろばん経験"];
-  if (exp) {
+  if (student["そろばん経験"] === "あり") {
     const levelPart = student["級・段"] ? `（${student["級・段"]}）` : "";
-    bikoLines.push(`そろばん経験：${exp}${levelPart}`);
+    bikoLines.push(`そろばん経験：あり${levelPart}`);
   }
   if (sorobanOrders.length > 0) {
     bikoLines.push(`【そろばん購入希望】\n${sorobanOrders.join("\n")}`);
