@@ -574,18 +574,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 
-    <!-- Wave to teal -->
-    <svg viewBox="0 0 1440 64" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full block">
-        <path d="M0,32 C360,0 1080,64 1440,24 L1440,64 L0,64 Z" fill="#4A96AE"/>
-    </svg>
 </section>
 
 
 <!-- ========== 無料体験 CTA ========== -->
-<section class="pt-10 pb-0" style="background-image:url('Pictures/LP_background.png'); background-size:cover; background-position:center; position:relative;">
+<section class="pb-0" style="background-image:url('Pictures/LP_background.png'); background-size:cover; background-position:center; position:relative;">
 <div style="position:absolute; inset:0; background:rgba(0,110,135,0.79); pointer-events:none;"></div>
+<!-- White wave overlaid at top of background image -->
+<div style="position:absolute; top:0; left:0; right:0; pointer-events:none; z-index:2;">
+    <svg viewBox="0 0 1440 64" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block; width:100%;">
+        <path d="M0,32 C360,0 1080,64 1440,24 L1440,64 L0,64 Z" fill="white"/>
+    </svg>
+</div>
 <div style="position:relative; z-index:1;">
-    <div class="max-w-3xl mx-auto px-5 text-center pb-16">
+    <div class="max-w-3xl mx-auto px-5 text-center pb-16" style="padding-top: 80px;">
         <div class="fade-in">
             <span class="sec-title white-on-teal">無料体験のご案内</span>
             <h2 class="font-display text-3xl md:text-4xl font-black text-white mt-6 mb-4">
