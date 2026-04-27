@@ -163,6 +163,21 @@ TOKEN_GAKUHI
 
 GTMスニペットは `<head>` 内（同期）と `<body>` 直後（`<noscript>` iframe）の両方に配置すること。
 
+### CV（コンバージョン）計測
+
+- **CVページ**: `trial-thanks.html`（ルート直下）のページビューをCV地点として計測
+- フォーム送信完了後は必ずこのページにリダイレクトすること
+  - `trial.html`（体験申込）→ `trial-thanks.html`
+  - `LP/trial.html`（LP版体験申込）→ `LP/trial-thanks.html`（LP版サンクス）※LP版はLP内で完結
+  - `form/taiken-nakamura.html`（中村校体験会）→ `../trial-thanks.html`
+
+### 広告ランディングページ
+
+| 媒体 | ランディングページ |
+|------|------------------|
+| Google 広告 | `https://rakutama-tokyo.com/`（トップページ） |
+| Meta 広告（Facebook/Instagram） | `https://rakutama-tokyo.com/LP/trial.html` |
+
 ---
 
 ## デプロイフロー
