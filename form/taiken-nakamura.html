@@ -280,15 +280,6 @@
       </form>
     </div>
 
-    <!-- Success Screen (hidden initially) -->
-    <div id="success-screen" class="hidden bg-white rounded-2xl shadow-md p-8 text-center">
-      <div class="w-16 h-16 rounded-full bg-[#EBF5F8] flex items-center justify-center mx-auto mb-4">
-        <i class="fa-solid fa-check text-[#4A96AE] text-2xl"></i>
-      </div>
-      <h2 class="text-xl font-black text-gray-800 font-display mb-3">申込が完了しました</h2>
-      <p class="text-sm text-gray-500">そろばん体験会のお申し込みを受け付けました。<br>担当者よりご連絡いたします。</p>
-    </div>
-
   </main>
 
   <footer class="text-center py-8 text-xs text-gray-400">
@@ -387,9 +378,7 @@
           throw new Error(data.error || data.message || `送信に失敗しました（${response.status}）`);
         }
 
-        document.getElementById('form-card').classList.add('hidden');
-        document.getElementById('success-screen').classList.remove('hidden');
-        document.getElementById('success-screen').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        window.location.href = '../trial-thanks.html';
 
       } catch (err) {
         errorBox.textContent = err.message || '送信中にエラーが発生しました。しばらく経ってから再度お試しください。';
