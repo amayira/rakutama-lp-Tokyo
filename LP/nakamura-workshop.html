@@ -147,29 +147,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </svg>
   </div>
 
-  <!-- "参加無料" バッジ（左上） -->
-  <div style="position:absolute; top:16px; left:16px; z-index:10;">
-    <div class="free-badge">
-      <span class="text-sm font-black">参加</span>
-      <span class="text-lg font-black">無料</span>
-    </div>
-  </div>
+  <!-- バッジ＆コピー：PC では max-width コンテナ内に収める -->
+  <div style="position:absolute; top:0; left:0; right:0; z-index:10; pointer-events:none;
+              display:flex; justify-content:space-between; align-items:flex-start;
+              max-width:900px; margin:0 auto; padding:16px;">
 
-  <!-- メインコピー（右上・正式縦書き・コンパクト白枠・鋭利角・水色文字）
-       writing-mode:vertical-rl で鉤括弧も正しく縦向きに表示 -->
-  <div style="position:absolute; top:16px; right:16px; z-index:10; display:flex; gap:3px; overflow:visible;">
-    <div style="writing-mode:vertical-rl; text-orientation:mixed; white-space:nowrap;
-                background:#fff; color:#4A96AE;
-                font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:0.8rem;
-                padding:8px 5px; border-radius:0;">
-      魔法の「パチパチ」体験
+    <!-- "参加無料" バッジ（左上） -->
+    <div style="pointer-events:auto;">
+      <div class="free-badge">
+        <span class="text-sm font-black">参加</span>
+        <span class="text-lg font-black">無料</span>
+      </div>
     </div>
-    <div style="writing-mode:vertical-rl; text-orientation:mixed; white-space:nowrap;
-                background:#fff; color:#4A96AE;
-                font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:0.8rem;
-                padding:8px 5px; border-radius:0;">
-      数字がパズルに変わる！
+
+    <!-- メインコピー（右上・縦書き） -->
+    <div style="pointer-events:auto; display:flex; gap:3px; overflow:visible;">
+      <div style="writing-mode:vertical-rl; text-orientation:mixed; white-space:nowrap;
+                  background:#fff; color:#4A96AE;
+                  font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:0.8rem;
+                  padding:8px 5px; border-radius:0;">
+        魔法の「パチパチ」体験
+      </div>
+      <div style="writing-mode:vertical-rl; text-orientation:mixed; white-space:nowrap;
+                  background:#fff; color:#4A96AE;
+                  font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:0.8rem;
+                  padding:8px 5px; border-radius:0;">
+        数字がパズルに変わる！
+      </div>
     </div>
+
   </div>
 
   <!-- 下部波形（写真下端→次セクションへ水色でつなぐ） -->
