@@ -177,7 +177,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <nav class="hidden md:flex items-center gap-4 text-sm text-gray-600 font-bold">
             <a href="features" class="nav-link hover:text-primary transition">楽珠そろばん教室の特徴</a>
             <a href="courses" class="nav-link hover:text-primary transition">コース・料金</a>
-            <a href="access" class="nav-link hover:text-primary transition">教室案内</a>
+            <a href="access" class="nav-link hover:text-primary transition">教室・講師紹介</a>
             <a href="faq" class="nav-link hover:text-primary transition">よくある質問</a>
             <a href="/form/" target="_blank" class="nav-link hover:text-primary transition">各種フォーム</a>
         </nav>
@@ -196,7 +196,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <nav class="flex flex-col px-5 py-4 gap-4 text-sm font-bold text-gray-700">
             <a href="features">楽珠そろばん教室の特徴</a>
             <a href="courses">コース・料金</a>
-            <a href="access">教室案内</a>
+            <a href="access">教室・講師紹介</a>
             <a href="faq">よくある質問</a>
             <a href="/form/" target="_blank">各種フォーム</a>
             <a href="trial" class="text-primary font-bold">無料体験を申し込む</a>
@@ -318,42 +318,84 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 
-<!-- ========== 楽珠メソッド ========== -->
-<section class="bg-white pt-6 pb-0 relative">
-    <div class="max-w-5xl mx-auto px-5 pb-16">
-        <div class="text-center mb-10 fade-in">
-            <span class="sec-title">楽珠メソッドとは？</span>
-            <h2 class="font-display text-3xl md:text-4xl font-black text-gray-800 mt-6">そろばんが育てる<br><span class="text-primary">3つの力</span></h2>
-        </div>
+<!-- ========== 3つの非認知能力 ========== -->
+<section style="background:#4A96AE;" class="pt-0 pb-0 relative">
+    <!-- Wave from white -->
+    <div style="background:#ffffff; line-height:0; margin-bottom:-1px;">
+        <svg viewBox="0 0 1440 44" preserveAspectRatio="none" style="width:100%; height:44px; display:block;">
+            <path d="M0,44 C360,0 1080,44 1440,10 L1440,44 L0,44 Z" fill="#4A96AE"/>
+        </svg>
+    </div>
 
-        <div class="grid md:grid-cols-3 gap-5">
-            <div class="pop-card p-6 text-center fade-in">
-                <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-brain text-primary text-2xl"></i>
+    <div class="max-w-5xl mx-auto px-5 py-10 relative z-10">
+        <div class="mb-8 fade-in">
+            <div style="display:flex; flex-direction:column; align-items:flex-start; gap:8px;">
+                <div style="background:#fff; padding:8px 16px; box-shadow:0 4px 12px rgba(0,0,0,0.18); display:inline-block;">
+                    <span class="font-display font-black" style="color:#4A96AE; font-size:clamp(1rem,4vw,1.4rem); white-space:nowrap;">一生モノの『自信』と『集中力』を、</span>
                 </div>
-                <h3 class="font-display font-black text-lg text-gray-800 mb-2">右脳計算力</h3>
-                <p class="text-sm text-gray-600 leading-relaxed">珠をイメージして瞬時に答えを出す右脳計算。暗算力が飛躍的に伸びます。</p>
+                <div style="background:#fff; padding:8px 16px; box-shadow:0 4px 12px rgba(0,0,0,0.18); display:inline-block;">
+                    <span class="font-display font-black" style="color:#4A96AE; font-size:clamp(1rem,4vw,1.4rem); white-space:nowrap;">パチパチ弾いて手に入れよう！</span>
+                </div>
             </div>
-            <div class="pop-card p-6 text-center fade-in" style="border-color:#FDE68A; background:#FFFBEB;">
-                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-bullseye text-secondary text-2xl"></i>
-                </div>
-                <h3 class="font-display font-black text-lg text-gray-800 mb-2">集中力</h3>
-                <p class="text-sm text-gray-600 leading-relaxed">そろばんに向き合う時間が、自然と集中する習慣を育てます。</p>
-            </div>
-            <div class="pop-card p-6 text-center fade-in">
-                <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-seedling text-primary text-2xl"></i>
-                </div>
-                <h3 class="font-display font-black text-lg text-gray-800 mb-2">自律学習</h3>
-                <p class="text-sm text-gray-600 leading-relaxed">自分で考え、自分で進める学習スタイルが、勉強の自信につながります。</p>
+            <div class="mt-4 inline-block bg-amber-400 text-white font-display font-black text-base px-6 py-2 rounded-full">
+                そろばんが育てる「3つの非認知能力」
             </div>
         </div>
 
-        <div class="text-center mt-8 fade-in">
-            <a href="features" class="inline-flex items-center gap-2 text-primary font-black text-sm hover:underline">
-                教室の特徴を詳しく見る <i class="fa-solid fa-arrow-right text-xs"></i>
-            </a>
+        <div class="grid md:grid-cols-3 gap-5 fade-in">
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+                    <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+                    <span style="font-family:'Inter','Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:2.4rem; color:#4A96AE; line-height:1;">01</span>
+                    <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+                </div>
+                <h3 class="font-display font-black text-lg mb-3 text-center" style="color:#1f2937;">
+                    圧倒的な<br>「暗算力」と「数感」
+                </h3>
+                <p class="text-sm leading-relaxed text-gray-600">
+                    頭の中にそろばんを浮かべる「珠算式暗算」で、一生モノの計算スピードが身につきます。算数が「得意」から「大好き」に変わります。
+                </p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+                    <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+                    <span style="font-family:'Inter','Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:2.4rem; color:#4A96AE; line-height:1;">02</span>
+                    <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+                </div>
+                <h3 class="font-display font-black text-lg mb-3 text-center" style="color:#1f2937;">
+                    ゾーンに入る<br>「集中力」
+                </h3>
+                <p class="text-sm leading-relaxed text-gray-600">
+                    制限時間内に正確に弾く作業は、高い没頭感を生みます。他の学習にも活きる「深く集中する癖」がつきます。
+                </p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+                    <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+                    <span style="font-family:'Inter','Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:2.4rem; color:#4A96AE; line-height:1;">03</span>
+                    <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+                </div>
+                <h3 class="font-display font-black text-lg mb-3 text-center" style="color:#1f2937;">
+                    最後までやり遂げる<br>「忍耐力」と「自信」
+                </h3>
+                <p class="text-sm leading-relaxed text-gray-600">
+                    検定試験を通じて「努力が結果になる成功体験」を積み重ね、自己肯定感を育みます。
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-8 -mx-5 fade-in">
+            <div style="background:#F5C800; clip-path: polygon(0 0, 100% 0, calc(100% - 36px) 50%, 100% 100%, 0 100%); padding: 16px 60px 16px 1.5rem; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
+                <h2 class="font-display font-black" style="color:#374151; font-size:clamp(0.95rem,4vw,1.5rem);">
+                    そろばんは、右脳を鍛える最強のメソッド
+                </h2>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center fade-in">
+            <p class="text-white text-sm md:text-base leading-relaxed max-w-2xl mx-auto opacity-90">
+                一般的な筆算が左脳（論理）を使うのに対し、そろばんは<span class="font-bold underline">右脳（イメージ・直感）</span>をフル回転させます。デジタル時代だからこそ、アナログな刺激がお子様の脳の可能性を広げます。
+            </p>
         </div>
     </div>
 
@@ -460,6 +502,102 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="text-center mt-8">
             <a href="access" class="btn-pop btn-pop-yellow text-sm px-8 py-3.5">
                 各教室の詳細・地図を見る <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Wave to white -->
+    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full block">
+        <path d="M0,30 C480,0 960,60 1440,20 L1440,60 L0,60 Z" fill="#ffffff"/>
+    </svg>
+</section>
+
+
+<!-- ========== 楽珠の特徴 ========== -->
+<section class="bg-white pt-10 pb-0">
+    <div class="max-w-5xl mx-auto px-5 pb-16">
+        <div class="text-center mb-10 fade-in">
+            <span class="sec-title">楽珠そろばん教室の特徴</span>
+            <h2 class="font-display text-3xl md:text-4xl font-black text-gray-800 mt-6">おうちで伸びる、<br class="md:hidden"><span class="text-primary">4つの無料プログラム</span></h2>
+            <p class="text-gray-500 text-sm mt-3">月謝の中に含まれる、他の教室にはない独自サポート</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-5 fade-in">
+            <!-- 本気の朝練 -->
+            <div class="pop-card p-6 flex gap-4 items-start">
+                <div class="w-14 h-14 bg-accent rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-sun text-primary text-2xl"></i>
+                </div>
+                <div>
+                    <div class="inline-block bg-primary/10 text-primary text-xs font-black px-3 py-0.5 rounded-full mb-2">毎週月曜 6:30〜（30分）</div>
+                    <h3 class="font-display font-black text-lg text-gray-800 mb-1">本気の朝練</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">月曜朝のオンライン練習会。先生と一緒に週のスタートダッシュを切ろう！朝の集中習慣が学力の土台をつくります。</p>
+                </div>
+            </div>
+
+            <!-- 暗算道場 -->
+            <div class="pop-card p-6 flex gap-4 items-start" style="border-color:#FDE68A; background:#FFFBEB;">
+                <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-bolt text-secondary text-2xl"></i>
+                </div>
+                <div>
+                    <div class="inline-block text-xs font-black px-3 py-0.5 rounded-full mb-2" style="background:#FDE68A; color:#92400E;">毎週土曜 8:00〜（30分）</div>
+                    <h3 class="font-display font-black text-lg text-gray-800 mb-1">暗算道場</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">土曜朝の暗算練習会。フラッシュ暗算も！スピードと精度を磨いて、暗算の達人を目指しましょう。</p>
+                </div>
+            </div>
+
+            <!-- そろばん研究所 -->
+            <div class="pop-card p-6 flex gap-4 items-start">
+                <div class="w-14 h-14 bg-accent rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-microscope text-primary text-2xl"></i>
+                </div>
+                <div>
+                    <div class="inline-block bg-primary/10 text-primary text-xs font-black px-3 py-0.5 rounded-full mb-2">毎月第1日曜 9:00〜（90分）</div>
+                    <h3 class="font-display font-black text-lg text-gray-800 mb-1">そろばん研究所</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">月1回の上級者向け特別練習会。応用問題・高速計算に挑戦。上位を目指す子の実力を一気に伸ばします。</p>
+                </div>
+            </div>
+
+            <!-- 解説動画配信 -->
+            <div class="pop-card p-6 flex gap-4 items-start" style="border-color:#FDE68A; background:#FFFBEB;">
+                <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-play-circle text-secondary text-2xl"></i>
+                </div>
+                <div>
+                    <div class="inline-block text-xs font-black px-3 py-0.5 rounded-full mb-2" style="background:#FDE68A; color:#92400E;">解説動画配信</div>
+                    <h3 class="font-display font-black text-lg text-gray-800 mb-1">練習用プリントも公開中</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">授業の振り返りに使える解説動画と練習プリントを随時配信。おうちでの自学習をしっかりサポートします。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- らくたまカップ -->
+        <div class="mt-6 fade-in">
+            <div class="rounded-2xl overflow-hidden border-2 border-secondary" style="background: linear-gradient(135deg, #FFFBEB 0%, #FFF9E6 100%);">
+                <div class="bg-secondary px-6 py-3 flex items-center gap-3">
+                    <i class="fa-solid fa-trophy text-white text-xl"></i>
+                    <span class="font-display font-black text-white text-lg">らくたまカップ</span>
+                    <span class="ml-auto bg-white text-secondary text-xs font-black px-3 py-0.5 rounded-full">年1回開催</span>
+                </div>
+                <div class="p-6 flex flex-col md:flex-row items-start md:items-center gap-4">
+                    <div class="flex-1">
+                        <h3 class="font-display font-black text-xl text-gray-800 mb-2">生徒みんなで競い合う<br>そろばん大会！</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">楽珠そろばん教室の生徒が一堂に集まる年1回の競技大会。日頃の練習の成果を発揮する晴れ舞台。順位を競うだけでなく、仲間と切磋琢磨することで「もっと上手くなりたい！」という気持ちが育ちます。</p>
+                    </div>
+                    <div class="flex-shrink-0 text-center">
+                        <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto" style="background:#FEF3C7;">
+                            <i class="fa-solid fa-medal text-secondary text-4xl"></i>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 font-bold">頑張りを称える<br>表彰あり</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-8 fade-in">
+            <a href="features" class="inline-flex items-center gap-2 text-primary font-black text-sm hover:underline">
+                教室の特徴をもっと見る <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
         </div>
     </div>
@@ -683,7 +821,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <ul class="space-y-2">
                         <li><a href="features" class="hover:text-white transition">楽珠そろばん教室の特徴</a></li>
                         <li><a href="courses" class="hover:text-white transition">コース・料金</a></li>
-                        <li><a href="access" class="hover:text-white transition">教室案内</a></li>
+                        <li><a href="access" class="hover:text-white transition">教室・講師紹介</a></li>
                         <li><a href="faq" class="hover:text-white transition">よくある質問</a></li>
                         <li><a href="trial" class="hover:text-white transition">無料体験を申し込む</a></li>
                     </ul>
