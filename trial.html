@@ -755,6 +755,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             submitSpinner.classList.add('hidden');
         }
     });
+
+    // form_start: フォームの最初のフィールド操作でGTM経由GA4へ送信
+    (function () {
+      var fired = false;
+      document.getElementById('taiken-form').addEventListener('focusin', function (e) {
+        if (fired) return;
+        var tag = e.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+          fired = true;
+          window.dataLayer = window.dataLayer || [];
+          dataLayer.push({ event: 'form_start', form_name: 'taiken_trial' });
+        }
+      });
+    })();
 </script>
 </body>
 </html>

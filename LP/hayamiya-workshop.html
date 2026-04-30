@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5K7GZCTN');</script>
+  <!-- End Google Tag Manager -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【無料体験会】そろばん体験会 早宮校｜楽珠そろばん教室 東京・練馬</title>
+  <meta name="description" content="6月中毎週開催！練馬区早宮のリトルッカで開催するそろばん無料体験会。参加費無料・手ぶらでOK。定員各回10名・先着予約制。">
+  <link rel="canonical" href="https://rakutama-tokyo.com/LP/hayamiya-workshop.html">
+  <link rel="icon" type="image/png" sizes="32x32" href="../Pictures/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../Pictures/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../Pictures/favicon.png">
+  <meta name="theme-color" content="#4A96AE">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS (ビルド済み) -->
+  <link rel="stylesheet" href="../tailwind.css">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans JP', sans-serif; color: #374151; background-color: #EBF7FA; }
+    .font-display { font-family: 'Zen Kaku Gothic New', sans-serif; }
+    .font-number { font-family: 'Inter', sans-serif; }
+
+    /* Hero photo mosaic — 写真がセクション全体を埋める absolute グリッド */
+    .photo-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-rows: 55% 45%;
+      gap: 3px;
+    }
+    .photo-grid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-tall { grid-row: span 2; }
+
+    /* Title tile boxes — 水色背景・白文字（そろばん行） */
+    .title-tile {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 78px; height: 78px;
+      background: #4A96AE; color: #fff;
+      border-radius: 12px;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-weight: 900;
+      font-size: 2.4rem;
+      line-height: 1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    @media (min-width: 768px) {
+      .title-tile { width: 108px; height: 108px; font-size: 3.4rem; border-radius: 16px; }
+    }
+
+    /* Title tile boxes — 白背景・水色文字（体験会行） */
+    .title-tile-white {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 78px; height: 78px;
+      background: #fff; color: #4A96AE;
+      border-radius: 12px;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-weight: 900;
+      font-size: 2.4rem;
+      line-height: 1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    @media (min-width: 768px) {
+      .title-tile-white { width: 108px; height: 108px; font-size: 3.4rem; border-radius: 16px; }
+    }
+
+    /* Free badge */
+    .free-badge {
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 76px; height: 76px;
+      background: #F59E0B;
+      border-radius: 50%;
+      color: #fff;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-weight: 900;
+      line-height: 1.1;
+      box-shadow: 0 4px 16px rgba(245,158,11,0.5);
+    }
+    @media (min-width: 768px) {
+      .free-badge { width: 96px; height: 96px; }
+    }
+
+    /* Wave divider */
+    .wave-top { display: block; width: 100%; overflow: hidden; line-height: 0; }
+
+    /* Shimmer animation */
+    @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+    .shimmer-badge { background: linear-gradient(90deg,#F59E0B 0%,#ffd75e 45%,#F59E0B 100%); background-size: 200% auto; animation: shimmer 2.4s linear infinite; }
+
+    /* CTA button shine */
+    .btn-shine { position: relative; overflow: hidden; }
+    .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right,rgba(255,255,255,0) 0%,rgba(255,255,255,0.3) 50%,rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; }
+    @keyframes shine { 0%{left:-100%} 20%{left:200%} 100%{left:200%} }
+
+    /* Accordion */
+    .accordion-content { transition: max-height 0.3s ease-out, opacity 0.3s ease-out; max-height: 0; opacity: 0; overflow: hidden; }
+    .accordion-content.active { opacity: 1; }
+
+    .has-sticky-footer { padding-bottom: 72px; }
+
+    /* vertical text */
+    .writing-vertical { writing-mode: vertical-rl; text-orientation: mixed; }
+  </style>
+</head>
+<body class="has-sticky-footer">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K7GZCTN"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- ==================== HERO ==================== -->
+<!-- 背景は薄い水色。波形SVGが上から写真に被さるチラシ同様のデザイン -->
+<section class="relative" style="min-height:520px; background:#C8EEF8;">
+
+  <!-- 写真グリッド（セクション全体を埋める absolute 配置） -->
+  <div class="photo-grid">
+    <img src="../Pictures/hayamiya_inside.jpg" alt="早宮校 授業風景">
+    <img src="../Pictures/fv.jpg" alt="楽珠そろばん教室" class="photo-tall">
+    <img src="../Pictures/hayamiya_outside.jpg" alt="早宮校 外観">
+  </div>
+
+  <!-- ★波形オーバーレイ（上から写真に被さる・背景色と同じ水色）★
+       背景色 #C8EEF8 の波形が photos の上端を食い込む、チラシの波形デザイン -->
+  <div style="position:absolute; top:0; left:0; right:0; z-index:7; pointer-events:none; line-height:0;">
+    <svg viewBox="0 0 1200 90" preserveAspectRatio="none" style="width:100%; height:90px; display:block;">
+      <path d="M0,0 L1200,0 L1200,45
+               C1050,85 900,15 750,55
+               C600,90 450,20 300,60
+               C150,90 60,30 0,55
+               Z"
+            fill="#C8EEF8"/>
+    </svg>
+  </div>
+
+  <!-- バッジ＆コピー：PC では max-width コンテナ内に収める -->
+  <div style="position:absolute; top:0; left:0; right:0; z-index:10; pointer-events:none;
+              display:flex; justify-content:space-between; align-items:flex-start;
+              max-width:900px; margin:0 auto; padding:16px;">
+
+    <!-- "参加無料" バッジ（左上） -->
+    <div style="pointer-events:auto;">
+      <div class="free-badge">
+        <span class="text-sm font-black">参加</span>
+        <span class="text-lg font-black">無料</span>
+      </div>
+    </div>
+
+    <!-- メインコピー（右上・縦書き） -->
+    <div style="pointer-events:auto; display:flex; gap:3px; overflow:visible;">
+      <div style="writing-mode:vertical-rl; text-orientation:mixed; white-space:nowrap;
+                  background:#fff; color:#4A96AE;
+                  font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:0.8rem;
+                  padding:8px 5px; border-radius:0;">
+        魔法の「パチパチ」体験
+      </div>
+      <div style="writing-mode:vertical-rl; text-orientation:mixed; white-space:nowrap;
+                  background:#fff; color:#4A96AE;
+                  font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:0.8rem;
+                  padding:8px 5px; border-radius:0;">
+        数字がパズルに変わる！
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 下部波形（写真下端→次セクションへ水色でつなぐ） -->
+  <div style="position:absolute; bottom:0; left:0; right:0; z-index:8; pointer-events:none; line-height:0;">
+    <svg viewBox="0 0 1200 80" preserveAspectRatio="none" style="width:100%; height:80px; display:block;">
+      <path d="M0,40 C150,0 300,70 450,30 C600,0 750,65 900,25 C1050,0 1150,50 1200,30 L1200,80 L0,80 Z" fill="#C8EEF8"/>
+    </svg>
+  </div>
+
+  <!-- タイトル＋CTA（画像上・下部配置・左端揃え） -->
+  <div style="position:absolute; bottom:0; left:0; right:0; z-index:10; padding:0 16px 24px;">
+
+    <!-- 中央揃えのコンテナ内で左端を統一 -->
+    <div style="display:flex; justify-content:center; margin-bottom:8px;">
+      <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;">
+
+        <!-- 吹き出し -->
+        <div style="position:relative; background:#fff; color:#4A96AE;
+                    font-family:'Zen Kaku Gothic New',sans-serif; font-weight:700; font-size:0.75rem;
+                    padding:5px 12px; border-radius:20px; white-space:nowrap;
+                    box-shadow:0 2px 8px rgba(0,0,0,0.15); margin-bottom:2px;">
+          練馬区早宮周辺にお住まいの皆さまへ
+          <span style="position:absolute; bottom:-7px; left:20px;
+                       width:0; height:0;
+                       border-left:7px solid transparent;
+                       border-right:7px solid transparent;
+                       border-top:8px solid #fff;"></span>
+        </div>
+
+        <!-- そろばん（水色タイル4マス） -->
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="title-tile">そ</div>
+          <div class="title-tile">ろ</div>
+          <div class="title-tile">ば</div>
+          <div class="title-tile">ん</div>
+        </div>
+
+        <!-- 体験会（白タイル4マス・左端はそろばん行と一致） -->
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="title-tile-white">体</div>
+          <div class="title-tile-white">験</div>
+          <div class="title-tile-white">会</div>
+          <div class="title-tile-white" style="padding:6px;">
+            <img src="../Pictures/soroban.png" alt="そろばん" style="width:100%; height:100%; object-fit:contain; display:block;">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 主催表記 -->
+    <div class="text-center" style="margin-top:8px;">
+      <div style="display:inline-flex; align-items:center; gap:6px;">
+        <img src="../Pictures/favicon.png" alt="" style="height:1em; width:auto; display:block;">
+        <span style="color:#374151; font-size:0.875rem; font-family:'Zen Kaku Gothic New',sans-serif; font-weight:700;">主催｜楽珠そろばん教室</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== キャッチコピー ==================== -->
+<section style="background:#C8EEF8; margin-top:-4px; position:relative; z-index:1;" class="pt-3 pb-6 px-4">
+  <div class="max-w-2xl mx-auto text-center">
+    <p class="font-display font-black text-xl md:text-2xl text-gray-800 leading-relaxed">
+      「計算が速くなる」だけじゃない。
+    </p>
+    <p class="text-sm md:text-base mt-4 leading-relaxed max-w-xl mx-auto" style="color:#374151;">
+      そろばんは、<span class="font-bold text-[#4A96AE]">集中力</span>、<span class="font-bold text-[#4A96AE]">記憶力</span>、そして<span class="font-bold text-[#4A96AE]">「やればできる」という自信</span>を育む脳トレの王様です。<br>
+      まずはパチパチと指を動かす楽しさを、親子で体感してみませんか？
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 開催概要 ==================== -->
+<section style="background:#C8EEF8;" class="py-6 px-4">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+      <!-- ヘッダー -->
+      <div class="px-6 py-3 flex items-center justify-between" style="background:#2C7A94;">
+        <h2 class="font-display font-black text-white text-lg">開催概要</h2>
+        <span class="shimmer-badge inline-flex items-center gap-1 rounded-full px-4 py-1.5 shadow-md">
+          <span class="text-white font-display font-black text-xs whitespace-nowrap">6月中 毎週開催</span>
+        </span>
+      </div>
+      <!-- 内容 -->
+      <div class="p-6 space-y-3 text-sm">
+        <div class="flex gap-3">
+          <span class="text-[#4A96AE]"><i class="fa-solid fa-yen-sign w-5 text-center"></i></span>
+          <div><span class="font-bold">参加費：</span>無料（手ぶらでOK！）</div>
+        </div>
+        <div class="flex gap-3">
+          <span class="text-[#4A96AE]"><i class="fa-solid fa-users w-5 text-center"></i></span>
+          <div><span class="font-bold">定員：</span>各回 10名様（先着順・予約制）</div>
+        </div>
+        <div class="flex gap-3 items-start">
+          <span class="text-[#4A96AE] pt-0.5"><i class="fa-solid fa-calendar-days w-5 text-center"></i></span>
+          <div>
+            <span class="font-bold">開催日程：</span>6月中の毎週 火曜日・金曜日<br>
+            <span class="text-gray-600 text-xs">
+              火曜：6/2, 6/9, 6/16, 6/23, 6/30<br>
+              金曜：6/5, 6/12, 6/19, 6/26
+            </span>
+          </div>
+        </div>
+        <div class="flex gap-3 items-start">
+          <span class="text-[#4A96AE] pt-0.5"><i class="fa-solid fa-clock w-5 text-center"></i></span>
+          <div>
+            <span class="font-bold">時間：</span>各日 2部制（各45分〜50分程度）<br>
+            <span class="text-gray-600 text-xs">① 16:00〜　② 17:00〜</span>
+          </div>
+        </div>
+        <div class="flex gap-3 items-start">
+          <span class="text-[#4A96AE] pt-0.5"><i class="fa-solid fa-map-pin w-5 text-center"></i></span>
+          <div>
+            <span class="font-bold">会場：</span>リトルッカ<br>
+            <span class="text-gray-500 text-xs">〒179-0085 東京都練馬区早宮4丁目27−10−5</span>
+          </div>
+        </div>
+        <div class="flex gap-3 items-start">
+          <span class="text-[#4A96AE] pt-0.5"><i class="fa-solid fa-gift w-5 text-center"></i></span>
+          <div>
+            <span class="font-bold" style="color:#D97706;">特典：</span><span class="font-bold">初心者テキストプレゼント</span>
+          </div>
+        </div>
+      </div>
+      <!-- CTA -->
+      <div class="px-6 pb-8">
+        <a href="#form" class="btn-shine block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-display font-black text-base py-3 rounded-full shadow-md transition">
+          この体験会に申し込む（無料）
+        </a>
+      </div>
+    </div>
+
+    <!-- 地図 -->
+    <div class="mt-4 rounded-2xl overflow-hidden shadow-md" style="aspect-ratio:4/3;">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2500!2d139.6361373655312!3d35.733743774384514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f16.0!3m3!1m2!1s0x6018ede156e18c97%3A0xa8cdb493942cc95b!2z5qW954-g44Gd44KN44Gw44KT5pWZ5a6kIOaXqeWuruagoQ!5e0!3m2!1sja!2sjp!4v1775634808468!5m2!1sja!2sjp"
+        width="100%" height="100%" style="border:0; display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- 波形：開催概要(#2C7A94) → ブランドカラー(#4A96AE) -->
+<div style="background:#4A96AE; line-height:0; margin-top:-1px;">
+  <svg viewBox="0 0 1200 50" preserveAspectRatio="none" style="width:100%; height:50px; display:block;">
+    <path d="M0,0 C150,44 300,6 450,32 C600,50 750,6 900,28 C1050,47 1150,12 1200,25 L1200,0 L0,0 Z" fill="#C8EEF8"/>
+  </svg>
+</div>
+
+<!-- ==================== 3つの非認知能力 ==================== -->
+<section style="background:#4A96AE;" class="py-8 px-4 relative">
+  <div class="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-white opacity-5 rounded-full"></div>
+  <div class="absolute bottom-0 left-0 -mb-16 -ml-16 w-48 h-48 bg-white opacity-5 rounded-full"></div>
+
+  <div class="max-w-3xl mx-auto relative z-10">
+    <!-- 見出し -->
+    <div class="mb-6">
+      <div style="display:flex; flex-direction:column; align-items:flex-start; gap:8px;">
+        <div style="background:#fff; border-radius:0; padding:8px 14px; box-shadow:0 4px 12px rgba(0,0,0,0.18); display:inline-block;">
+          <span class="font-display font-black" style="color:#4A96AE; font-size:clamp(1rem,4.5vw,1.4rem); white-space:nowrap;">一生モノの『自信』と『集中力』を、</span>
+        </div>
+        <div style="background:#fff; border-radius:0; padding:8px 14px; box-shadow:0 4px 12px rgba(0,0,0,0.18); display:inline-block;">
+          <span class="font-display font-black" style="color:#4A96AE; font-size:clamp(1rem,4.5vw,1.4rem); white-space:nowrap;">パチパチ弾いて手に入れよう！</span>
+        </div>
+      </div>
+      <div class="mt-4 inline-block bg-amber-400 text-white font-display font-black text-base px-6 py-2 rounded-full">
+        そろばんが育てる「3つの非認知能力」
+      </div>
+    </div>
+
+    <!-- 3カード -->
+    <div class="grid md:grid-cols-3 gap-4" style="padding-top:8px;">
+      <!-- 暗算力 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+          <span style="font-family:'Inter','Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:2.4rem; color:#4A96AE; line-height:1;">01</span>
+          <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+        </div>
+        <h3 class="font-display font-black text-lg mb-3 text-center" style="color:#1f2937;">
+          圧倒的な<br>「暗算力」と「数感」
+        </h3>
+        <p class="text-sm leading-relaxed text-gray-600">
+          頭の中にそろばんを浮かべる「珠算式暗算」で、一生モノの計算スピードが身につきます。算数が「得意」から「大好き」に変わります。
+        </p>
+      </div>
+      <!-- 集中力 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+          <span style="font-family:'Inter','Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:2.4rem; color:#4A96AE; line-height:1;">02</span>
+          <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+        </div>
+        <h3 class="font-display font-black text-lg mb-3 text-center" style="color:#1f2937;">
+          ゾーンに入る<br>「集中力」
+        </h3>
+        <p class="text-sm leading-relaxed text-gray-600">
+          制限時間内に正確に弾く作業は、高い没頭感を生みます。他の学習にも活きる「深く集中する癖」がつきます。
+        </p>
+      </div>
+      <!-- 忍耐力 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+          <span style="font-family:'Inter','Zen Kaku Gothic New',sans-serif; font-weight:900; font-size:2.4rem; color:#4A96AE; line-height:1;">03</span>
+          <div style="flex:1; height:1.5px; background:#4A96AE; opacity:0.35;"></div>
+        </div>
+        <h3 class="font-display font-black text-lg mb-3 text-center" style="color:#1f2937;">
+          最後までやり遂げる<br>「忍耐力」と「自信」
+        </h3>
+        <p class="text-sm leading-relaxed text-gray-600">
+          検定試験を通じて「努力が結果になる成功体験」を積み重ね、自己肯定感を育みます。
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- リボン見出し（左端から全幅・右端Vノッチ） -->
+  <div style="margin-top:28px; margin-left:-1rem; margin-right:-1rem;">
+    <div style="background:#F5C800; clip-path: polygon(0 0, 100% 0, calc(100% - 36px) 50%, 100% 100%, 0 100%); padding: 16px 60px 16px 1.5rem; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
+      <h2 class="font-display font-black" style="color:#374151; font-size:clamp(0.95rem,4.2vw,1.5rem); white-space:nowrap;">
+        そろばんは、右脳を鍛える最強のメソッド
+      </h2>
+    </div>
+  </div>
+
+  <!-- 説明文 -->
+  <div class="max-w-3xl mx-auto relative z-10 mt-4 text-center">
+    <p class="text-white text-sm md:text-base leading-relaxed max-w-2xl mx-auto opacity-90">
+      一般的な筆算が左脳（論理）を使うのに対し、そろばんは<span class="font-bold underline">右脳（イメージ・直感）</span>をフル回転させます。デジタル時代だからこそ、アナログな刺激がお子様の脳の可能性を広げます。
+    </p>
+  </div>
+</section>
+
+<!-- 三角形：ブランドカラー(#4A96AE) → 水色(#C8EEF8) -->
+<div style="background:#C8EEF8; line-height:0; margin-top:-1px;">
+  <svg viewBox="0 0 1200 44" preserveAspectRatio="none" style="width:100%; height:44px; display:block;">
+    <path d="M0,0 L1200,0 L600,44 Z" fill="#4A96AE"/>
+  </svg>
+</div>
+
+<!-- ==================== Q&A ==================== -->
+<section style="background:#C8EEF8;" class="py-8 px-4">
+  <div class="max-w-3xl mx-auto">
+    <!-- 見出し -->
+    <div class="text-center mb-6">
+      <div style="display:inline-block; border: 3px solid #4A96AE; padding: 10px 40px; background:#fff; box-shadow: 4px 4px 0 #4A96AE;">
+        <span class="font-display font-black" style="color:#4A96AE; font-size:1.6rem; letter-spacing:0.15em;">Q&A</span>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <!-- Q1 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-[#4A96AE]/20">
+        <h3 class="font-display font-black text-base mb-3 text-center" style="color:#4A96AE;">
+          何歳から<br>参加できますか？
+        </h3>
+        <div class="w-12 h-0.5 bg-[#4A96AE]/30 mx-auto mb-3"></div>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          数字の読み書きができれば何歳からでもOK！年長さんからはじめるお子様もたくさんいらっしゃいます。
+        </p>
+      </div>
+      <!-- Q2 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-[#4A96AE]/20">
+        <h3 class="font-display font-black text-base mb-3 text-center" style="color:#4A96AE;">
+          そろばんを持っていま<br>せんが大丈夫ですか？
+        </h3>
+        <div class="w-12 h-0.5 bg-[#4A96AE]/30 mx-auto mb-3"></div>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          はい！体験用のそろばんをお貸出ししますので、手ぶらでお越しください。
+        </p>
+      </div>
+      <!-- Q3 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-[#4A96AE]/20">
+        <h3 class="font-display font-black text-base mb-3 text-center" style="color:#4A96AE;">
+          保護者の付き添いは<br>必要ですか？
+        </h3>
+        <div class="w-12 h-0.5 bg-[#4A96AE]/30 mx-auto mb-3"></div>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          ぜひお子様の頑張る姿を隣で見守ってあげてください。もちろん、送迎のみでも大丈夫です。
+        </p>
+      </div>
+      <!-- Q4 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-[#4A96AE]/20">
+        <h3 class="font-display font-black text-base mb-3 text-center" style="color:#4A96AE;">
+          体験後に入会を<br>強く勧められますか？
+        </h3>
+        <div class="w-12 h-0.5 bg-[#4A96AE]/30 mx-auto mb-3"></div>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          そのような心配は不要です。体験会はお子様に「楽しさ」を体感していただく場ですので、その場での勧誘やしつこいご連絡は一切しておりません。ご家族でゆっくりご検討ください。
+        </p>
+      </div>
+      <!-- Q5 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-[#4A96AE]/20 md:col-span-2">
+        <h3 class="font-display font-black text-base mb-3 text-center" style="color:#4A96AE;">
+          月謝はいくらですか？
+        </h3>
+        <div class="w-12 h-0.5 bg-[#4A96AE]/30 mx-auto mb-3"></div>
+        <p class="text-sm text-gray-600 leading-relaxed text-center">
+          コース・料金の詳細はホームページでご確認いただけます。<br>
+          <a href="https://rakutama-tokyo.com/courses" target="_blank" rel="noopener"
+            class="inline-flex items-center gap-1 mt-2 font-bold text-[#4A96AE] underline underline-offset-2 hover:opacity-70 transition">
+            コース・料金を見る <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-6">
+      <a href="#form" class="btn-shine inline-block bg-amber-500 hover:bg-amber-600 text-white font-display font-black text-base py-3.5 px-10 rounded-full shadow-lg transition">
+        お気軽にお申し込みください！
+        <i class="fa-solid fa-arrow-down ml-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 講師紹介 ==================== -->
+<section style="background:#C8EEF8;" class="py-8 px-4">
+  <div class="max-w-2xl mx-auto">
+    <div class="rounded-3xl p-5 flex flex-col md:flex-row items-center gap-5">
+      <!-- 写真 -->
+      <div class="flex-shrink-0 text-center">
+        <div style="width:260px; height:260px; border-radius:50%; overflow:hidden; border:4px solid #4A96AE; box-shadow:0 4px 16px rgba(74,150,174,0.3); margin:0 auto; flex-shrink:0;">
+          <img src="../Pictures/nakamura_hayamiya.jpg" alt="講師 中村 由美子" style="width:100%; height:100%; object-fit:cover; object-position:center top; display:block;">
+        </div>
+      </div>
+      <!-- テキスト -->
+      <div>
+        <p class="text-xs text-[#4A96AE] font-bold mb-1">講師紹介</p>
+        <h3 class="font-display font-black text-xl text-gray-800 mb-1">中村 由美子</h3>
+        <p class="text-sm font-bold text-amber-500 mb-3">「一人ひとりのペースを大切に！」</p>
+        <div class="w-full h-px bg-[#4A96AE]/20 mb-3"></div>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          長年さまざまな事情を持つ子どもたちと関わってきた経験を活かし、一人ひとりのペースを大切に、急かさず丁寧に向き合います。リトルッカでお待ちしています！
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 波形：水色(#C8EEF8) → ブランドカラー(#4A96AE) -->
+<div style="background:#4A96AE; line-height:0; margin-top:-1px;">
+  <svg viewBox="0 0 1200 50" preserveAspectRatio="none" style="width:100%; height:50px; display:block;">
+    <path d="M0,25 C150,0 300,44 450,19 C600,0 750,41 900,16 C1050,0 1150,31 1200,19 L1200,0 L0,0 Z" fill="#C8EEF8"/>
+  </svg>
+</div>
+
+<!-- ==================== アクセス ==================== -->
+<section style="background:#4A96AE;" class="pb-8 px-4">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-5">
+      <h2 class="font-display font-black text-xl md:text-2xl text-white">会場アクセス</h2>
+      <p class="text-sm text-white mt-1 opacity-80">リトルッカ</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- 地図 -->
+      <div class="rounded-2xl overflow-hidden shadow-md h-56 md:h-auto">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2500!2d139.6361373655312!3d35.733743774384514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f16.0!3m3!1m2!1s0x6018ede156e18c97%3A0xa8cdb493942cc95b!2z5qW954-g44Gd44KN44Gw44KT5pWZ5a6kIOaXqeWuruagoQ!5e0!3m2!1sja!2sjp!4v1775634808468!5m2!1sja!2sjp"
+          width="100%" height="100%" style="border:0; min-height:220px;" allowfullscreen="" loading="lazy"
+          title="リトルッカ 地図">
+        </iframe>
+      </div>
+      <!-- アクセス情報 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-4">
+          <i class="fa-solid fa-map-pin text-[#4A96AE]"></i>
+          <p class="font-bold text-gray-800">〒179-0085<br>東京都練馬区早宮4丁目27−10−5</p>
+        </div>
+        <div class="space-y-3 text-sm text-gray-600">
+          <div class="flex gap-3 items-start">
+            <i class="fa-solid fa-school text-[#4A96AE] mt-0.5 flex-shrink-0 w-5 text-center"></i>
+            <div>
+              <span class="font-bold text-gray-700">最寄り小学校</span><br>
+              練馬東小学校 徒歩2分 ／ 早宮小学校 徒歩4分
+            </div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <i class="fa-solid fa-circle-info text-[#4A96AE] mt-0.5 flex-shrink-0 w-5 text-center"></i>
+            <div>
+              練馬東小・早宮小から近く、放課後に寄りやすい立地です。路地を入ったところで車通りが少なく安心して通わせられます。
+            </div>
+          </div>
+        </div>
+        <a href="https://maps.app.goo.gl/K6SgaqqMN4GbAxMz5" target="_blank" rel="noopener"
+          class="mt-4 inline-flex items-center gap-1.5 text-xs text-[#4A96AE] font-bold border border-[#4A96AE] rounded-full px-4 py-1.5 hover:bg-[#4A96AE] hover:text-white transition-colors">
+          <i class="fas fa-map-marked-alt"></i>Googleマップで見る
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 波形：アクセス(#4A96AE) → CTA(#C8EEF8) -->
+<div style="background:#C8EEF8; line-height:0; margin-top:-1px;">
+  <svg viewBox="0 0 1200 50" preserveAspectRatio="none" style="width:100%; height:50px; display:block;">
+    <path d="M0,25 C150,0 300,44 450,19 C600,0 750,41 900,16 C1050,0 1150,31 1200,19 L1200,0 L0,0 Z" fill="#4A96AE"/>
+  </svg>
+</div>
+
+<!-- ==================== 最終CTA ==================== -->
+<section style="background:#C8EEF8;" class="py-8 px-4 text-center">
+  <div class="max-w-2xl mx-auto">
+    <h2 class="font-display font-black text-gray-800 text-2xl md:text-3xl mb-3">
+      「できた！」の数だけ、<br>子どもは伸びる。
+    </h2>
+    <p class="text-gray-600 text-sm mb-5 leading-relaxed">
+      そろばんを通じて手に入れた「自信」と「集中力」は、<br>お子様の一生の財産になります。<br>
+      席数には限りがありますので、お早めにお申し込みください。
+    </p>
+    <a href="#form" class="btn-shine inline-block bg-amber-500 hover:bg-amber-600 text-white font-display font-black text-lg py-4 px-10 rounded-full shadow-xl transition">
+      下のフォームから申し込む
+      <i class="fa-solid fa-arrow-down ml-2"></i>
+    </a>
+  </div>
+</section>
+
+<!-- 波形：CTA(#C8EEF8) → フォーム(#4A96AE) -->
+<div style="background:#4A96AE; line-height:0; margin-top:-1px;">
+  <svg viewBox="0 0 1200 50" preserveAspectRatio="none" style="width:100%; height:50px; display:block;">
+    <path d="M0,0 C150,44 300,6 450,32 C600,50 750,6 900,28 C1050,47 1150,12 1200,25 L1200,0 L0,0 Z" fill="#C8EEF8"/>
+  </svg>
+</div>
+
+<!-- ==================== 申込フォーム ==================== -->
+<section id="form" style="background:#4A96AE;" class="py-8 px-4">
+  <div class="max-w-2xl mx-auto">
+    <div class="text-center mb-5">
+      <div class="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-display font-black rounded-full px-4 py-1 mb-3">
+        <i class="fa-solid fa-calendar-check"></i> 無料体験会・予約制
+      </div>
+      <h2 class="font-display font-black text-2xl md:text-3xl text-white">そろばん体験会</h2>
+      <p class="text-base font-bold text-white/80 font-display">申込フォーム</p>
+      <p class="text-sm text-white/70 mt-1">リトルッカ 6月開催分</p>
+    </div>
+
+    <div id="form-card" class="bg-white rounded-2xl shadow-md p-6 md:p-8">
+
+      <!-- 開催概要 -->
+      <div class="mb-6 bg-[#EBF5F8] border border-[#4A96AE]/30 rounded-xl p-4 text-sm">
+        <div class="font-bold text-[#2A6E84] mb-2">
+          <i class="fa-solid fa-circle-info mr-1"></i> 開催概要
+        </div>
+        <ul class="space-y-1 text-gray-700 text-sm">
+          <li><span class="font-medium">参加費：</span>無料（手ぶらでOK！）</li>
+          <li><span class="font-medium">定員：</span>各回 10名様（先着順・予約制）</li>
+          <li><span class="font-medium">時間：</span>各部 45〜50分程度</li>
+          <li><span class="font-medium">会場：</span>リトルッカ</li>
+          <li class="text-gray-500 text-xs mt-2">〒179-0085 東京都練馬区早宮4丁目27-10-5</li>
+        </ul>
+      </div>
+
+      <!-- エラーボックス -->
+      <div id="error-box" class="hidden mb-4 bg-red-50 border border-red-300 text-red-700 rounded-xl px-4 py-3 text-sm"></div>
+
+      <form id="taiken-form" novalidate>
+
+        <!-- お子様の情報 -->
+        <div class="mb-5">
+          <div class="mb-4">
+            <span class="text-xs font-display font-black border-2 border-[#4A96AE] text-[#4A96AE] rounded-full px-4 py-1">お子様の情報</span>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">お子様のお名前 <span class="text-red-500">*</span></label>
+            <div class="grid grid-cols-2 gap-3">
+              <input type="text" id="family-name" placeholder="氏（姓）" required
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE]">
+              <input type="text" id="given-name" placeholder="名（名）" required
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE]">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">フリガナ</label>
+            <input type="text" id="furigana" placeholder="カタカナでご入力ください"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE]">
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">学年</label>
+            <select id="grade"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE] bg-white">
+              <option value="">選択してください</option>
+              <option>年少</option>
+              <option>年中</option>
+              <option>年長</option>
+              <option>小1</option>
+              <option>小2</option>
+              <option>小3</option>
+              <option>小4</option>
+              <option>小5</option>
+              <option>小6</option>
+              <option>中1</option>
+              <option>中2</option>
+              <option>中3</option>
+              <option>その他</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">そろばん経験</label>
+            <div class="flex gap-6">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="experience" value="なし" checked class="accent-[#4A96AE]">
+                <span class="text-sm">なし</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="experience" value="あり" class="accent-[#4A96AE]">
+                <span class="text-sm">あり</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="level-field" class="mb-4 hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-1">級・段</label>
+            <input type="text" id="level" placeholder="例：8級"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE]">
+          </div>
+        </div>
+
+        <!-- 保護者・連絡先 -->
+        <div class="mb-5">
+          <div class="mb-4">
+            <span class="text-xs font-display font-black border-2 border-[#4A96AE] text-[#4A96AE] rounded-full px-4 py-1">保護者・連絡先</span>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">メールアドレス <span class="text-red-500">*</span></label>
+            <input type="email" id="email" placeholder="例：example@email.com" required
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE]">
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">電話番号 <span class="text-gray-400 text-xs font-normal">任意</span></label>
+            <input type="tel" id="tel" placeholder="例：090-1234-5678"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE]">
+          </div>
+
+        </div>
+
+        <!-- 希望日時 -->
+        <div class="mb-5">
+          <div class="mb-4">
+            <span class="text-xs font-display font-black border-2 border-[#4A96AE] text-[#4A96AE] rounded-full px-4 py-1">希望日時</span>
+          </div>
+
+          <p class="text-xs text-gray-500 mb-4">
+            開催日：火曜日（6/2・6/9・6/16・6/23・6/30）、金曜日（6/5・6/12・6/19・6/26）<br>
+            各日 ①16:00〜 ②17:00〜 の2部制です。第1希望・第2希望をお選びください。
+          </p>
+
+          <div class="space-y-4">
+            <!-- 第1希望 -->
+            <div class="rounded-xl border border-gray-200 p-4 bg-gray-50/60">
+              <p class="text-sm font-bold text-gray-800 mb-3">第1希望 <span class="text-red-500">*</span></p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="pref1-date" class="block text-xs text-gray-500 mb-1">日付</label>
+                  <select id="pref1-date" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE] bg-white">
+                    <option value="">選択してください</option>
+                    <option value="2026年6月2日(火)">6月2日（火）</option>
+                    <option value="2026年6月5日(金)">6月5日（金）</option>
+                    <option value="2026年6月9日(火)">6月9日（火）</option>
+                    <option value="2026年6月12日(金)">6月12日（金）</option>
+                    <option value="2026年6月16日(火)">6月16日（火）</option>
+                    <option value="2026年6月19日(金)">6月19日（金）</option>
+                    <option value="2026年6月23日(火)">6月23日（火）</option>
+                    <option value="2026年6月26日(金)">6月26日（金）</option>
+                    <option value="2026年6月30日(火)">6月30日（火）</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="pref1-time" class="block text-xs text-gray-500 mb-1">時間</label>
+                  <select id="pref1-time" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE] bg-white">
+                    <option value="">選択してください</option>
+                    <option value="16:00">① 16:00〜</option>
+                    <option value="17:00">② 17:00〜</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 第2希望 -->
+            <div class="rounded-xl border border-gray-200 p-4 bg-gray-50/60">
+              <p class="text-sm font-bold text-gray-800 mb-3">第2希望 <span class="text-red-500">*</span></p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="pref2-date" class="block text-xs text-gray-500 mb-1">日付</label>
+                  <select id="pref2-date" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE] bg-white">
+                    <option value="">選択してください</option>
+                    <option value="2026年6月2日(火)">6月2日（火）</option>
+                    <option value="2026年6月5日(金)">6月5日（金）</option>
+                    <option value="2026年6月9日(火)">6月9日（火）</option>
+                    <option value="2026年6月12日(金)">6月12日（金）</option>
+                    <option value="2026年6月16日(火)">6月16日（火）</option>
+                    <option value="2026年6月19日(金)">6月19日（金）</option>
+                    <option value="2026年6月23日(火)">6月23日（火）</option>
+                    <option value="2026年6月26日(金)">6月26日（金）</option>
+                    <option value="2026年6月30日(火)">6月30日（火）</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="pref2-time" class="block text-xs text-gray-500 mb-1">時間</label>
+                  <select id="pref2-time" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE] bg-white">
+                    <option value="">選択してください</option>
+                    <option value="16:00">① 16:00〜</option>
+                    <option value="17:00">② 17:00〜</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 備考 -->
+        <div class="mb-5">
+          <div class="mb-4">
+            <span class="text-xs font-display font-black border-2 border-[#4A96AE] text-[#4A96AE] rounded-full px-4 py-1">その他</span>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">備考 <span class="text-gray-400 text-xs font-normal">任意</span></label>
+            <textarea id="notes" rows="3"
+              placeholder="ご質問・ご要望などお気軽にどうぞ"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A96AE]/40 focus:border-[#4A96AE] resize-y"></textarea>
+          </div>
+        </div>
+
+        <!-- 送信ボタン -->
+        <button type="submit" id="submit-btn"
+          class="w-full bg-amber-500 hover:bg-amber-600 text-white font-display font-black text-base py-3 rounded-full shadow-md transition flex items-center justify-center gap-2">
+          <span id="submit-text">申し込む</span>
+          <i id="submit-spinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+        </button>
+        <p class="text-center text-xs text-gray-400 mt-3">送信後、担当者よりご連絡いたします</p>
+      </form>
+    </div>
+
+    <p class="text-xs text-white/70 mt-4 text-center">
+      またはLINEでも受け付けています →
+      <a href="https://lin.ee/oW7wspr" target="_blank" rel="noopener" class="underline hover:text-white">LINE友だち追加</a>
+    </p>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="bg-gray-800 text-gray-400 py-7">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="flex flex-col md:flex-row justify-between gap-5 mb-5">
+      <div>
+        <img src="../Pictures/title.png" alt="楽珠そろばん教室" class="h-8 w-auto object-contain mb-3 opacity-90">
+        <p class="text-sm leading-relaxed">東京・練馬区を中心に展開するそろばん教室です。</p>
+        <p class="text-xs mt-1 opacity-60">楽珠そろばん（FC加盟校）</p>
+        <p class="text-xs mt-0.5 opacity-60">運営：アルファーブレイン合同会社</p>
+        <div class="mt-3 space-y-1">
+          <a href="https://lin.ee/oW7wspr" target="_blank" rel="noopener" class="flex items-center gap-2 text-sm hover:text-white transition">
+            <i class="fa-brands fa-line text-lg"></i> 公式LINE（お問い合わせ）
+          </a>
+          <a href="https://rakutama-tokyo.com/" class="flex items-center gap-2 text-sm hover:text-white transition">
+            <i class="fa-solid fa-globe text-lg"></i> rakutama-tokyo.com
+          </a>
+        </div>
+      </div>
+      <div class="text-sm">
+        <h4 class="text-white font-bold mb-3">サイトメニュー</h4>
+        <ul class="space-y-2">
+          <li><a href="../" class="hover:text-white transition">トップページ</a></li>
+          <li><a href="../features" class="hover:text-white transition">楽珠そろばん教室の特徴</a></li>
+          <li><a href="../courses" class="hover:text-white transition">コース・料金</a></li>
+          <li><a href="../access" class="hover:text-white transition">教室案内</a></li>
+          <li><a href="../trial" class="hover:text-white transition">無料体験を申し込む</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-gray-700 pt-5 text-xs text-center opacity-40">
+      &copy; 2026 Alpha-Brain LLC.
+    </div>
+  </div>
+</footer>
+
+<!-- ==================== スマホ固定CTA ==================== -->
+<div class="fixed bottom-0 left-0 w-full bg-white border-t px-2 py-2 md:hidden z-50 flex items-center gap-2 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+  <div class="text-xs font-bold text-[#4A96AE] shrink-0 leading-tight">
+    そろばん体験会<br>
+    <span class="text-[10px] text-gray-500 font-normal">6月毎週開催</span>
+  </div>
+  <a href="#form" class="bg-amber-500 text-white font-display font-black py-2.5 px-3 rounded-full shadow-md text-xs whitespace-nowrap flex-1 text-center">
+    無料で申し込む <i class="fa-solid fa-chevron-right ml-0.5"></i>
+  </a>
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+  const API_BASE = 'https://rakutama-kintone.k-ariyama.workers.dev';
+  const CLASSROOM = '早宮校';
+
+  // Toggle 級・段 field
+  document.querySelectorAll('input[name="experience"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const levelField = document.getElementById('level-field');
+      levelField.classList.toggle('hidden', radio.value !== 'あり' || !radio.checked);
+    });
+  });
+
+  function mergePreferredDatetime() {
+    const d1 = document.getElementById('pref1-date').value;
+    const t1 = document.getElementById('pref1-time').value;
+    const d2 = document.getElementById('pref2-date').value;
+    const t2 = document.getElementById('pref2-time').value;
+    if (!d1 || !t1 || !d2 || !t2) return '';
+    return `第1希望：${d1} ${t1} ／ 第2希望：${d2} ${t2}`;
+  }
+
+  document.getElementById('taiken-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const errorBox = document.getElementById('error-box');
+    errorBox.classList.add('hidden');
+    errorBox.textContent = '';
+
+    const familyName = document.getElementById('family-name').value.trim();
+    const givenName  = document.getElementById('given-name').value.trim();
+    const furigana   = document.getElementById('furigana').value.trim();
+    const grade      = document.getElementById('grade').value;
+    const experience = document.querySelector('input[name="experience"]:checked').value;
+    const levelIfAny = experience === 'あり' ? document.getElementById('level').value.trim() : '';
+
+    const tel        = document.getElementById('tel').value.trim();
+    const email      = document.getElementById('email').value.trim();
+    const pref1d     = document.getElementById('pref1-date').value;
+    const pref1t     = document.getElementById('pref1-time').value;
+    const pref2d     = document.getElementById('pref2-date').value;
+    const pref2t     = document.getElementById('pref2-time').value;
+    const notes      = document.getElementById('notes').value.trim();
+
+    const errors = [];
+    if (!familyName) errors.push('姓をご入力ください');
+    if (!givenName)  errors.push('名をご入力ください');
+    if (!email)      errors.push('メールアドレスをご入力ください');
+    if (!pref1d || !pref1t) errors.push('第1希望の日付・時間を選択してください');
+    if (!pref2d || !pref2t) errors.push('第2希望の日付・時間を選択してください');
+    if (pref1d && pref1t && pref2d && pref2t && pref1d === pref2d && pref1t === pref2t) {
+      errors.push('第1希望と第2希望は異なる日時をお選びください');
+    }
+
+    if (errors.length > 0) {
+      errorBox.textContent = errors.join(' / ');
+      errorBox.classList.remove('hidden');
+      errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const submitBtn     = document.getElementById('submit-btn');
+    const submitText    = document.getElementById('submit-text');
+    const submitSpinner = document.getElementById('submit-spinner');
+    submitBtn.disabled = true;
+    submitText.textContent = '送信中...';
+    submitSpinner.classList.remove('hidden');
+
+    try {
+      const response = await fetch(`${API_BASE}/api/taiken`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          氏: familyName,
+          名: givenName,
+          フリガナ: furigana,
+          学年: grade,
+          電話番号: tel,
+          メールアドレス: email,
+          住所: '',
+          そろばん経験: experience,
+          '級・段': levelIfAny,
+          教室名: CLASSROOM,
+          希望日時: mergePreferredDatetime(),
+          備考: notes ? `【体験会】${notes}` : '【体験会】',
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || data.message || `送信に失敗しました（${response.status}）`);
+      }
+
+      window.location.href = '../trial-thanks.html';
+
+    } catch (err) {
+      errorBox.textContent = err.message || '送信中にエラーが発生しました。しばらく経ってから再度お試しください。';
+      errorBox.classList.remove('hidden');
+      errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } finally {
+      submitBtn.disabled = false;
+      submitText.textContent = '申し込む';
+      submitSpinner.classList.add('hidden');
+    }
+  });
+</script>
+</body>
+</html>
