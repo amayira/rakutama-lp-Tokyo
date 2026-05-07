@@ -1029,6 +1029,17 @@
         const JP_TO_DAY = { '日': 0, '月': 1, '火': 2, '水': 3, '木': 4, '金': 5, '土': 6 };
 
         let lastJugyoByDay = null;
+        let currentClassroom = null;
+
+        const BLOCKED_DATES_BY_CLASSROOM = {
+            '早宮校': new Set(['2026-06-05', '2026-06-12'])
+        };
+        const EXTRA_DATES_BY_CLASSROOM = {
+            '早宮校': [
+                { date: new Date(2026, 5, 4),  label: '2026年6月4日(木)',  display: '6月4日（木）【臨時】',  times: ['16:00', '17:00'] },
+                { date: new Date(2026, 5, 11), label: '2026年6月11日(木)', display: '6月11日（木）【臨時】', times: ['16:00', '17:00'] },
+            ]
+        };
 
         function parseJugyoClassesToSchedule(classList) {
             const byDay = new Map();
@@ -1043,7 +1054,7 @@
             return byDay;
         }
 
-        function buildDateSelectForSchedule(sel, allowedDays, noClassroomYet) {
+        function buildDateSelectForSchedule(sel, allowedDays, noClassroomYet, classroom) {
             const wdays = ['日', '月', '火', '水', '木', '金', '土'];
             const daysAhead = 90;
             const earliest = new Date(2026, 5, 1);
@@ -1059,15 +1070,40 @@
             else ph.textContent = '開講情報を取得できませんでした';
             sel.appendChild(ph);
             if (!allowedDays || !allowedDays.size) return;
+            const blocked = BLOCKED_DATES_BY_CLASSROOM[classroom] || new Set();
+            const extras = EXTRA_DATES_BY_CLASSROOM[classroom] || [];
+            let extraIdx = 0;
             for (let i = 0; i < daysAhead; i++) {
                 const d = new Date(base);
                 d.setDate(base.getDate() + i);
+                while (extraIdx < extras.length && extras[extraIdx].date < d) {
+                    if (extras[extraIdx].date >= base) {
+                        const e = extras[extraIdx];
+                        const opt = document.createElement('option');
+                        opt.value = e.label;
+                        opt.textContent = e.display;
+                        sel.appendChild(opt);
+                    }
+                    extraIdx++;
+                }
+                const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                if (blocked.has(key)) continue;
                 if (!allowedDays.has(d.getDay())) continue;
                 const label = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日(${wdays[d.getDay()]})`;
                 const opt = document.createElement('option');
                 opt.value = label;
                 opt.textContent = label;
                 sel.appendChild(opt);
+            }
+            while (extraIdx < extras.length) {
+                if (extras[extraIdx].date >= base) {
+                    const e = extras[extraIdx];
+                    const opt = document.createElement('option');
+                    opt.value = e.label;
+                    opt.textContent = e.display;
+                    sel.appendChild(opt);
+                }
+                extraIdx++;
             }
         }
 
@@ -1077,7 +1113,19 @@
             ph.value = '';
             ph.textContent = '選択してください';
             timeSel.appendChild(ph);
-            if (!byDay || !byDay.size || !dateLabel) return;
+            if (!dateLabel) return;
+            const extras = EXTRA_DATES_BY_CLASSROOM[currentClassroom] || [];
+            const extraMatch = extras.find(e => e.label === dateLabel);
+            if (extraMatch) {
+                extraMatch.times.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t;
+                    opt.textContent = t;
+                    timeSel.appendChild(opt);
+                });
+                return;
+            }
+            if (!byDay || !byDay.size) return;
             const m = dateLabel.match(/\(([月火水木金土日])\)$/);
             if (!m) return;
             const day = JP_TO_DAY[m[1]];
@@ -1091,11 +1139,12 @@
             });
         }
 
-        function applyPreferenceDropdownsForSchedule(byDay, noClassroomYet) {
+        function applyPreferenceDropdownsForSchedule(byDay, noClassroomYet, classroom) {
+            currentClassroom = classroom || null;
             lastJugyoByDay = (byDay && byDay.size) ? byDay : null;
             const allowed = lastJugyoByDay ? new Set(lastJugyoByDay.keys()) : null;
-            buildDateSelectForSchedule(document.getElementById('pref1-date'), allowed, noClassroomYet);
-            buildDateSelectForSchedule(document.getElementById('pref2-date'), allowed, noClassroomYet);
+            buildDateSelectForSchedule(document.getElementById('pref1-date'), allowed, noClassroomYet, currentClassroom);
+            buildDateSelectForSchedule(document.getElementById('pref2-date'), allowed, noClassroomYet, currentClassroom);
             buildTimeSelectForChosenDate(document.getElementById('pref1-time'), lastJugyoByDay, '');
             buildTimeSelectForChosenDate(document.getElementById('pref2-time'), lastJugyoByDay, '');
         }
@@ -1174,7 +1223,7 @@
             }
 
             const byDay = parseJugyoClassesToSchedule(effectiveClasses);
-            applyPreferenceDropdownsForSchedule(byDay.size ? byDay : null, false);
+            applyPreferenceDropdownsForSchedule(byDay.size ? byDay : null, false, classroom);
         });
 
         applyPreferenceDropdownsForSchedule(null, true);
