@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>講師ログイン | 楽珠そろばん教室</title>
+  <link rel="icon" href="https://rakutama-tokyo.com/Pictures/favicon.png" type="image/png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta name="robots" content="noindex, nofollow" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4A96AE',
+            base: '#F7FBFA',
+          },
+          fontFamily: {
+            sans: ['Noto Sans JP', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Noto Sans JP', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-base flex items-center justify-center px-4">
+
+  <div class="w-full max-w-sm">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-14 h-14 bg-primary rounded-full mb-4">
+        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+      </div>
+      <h1 class="text-xl font-bold text-gray-800">楽珠そろばん教室</h1>
+      <p class="text-sm text-gray-500 mt-1">講師ポータル</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+      <form id="loginForm">
+        <div class="mb-6">
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+            パスワード
+          </label>
+          <input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            placeholder="パスワードを入力"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+          />
+        </div>
+
+        <div id="errorMsg" class="hidden mb-4 px-4 py-3 bg-red-50 text-red-700 text-sm rounded-xl">
+          パスワードが違います
+        </div>
+
+        <button
+          type="submit"
+          id="submitBtn"
+          class="w-full bg-primary hover:bg-[#3a86a0] text-white font-bold py-3 rounded-xl transition text-sm disabled:opacity-50"
+        >
+          ログイン
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-6">
+      このページは講師専用です。外部への共有はご遠慮ください。
+    </p>
+  </div>
+
+  <script>
+    const API = 'https://rakutama-kintone.k-ariyama.workers.dev';
+
+    // すでにログイン済みなら名簿ページへ
+    if (sessionStorage.getItem('staffKey')) {
+      location.href = 'roster.html';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const errMsg = document.getElementById('errorMsg');
+      const password = document.getElementById('password').value;
+
+      btn.disabled = true;
+      btn.textContent = '確認中…';
+      errMsg.classList.add('hidden');
+
+      try {
+        const res = await fetch(`${API}/api/staff/auth`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          sessionStorage.setItem('staffKey', password);
+          location.href = 'roster.html';
+        } else {
+          errMsg.classList.remove('hidden');
+          btn.disabled = false;
+          btn.textContent = 'ログイン';
+        }
+      } catch {
+        errMsg.textContent = 'サーバーに接続できません。しばらくしてから再試行してください。';
+        errMsg.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'ログイン';
+      }
+    });
+  </script>
+</body>
+</html>

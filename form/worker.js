@@ -182,7 +182,7 @@ function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
 }
 
@@ -539,6 +539,80 @@ async function handleClassChange(body, env) {
   return { success: true };
 }
 
+// ─── Staff portal handlers ───────────────────────────────────────────────────
+
+/** Validate staff password from Authorization: Bearer <password> header */
+function isValidStaffAuth(request, env) {
+  const auth = request.headers.get("Authorization") ?? "";
+  const key = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  return key.length > 0 && key === env.STAFF_PASSWORD;
+}
+
+/**
+ * POST /api/staff/auth
+ * { password } → { success: true } or 401
+ */
+async function handleStaffAuth(body, env) {
+  if (body.password && body.password === env.STAFF_PASSWORD) {
+    return { success: true };
+  }
+  return { success: false, error: "パスワードが違います", status: 401 };
+}
+
+/**
+ * GET /api/staff/taiken?school=all|早宮校|氷川台校|中村校
+ * Returns 体験参加名簿 (App 17) records.
+ * Fields: 体験参加日, 時刻, 氏, 名, フリガナ, 学年, そろばん経験, 教室名
+ */
+async function handleStaffTaiken(params, env) {
+  const school = params.get("school") ?? "all";
+  const schoolCond = school !== "all" ? `教室名 = "${school}" and ` : "";
+  const query = `${schoolCond}order by 体験参加日 desc limit 500`;
+
+  const data = await kintoneGet(APP.TAIKEN, query, env.TOKEN_TAIKEN);
+  const records = (data.records ?? []).map(rec => ({
+    体験参加日: rec["体験参加日"]?.value ?? "",
+    時刻: rec["時刻"]?.value ?? "",
+    氏: rec["氏"]?.value ?? "",
+    名: rec["名"]?.value ?? "",
+    フリガナ: rec["フリガナ"]?.value ?? "",
+    学年: rec["学年"]?.value ?? "",
+    そろばん経験: rec["そろばん経験"]?.value ?? "",
+    教室名: rec["教室名"]?.value ?? "",
+  }));
+
+  return { success: true, records };
+}
+
+/**
+ * GET /api/staff/seito?school=all|早宮校|氷川台校|中村校
+ * Returns active 生徒名簿 (App 19) records.
+ * Excludes records where 退会日 is set and in the past.
+ * Fields: 生徒番号, コース名, 氏, 名, フリガナ, 学年, クラス, 初回授業日, 退会日, 教室名
+ */
+async function handleStaffSeito(params, env) {
+  const school = params.get("school") ?? "all";
+  const schoolCond = school !== "all" ? `教室名 = "${school}" and ` : "";
+  const activeCond = `(退会日 = "" or 退会日 >= TODAY())`;
+  const query = `${schoolCond}${activeCond} order by 生徒番号 asc limit 500`;
+
+  const data = await kintoneGet(APP.SEITO_NEW, query, env.TOKEN_SEITO_NEW);
+  const records = (data.records ?? []).map(rec => ({
+    生徒番号: rec["生徒番号"]?.value ?? "",
+    コース名: rec["コース名"]?.value ?? "",
+    氏: rec["氏"]?.value ?? "",
+    名: rec["名"]?.value ?? "",
+    フリガナ: rec["フリガナ"]?.value ?? "",
+    学年: rec["学年"]?.value ?? "",
+    クラス: rec["クラス"]?.value ?? "",
+    初回授業日: rec["初回授業日"]?.value ?? "",
+    退会日: rec["退会日"]?.value ?? "",
+    教室名: rec["教室名"]?.value ?? "",
+  }));
+
+  return { success: true, records };
+}
+
 // ─── Main fetch handler ──────────────────────────────────────────────────────
 
 export default {
@@ -566,6 +640,16 @@ export default {
           result = await handleGakuhi(params, env);
         } else if (path === "/api/furikae-tickets") {
           result = await handleFurikaeTickets(params, env);
+        } else if (path === "/api/staff/taiken") {
+          if (!isValidStaffAuth(request, env)) {
+            return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
+          }
+          result = await handleStaffTaiken(params, env);
+        } else if (path === "/api/staff/seito") {
+          if (!isValidStaffAuth(request, env)) {
+            return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
+          }
+          result = await handleStaffSeito(params, env);
         } else {
           return errorResponse("Not Found", 404, origin);
         }
@@ -618,6 +702,9 @@ export default {
           break;
         case "/api/flash-anzan":
           result = await handleFlashAnzan(body, env);
+          break;
+        case "/api/staff/auth":
+          result = await handleStaffAuth(body, env);
           break;
         default:
           return errorResponse("Not Found", 404, origin);

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>名簿 | 楽珠そろばん教室 講師ポータル</title>
+  <link rel="icon" href="https://rakutama-tokyo.com/Pictures/favicon.png" type="image/png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta name="robots" content="noindex, nofollow" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4A96AE',
+            base: '#F7FBFA',
+          },
+          fontFamily: {
+            sans: ['Noto Sans JP', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Noto Sans JP', sans-serif; }
+    .tab-active { border-bottom: 3px solid #4A96AE; color: #4A96AE; font-weight: 700; }
+    .school-active { background-color: #4A96AE; color: #fff; }
+  </style>
+</head>
+<body class="min-h-screen bg-base">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div>
+        <span class="font-bold text-gray-800 text-base">楽珠そろばん教室</span>
+        <span class="ml-2 text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">講師ポータル</span>
+      </div>
+      <button id="logoutBtn" class="text-sm text-gray-500 hover:text-red-500 transition flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        ログアウト
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6">
+
+    <!-- 名簿種別タブ -->
+    <div class="flex border-b border-gray-200 mb-5 bg-white rounded-t-xl overflow-hidden">
+      <button data-tab="taiken"
+        class="tab-btn flex-1 py-3 text-sm text-gray-500 transition tab-active"
+        onclick="switchTab('taiken')">
+        体験名簿
+      </button>
+      <button data-tab="seito"
+        class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
+        onclick="switchTab('seito')">
+        在籍生徒
+      </button>
+    </div>
+
+    <!-- 校フィルター -->
+    <div class="flex flex-wrap gap-2 mb-5">
+      <button data-school="all"
+        class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary transition school-active"
+        onclick="switchSchool('all')">全校</button>
+      <button data-school="早宮校"
+        class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary text-primary transition"
+        onclick="switchSchool('早宮校')">早宮校</button>
+      <button data-school="氷川台校"
+        class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary text-primary transition"
+        onclick="switchSchool('氷川台校')">氷川台校</button>
+      <button data-school="中村校"
+        class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary text-primary transition"
+        onclick="switchSchool('中村校')">中村校</button>
+    </div>
+
+    <!-- 件数・更新ボタン -->
+    <div class="flex items-center justify-between mb-3">
+      <p class="text-sm text-gray-500">
+        <span id="countLabel">読み込み中…</span>
+      </p>
+      <button id="reloadBtn" onclick="loadData()"
+        class="text-sm text-primary hover:text-[#3a86a0] flex items-center gap-1 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        更新
+      </button>
+    </div>
+
+    <!-- ローディング -->
+    <div id="loading" class="text-center py-16 text-gray-400 text-sm">
+      <svg class="w-8 h-8 animate-spin mx-auto mb-3 text-primary" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+      </svg>
+      読み込み中…
+    </div>
+
+    <!-- エラー -->
+    <div id="errorArea" class="hidden text-center py-12 text-red-500 text-sm bg-red-50 rounded-xl">
+      <p id="errorText">データの取得に失敗しました</p>
+      <button onclick="loadData()" class="mt-3 text-primary underline text-sm">再試行</button>
+    </div>
+
+    <!-- テーブルコンテナ -->
+    <div id="tableArea" class="hidden overflow-x-auto rounded-xl shadow-sm">
+      <table class="w-full bg-white text-sm border-collapse">
+        <thead id="tableHead" class="bg-primary text-white text-left"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- 空状態 -->
+    <div id="emptyArea" class="hidden text-center py-16 text-gray-400 text-sm">
+      該当するデータがありません
+    </div>
+
+  </main>
+
+  <script>
+    const API = 'https://rakutama-kintone.k-ariyama.workers.dev';
+
+    let currentTab = 'taiken';
+    let currentSchool = 'all';
+    let staffKey = '';
+
+    // ── 認証チェック ──────────────────────────────────────────────
+    staffKey = sessionStorage.getItem('staffKey');
+    if (!staffKey) {
+      location.href = 'index.html';
+    }
+
+    // ── ログアウト ────────────────────────────────────────────────
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('staffKey');
+      location.href = 'index.html';
+    });
+
+    // ── タブ切り替え ──────────────────────────────────────────────
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('tab-active', btn.dataset.tab === tab);
+      });
+      loadData();
+    }
+
+    // ── 校フィルター ──────────────────────────────────────────────
+    function switchSchool(school) {
+      currentSchool = school;
+      document.querySelectorAll('.school-btn').forEach(btn => {
+        const active = btn.dataset.school === school;
+        btn.classList.toggle('school-active', active);
+        btn.classList.toggle('text-primary', !active);
+        btn.classList.toggle('text-white', active);
+      });
+      loadData();
+    }
+
+    // ── データ取得 ────────────────────────────────────────────────
+    async function loadData() {
+      showState('loading');
+
+      const endpoint = currentTab === 'taiken' ? '/api/staff/taiken' : '/api/staff/seito';
+      const url = `${API}${endpoint}?school=${encodeURIComponent(currentSchool)}`;
+
+      try {
+        const res = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${staffKey}` },
+        });
+
+        if (res.status === 401) {
+          sessionStorage.removeItem('staffKey');
+          location.href = 'index.html';
+          return;
+        }
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        renderTable(data.records);
+      } catch (err) {
+        document.getElementById('errorText').textContent =
+          'データの取得に失敗しました: ' + (err.message || '不明なエラー');
+        showState('error');
+      }
+    }
+
+    // ── テーブル描画 ──────────────────────────────────────────────
+    function renderTable(records) {
+      if (records.length === 0) {
+        showState('empty');
+        document.getElementById('countLabel').textContent = '0件';
+        return;
+      }
+
+      const thead = document.getElementById('tableHead');
+      const tbody = document.getElementById('tableBody');
+
+      if (currentTab === 'taiken') {
+        thead.innerHTML = `
+          <tr>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">教室</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">体験参加日</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">時刻</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">氏名</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">フリガナ</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">学年</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">そろばん経験</th>
+          </tr>`;
+
+        tbody.innerHTML = records.map((r, i) => `
+          <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition">
+            <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.教室名)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${formatDate(r.体験参加日)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.時刻 || '―'}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${r.フリガナ || ''}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.学年 || '―'}</td>
+            <td class="px-4 py-3 whitespace-nowrap">${experienceBadge(r.そろばん経験)}</td>
+          </tr>`).join('');
+
+      } else {
+        thead.innerHTML = `
+          <tr>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">教室</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">生徒番号</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">氏名</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">フリガナ</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">学年</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">クラス</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">コース名</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">初回授業日</th>
+          </tr>`;
+
+        tbody.innerHTML = records.map((r, i) => `
+          <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition">
+            <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.教室名)}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-mono text-xs text-gray-500">${r.生徒番号 || '―'}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${r.フリガナ || ''}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.学年 || '―'}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.クラス || '―'}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.コース名 || '―'}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-600">${formatDate(r.初回授業日)}</td>
+          </tr>`).join('');
+      }
+
+      document.getElementById('countLabel').textContent = `${records.length}件`;
+      showState('table');
+    }
+
+    // ── UI ヘルパー ───────────────────────────────────────────────
+    function showState(state) {
+      document.getElementById('loading').classList.toggle('hidden', state !== 'loading');
+      document.getElementById('errorArea').classList.toggle('hidden', state !== 'error');
+      document.getElementById('tableArea').classList.toggle('hidden', state !== 'table');
+      document.getElementById('emptyArea').classList.toggle('hidden', state !== 'empty');
+      if (state === 'loading') {
+        document.getElementById('countLabel').textContent = '読み込み中…';
+      }
+    }
+
+    function formatDate(val) {
+      if (!val) return '―';
+      // "2026-06-01" → "2026/06/01"
+      return val.replace(/-/g, '/');
+    }
+
+    const SCHOOL_COLORS = {
+      '早宮校':  { bg: 'bg-blue-100',  text: 'text-blue-700'  },
+      '氷川台校': { bg: 'bg-teal-100',  text: 'text-teal-700'  },
+      '中村校':  { bg: 'bg-purple-100', text: 'text-purple-700' },
+    };
+
+    function schoolBadge(name) {
+      const c = SCHOOL_COLORS[name] ?? { bg: 'bg-gray-100', text: 'text-gray-600' };
+      return `<span class="inline-block text-xs px-2 py-0.5 rounded-full font-medium ${c.bg} ${c.text}">${name || '不明'}</span>`;
+    }
+
+    function experienceBadge(val) {
+      if (val === 'あり') {
+        return `<span class="inline-block text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">あり</span>`;
+      }
+      return `<span class="inline-block text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">なし</span>`;
+    }
+
+    // ── 初回ロード ────────────────────────────────────────────────
+    loadData();
+  </script>
+</body>
+</html>
