@@ -610,8 +610,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
 <!-- ========== 講師紹介 ========== -->
-<section class="bg-white pt-8 pb-14">
-    <div class="max-w-5xl mx-auto px-5">
+<section class="relative pt-20 pb-24 overflow-hidden" style="background:#dff0f5;">
+    <!-- 波形（上） -->
+    <div class="absolute top-0 left-0 w-full">
+        <svg viewBox="0 0 1440 70" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:70px;">
+            <path d="M0,70 C240,10 480,60 720,30 C960,0 1200,50 1440,10 L1440,0 L0,0 Z" fill="white"/>
+        </svg>
+    </div>
+    <!-- 波形（下） -->
+    <div class="absolute bottom-0 left-0 w-full">
+        <svg viewBox="0 0 1440 70" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:70px;">
+            <path d="M0,0 C240,60 480,10 720,40 C960,70 1200,20 1440,60 L1440,70 L0,70 Z" fill="white"/>
+        </svg>
+    </div>
+    <!-- 装飾円 -->
+    <div class="absolute -top-10 -right-10 w-56 h-56 rounded-full" style="background:#4A96AE;opacity:0.12;"></div>
+    <div class="absolute -bottom-8 -left-8 w-40 h-40 rounded-full" style="background:#4A96AE;opacity:0.10;"></div>
+    <div class="max-w-5xl mx-auto px-5 relative z-10">
         <div class="text-center mb-10 fade-in">
             <span class="sec-title">講師紹介</span>
             <h2 class="font-display text-3xl md:text-4xl font-black text-gray-800 mt-6">子どもたちに寄り添う<br><span class="text-primary">3人の講師</span></h2>
@@ -769,20 +784,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 
-<!-- ========== 採用情報 ========== -->
-<section class="bg-white py-10 border-t border-gray-100">
-    <div class="max-w-3xl mx-auto px-5">
-        <div class="bg-base border-2 border-primary/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-5">
-            <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-chalkboard-teacher text-primary text-2xl"></i>
-            </div>
-            <div class="flex-1 text-center sm:text-left">
-                <h3 class="font-display font-black text-lg text-gray-800 mb-1">講師採用：締め切りました</h3>
-                <p class="text-sm text-gray-600">たくさんのご応募ありがとうございました。現在の募集は終了しています。次回募集の際はサイトでお知らせします。</p>
-            </div>
-        </div>
-    </div>
-</section>
 
 
 <!-- ========== FOOTER ========== -->
