@@ -354,6 +354,7 @@ async function handleFurikae(body, env) {
 
   const record = buildRecord({
     振替受講日: body["振替受講日"] ?? "",
+    振替教室名: body["振替受講教室"] ?? "",
     時刻: body["時刻"] ?? "",
     備考: body["備考"] ?? "",
   });
@@ -566,8 +567,9 @@ async function handleStaffAuth(body, env) {
  */
 async function handleStaffTaiken(params, env) {
   const school = params.get("school") ?? "all";
-  const schoolCond = school !== "all" ? `教室名 = "${school}" and ` : "";
-  const query = `${schoolCond}order by 体験参加日 desc limit 500`;
+  const conditions = [`所属組織 in ("アルファーブレイン")`, `(体験参加日 >= TODAY() or 体験参加日 = "")`];
+  if (school !== "all") conditions.unshift(`教室名 = "${school}"`);
+  const query = `${conditions.join(" and ")} order by 体験参加日 asc, 時刻 asc limit 500`;
 
   const data = await kintoneGet(APP.TAIKEN, query, env.TOKEN_TAIKEN);
   const records = (data.records ?? []).map(rec => ({
@@ -592,9 +594,12 @@ async function handleStaffTaiken(params, env) {
  */
 async function handleStaffSeito(params, env) {
   const school = params.get("school") ?? "all";
-  const schoolCond = school !== "all" ? `教室名 = "${school}" and ` : "";
-  const activeCond = `(退会日 = "" or 退会日 >= TODAY())`;
-  const query = `${schoolCond}${activeCond} order by 生徒番号 asc limit 500`;
+  const conditions = [
+    `所属組織 in ("アルファーブレイン")`,
+    `(退会日 = "" or 退会日 >= TODAY())`,
+  ];
+  if (school !== "all") conditions.unshift(`教室名 = "${school}"`);
+  const query = `${conditions.join(" and ")} order by 生徒番号 asc limit 500`;
 
   const data = await kintoneGet(APP.SEITO_NEW, query, env.TOKEN_SEITO_NEW);
   const records = (data.records ?? []).map(rec => ({
