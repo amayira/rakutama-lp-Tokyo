@@ -138,6 +138,17 @@ async function kintoneGetById(appId, recordId, token) {
   return data; // { record: { ... } }
 }
 
+// ─── 時刻変換ヘルパー ────────────────────────────────────────────────────────
+// "16時" / "16:00" / "16:00:00" → "16:00:00"（Kintone 時刻型フォーマット）
+function toKintoneTime(val) {
+  if (!val) return "";
+  const mJp = String(val).match(/^(\d{1,2})時$/);
+  if (mJp) return `${mJp[1].padStart(2, "0")}:00:00`;
+  const mHM = String(val).match(/^(\d{1,2}):(\d{2})$/);
+  if (mHM) return `${mHM[1].padStart(2, "0")}:${mHM[2]}:00`;
+  return val; // すでに HH:MM:SS の場合はそのまま
+}
+
 // ─── 採番ヘルパー ─────────────────────────────────────────────────────────────
 
 /**
@@ -285,7 +296,7 @@ async function handleKesseki(body, env) {
     振替期日_終_: body["振替期日_終_"] ?? "",
     振替受講日: body["振替受講日"] ?? "",
     振替教室名: body["振替教室名"] ?? "",
-    時刻: body["時刻"] ?? "",
+    時刻: toKintoneTime(body["時刻"]),
     備考: body["備考"] ?? "",
   });
 
@@ -356,7 +367,7 @@ async function handleFurikae(body, env) {
   const record = buildRecord({
     振替受講日: body["振替受講日"] ?? "",
     振替教室名: body["振替受講教室"] ?? "",
-    時刻: body["時刻"] ?? "",
+    時刻: toKintoneTime(body["時刻"]),
     備考: body["備考"] ?? "",
   });
 
