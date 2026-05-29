@@ -630,6 +630,33 @@ async function handleStaffSeito(params, env) {
   return { success: true, records };
 }
 
+/**
+ * GET /api/staff/kesseki?school=all|早宮校|氷川台校|中村校
+ * Returns 振替管理 (App 14) records where 欠席日 >= TODAY() or 振替受講日 >= TODAY().
+ * Fields: 生徒番号, 氏, 名, 教室名, 欠席日, 振替受講日, 振替教室名, 振替期日_終_, 時刻
+ */
+async function handleStaffKesseki(params, env) {
+  const school = params.get("school") ?? "all";
+  const conditions = [`(欠席日 >= TODAY() or 振替受講日 >= TODAY())`];
+  if (school !== "all") conditions.unshift(`教室名 = "${school}"`);
+  const query = `${conditions.join(" and ")} order by 欠席日 asc limit 500`;
+
+  const data = await kintoneGet(APP.FURIKAE, query, env.TOKEN_FURIKAE);
+  const records = (data.records ?? []).map(rec => ({
+    生徒番号: rec["生徒番号"]?.value ?? "",
+    氏: rec["氏"]?.value ?? "",
+    名: rec["名"]?.value ?? "",
+    教室名: rec["教室名"]?.value ?? "",
+    欠席日: rec["欠席日"]?.value ?? "",
+    振替受講日: rec["振替受講日"]?.value ?? "",
+    振替教室名: rec["振替教室名"]?.value ?? "",
+    振替期日_終_: rec["振替期日_終_"]?.value ?? "",
+    時刻: rec["時刻"]?.value ?? "",
+  }));
+
+  return { success: true, records };
+}
+
 // ─── Main fetch handler ──────────────────────────────────────────────────────
 
 export default {
@@ -667,6 +694,11 @@ export default {
             return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
           }
           result = await handleStaffSeito(params, env);
+        } else if (path === "/api/staff/kesseki") {
+          if (!isValidStaffAuth(request, env)) {
+            return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
+          }
+          result = await handleStaffKesseki(params, env);
         } else {
           return errorResponse("Not Found", 404, origin);
         }

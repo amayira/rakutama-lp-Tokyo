@@ -64,6 +64,11 @@
         onclick="switchTab('seito')">
         在籍生徒
       </button>
+      <button data-tab="kesseki"
+        class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
+        onclick="switchTab('kesseki')">
+        欠席・振替
+      </button>
     </div>
 
     <!-- 校フィルター -->
@@ -171,7 +176,9 @@
     async function loadData() {
       showState('loading');
 
-      const endpoint = currentTab === 'taiken' ? '/api/staff/taiken' : '/api/staff/seito';
+      const endpoint = currentTab === 'taiken' ? '/api/staff/taiken'
+                     : currentTab === 'seito'  ? '/api/staff/seito'
+                     : '/api/staff/kesseki';
       const url = `${API}${endpoint}?school=${encodeURIComponent(currentSchool)}`;
 
       try {
@@ -230,7 +237,7 @@
             <td class="px-4 py-3 whitespace-nowrap">${experienceBadge(r.そろばん経験)}</td>
           </tr>`).join('');
 
-      } else {
+      } else if (currentTab === 'seito') {
         thead.innerHTML = `
           <tr>
             <th class="px-4 py-3 font-medium whitespace-nowrap">教室</th>
@@ -254,6 +261,37 @@
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.コース名 || '―'}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-600">${formatDate(r.初回授業日)}</td>
           </tr>`).join('');
+
+      } else {
+        thead.innerHTML = `
+          <tr>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">教室</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">氏名</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">欠席日</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">振替状況</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">振替受講日・時刻</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">振替先教室</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">振替期限</th>
+          </tr>`;
+
+        tbody.innerHTML = records.map((r, i) => {
+          const furikaeSchool = r.振替教室名 && r.振替教室名 !== r.教室名
+            ? schoolBadge(r.振替教室名)
+            : (r.振替教室名 ? schoolBadge(r.振替教室名) : '―');
+          const furikaeTime = r.振替受講日
+            ? formatDateWithDay(r.振替受講日) + (r.時刻 ? '&nbsp;' + r.時刻.slice(0, 5) : '')
+            : '―';
+          return `
+          <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition">
+            <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.教室名)}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${formatDateWithDay(r.欠席日)}</td>
+            <td class="px-4 py-3 whitespace-nowrap">${furikaeBadge(r.振替受講日)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${furikaeTime}</td>
+            <td class="px-4 py-3 whitespace-nowrap">${furikaeSchool}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${formatDate(r.振替期日_終_)}</td>
+          </tr>`;
+        }).join('');
       }
 
       document.getElementById('countLabel').textContent = `${records.length}件`;
@@ -273,8 +311,23 @@
 
     function formatDate(val) {
       if (!val) return '―';
-      // "2026-06-01" → "2026/06/01"
       return val.replace(/-/g, '/');
+    }
+
+    const DAY_NAMES = ['日', '月', '火', '水', '木', '金', '土'];
+
+    function formatDateWithDay(val) {
+      if (!val) return '―';
+      const [y, m, d] = val.split('-').map(Number);
+      const day = DAY_NAMES[new Date(y, m - 1, d).getDay()];
+      return val.replace(/-/g, '/') + `（${day}）`;
+    }
+
+    function furikaeBadge(振替受講日) {
+      if (振替受講日) {
+        return `<span class="inline-block text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">振替済み</span>`;
+      }
+      return `<span class="inline-block text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-medium">未振替</span>`;
     }
 
     const SCHOOL_COLORS = {
