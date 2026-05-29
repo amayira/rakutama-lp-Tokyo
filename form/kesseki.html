@@ -120,6 +120,17 @@
               </label>
             </div>
             <div id="furikae-date-fields">
+              <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700 mb-1">振替受講教室</label>
+                <select id="furikae-classroom" disabled
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white disabled:bg-gray-100 disabled:text-gray-400">
+                  <option value="">生徒番号を検索してください</option>
+                  <option value="早宮校">早宮校（火・金）</option>
+                  <option value="氷川台校">氷川台校（月・水）</option>
+                  <option value="中村校">中村校（月・木）</option>
+                </select>
+                <p class="mt-1 text-xs text-gray-400">別の教室で受講する場合は変更してください</p>
+              </div>
               <input type="date" id="furikae-date"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
               <div class="mt-3">
@@ -219,6 +230,29 @@
       }
     });
 
+    // ── 時刻プルダウン更新 ─────────────────────────────────────────────────────
+    async function loadTimeSlots(classroom) {
+      const timeSelect = document.getElementById('furikae-time');
+      timeSelect.innerHTML = '<option value="">選択してください</option>';
+      if (!classroom) return;
+      try {
+        const jRes = await fetch(`${API_BASE}/api/jugyo?classroom=${encodeURIComponent(classroom)}`);
+        const jData = await jRes.json();
+        if (jRes.ok && jData.success) {
+          jData.classes.forEach(cls => {
+            const opt = document.createElement('option');
+            opt.value = cls.name;
+            opt.textContent = cls.name;
+            timeSelect.appendChild(opt);
+          });
+        }
+      } catch { /* 取得失敗は無視 */ }
+    }
+
+    document.getElementById('furikae-classroom').addEventListener('change', function () {
+      loadTimeSlots(this.value);
+    });
+
     // Lookup
     document.getElementById('lookup-btn').addEventListener('click', async () => {
       const studentNumber = document.getElementById('student-number').value.trim();
@@ -227,12 +261,16 @@
       const lookupBtn = document.getElementById('lookup-btn');
       const lookupText = document.getElementById('lookup-text');
       const lookupSpinner = document.getElementById('lookup-spinner');
+      const classroomSelect = document.getElementById('furikae-classroom');
 
       lookupError.classList.add('hidden');
       studentInfo.classList.add('hidden');
       studentData = null;
       document.getElementById('submit-btn').disabled = true;
       document.getElementById('submit-hint').classList.remove('hidden');
+      classroomSelect.value = '';
+      classroomSelect.disabled = true;
+      document.getElementById('furikae-time').innerHTML = '<option value="">生徒番号を検索すると選択肢が表示されます</option>';
 
       if (!studentNumber) {
         lookupError.textContent = '生徒番号を入力してください';
@@ -266,23 +304,10 @@
         document.getElementById('submit-btn').disabled = false;
         document.getElementById('submit-hint').classList.add('hidden');
 
-        // 教室の授業一覧を取得して時刻プルダウンを更新
-        const timeSelect = document.getElementById('furikae-time');
-        timeSelect.innerHTML = '<option value="">選択してください</option>';
-        if (s.classroom) {
-          try {
-            const jRes = await fetch(`${API_BASE}/api/jugyo?classroom=${encodeURIComponent(s.classroom)}`);
-            const jData = await jRes.json();
-            if (jRes.ok && jData.success) {
-              jData.classes.forEach(cls => {
-                const opt = document.createElement('option');
-                opt.value = cls.name;
-                opt.textContent = cls.name;
-                timeSelect.appendChild(opt);
-              });
-            }
-          } catch { /* 取得失敗は無視 */ }
-        }
+        // 教室セレクタを有効化してホーム教室をプリセット
+        classroomSelect.disabled = false;
+        if (s.classroom) classroomSelect.value = s.classroom;
+        await loadTimeSlots(classroomSelect.value);
 
       } catch (err) {
         lookupError.textContent = err.message || '検索中にエラーが発生しました。';
@@ -309,6 +334,7 @@
       const absenceDate = document.getElementById('absence-date').value;
       const isMiteijou = document.getElementById('miteijou').checked;
       const furikaeDate = isMiteijou ? '' : document.getElementById('furikae-date').value;
+      const furikaeClassroom = isMiteijou ? '' : document.getElementById('furikae-classroom').value;
       const furikaeTime = isMiteijou ? '' : document.getElementById('furikae-time').value;
       const notes = document.getElementById('notes').value.trim();
       const studentNumber = document.getElementById('student-number').value.trim();
@@ -346,6 +372,7 @@
             振替期日_始_: substituteDeadlineStart,
             振替期日_終_: substituteDeadlineEnd,
             振替受講日: furikaeDate,
+            振替教室名: furikaeClassroom,
             時刻: furikaeTime,
             備考: notes,
           }),
