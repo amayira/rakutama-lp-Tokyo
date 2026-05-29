@@ -36,13 +36,18 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://rakutama-tokyo.com/LP/campaign.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://rakutama-tokyo.com/LP/hayamiya-workshop.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rakutama-tokyo.com/LP/coupon.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://rakutama-tokyo.com/LP/hikawadai-workshop.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rakutama-tokyo.com/LP/nakamura-workshop.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
