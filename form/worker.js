@@ -289,7 +289,7 @@ async function handleKesseki(body, env) {
     備考: body["備考"] ?? "",
   });
 
-  const furikaeToken = [env.TOKEN_FURIKAE, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
+  const furikaeToken = [env.TOKEN_FURIKAE, env.TOKEN_SEITO_NEW, env.TOKEN_KYOSHITSU].filter(Boolean).join(",");
   await kintonePost(APP.FURIKAE, record, furikaeToken);
   return { success: true };
 }
@@ -360,7 +360,7 @@ async function handleFurikae(body, env) {
     備考: body["備考"] ?? "",
   });
 
-  const furikaeToken = [env.TOKEN_FURIKAE, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
+  const furikaeToken = [env.TOKEN_FURIKAE, env.TOKEN_SEITO_NEW, env.TOKEN_KYOSHITSU].filter(Boolean).join(",");
   await kintoneUpdate(APP.FURIKAE, ticketId, record, furikaeToken);
   return { success: true };
 }
