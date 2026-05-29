@@ -268,12 +268,14 @@
         if (jRes.ok && jData.success) {
           const seen = new Set();
           jData.classes.forEach(cls => {
-            const timeVal = extractTime(cls);
-            if (!timeVal || seen.has(timeVal)) return;
-            seen.add(timeVal);
+            const m = String(cls.name).match(/(\d+)時/);
+            if (!m) return;
+            const label = `${m[1]}時`;
+            if (seen.has(label)) return;
+            seen.add(label);
             const opt = document.createElement('option');
-            opt.value = timeVal;
-            opt.textContent = `${timeVal}〜`;
+            opt.value = label;
+            opt.textContent = label;
             timeSelect.appendChild(opt);
           });
         }
