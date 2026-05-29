@@ -31,21 +31,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://rakutama-tokyo.com/LP/trial.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://rakutama-tokyo.com/LP/hayamiya-workshop.html</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://rakutama-tokyo.com/LP/hikawadai-workshop.html</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://rakutama-tokyo.com/LP/nakamura-workshop.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
