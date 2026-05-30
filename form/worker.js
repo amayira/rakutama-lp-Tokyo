@@ -581,7 +581,7 @@ async function handleStaffTaiken(params, env) {
   const school = params.get("school") ?? "all";
   const conditions = [`所属組織 in ("アルファーブレイン")`, `(体験参加日 >= TODAY() or 体験参加日 = "")`];
   if (school !== "all") conditions.unshift(`教室名 = "${school}"`);
-  const query = `${conditions.join(" and ")} order by 体験参加日 asc, 時刻 asc limit 500`;
+  const query = `${conditions.join(" and ")} order by 体験参加日 asc, 教室名 asc, 時刻 asc limit 500`;
 
   const data = await kintoneGet(APP.TAIKEN, query, env.TOKEN_TAIKEN);
   const records = (data.records ?? []).map(rec => ({
