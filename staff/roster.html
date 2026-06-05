@@ -238,6 +238,14 @@
           </tr>`).join('');
 
       } else if (currentTab === 'seito') {
+        records.sort((a, b) => {
+          const s = (a.教室名 || '').localeCompare(b.教室名 || '', 'ja');
+          if (s !== 0) return s;
+          const c = (a.クラス || '').localeCompare(b.クラス || '', 'ja');
+          if (c !== 0) return c;
+          return (a.フリガナ || '').localeCompare(b.フリガナ || '', 'ja');
+        });
+
         thead.innerHTML = `
           <tr>
             <th class="px-4 py-3 font-medium whitespace-nowrap">教室</th>
