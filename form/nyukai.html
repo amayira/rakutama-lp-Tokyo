@@ -299,17 +299,18 @@
             </div>
 
             <!-- ソロマットそろばん -->
-            <div class="border border-gray-200 rounded-xl overflow-hidden bg-white">
+            <div class="border border-gray-200 rounded-xl overflow-hidden bg-white opacity-60">
               <div class="flex items-center gap-4 px-4 pt-4 pb-3 border-b border-gray-100">
-                <img src="https://rakutama-tokyo.com/Pictures/soromat-soroban.jpg" alt="ソロマットそろばん" class="w-20 h-20 object-cover rounded-lg flex-shrink-0 cursor-zoom-in" onclick="openLightbox(this)" />
+                <img src="https://rakutama-tokyo.com/Pictures/soromat-soroban.jpg" alt="ソロマットそろばん" class="w-20 h-20 object-cover rounded-lg flex-shrink-0" />
                 <div>
                   <p class="text-sm font-bold text-gray-700">ソロマットそろばん</p>
                   <p class="text-xs text-gray-400 mt-0.5">ワンタッチ23桁 / 送料実費</p>
+                  <span class="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded">現在品切れ中</span>
                 </div>
               </div>
-              <label class="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-green-50 transition">
-                <input type="checkbox" name="soroban" value="【ソロマットそろばん購入】ワンタッチ23桁そろばん（カバ）8,800円[送料実費]" class="accent-green-500 w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span class="text-sm text-gray-700">ワンタッチ23桁そろばん（カバ）<span class="font-medium ml-2">8,800円</span></span>
+              <label class="flex items-start gap-3 px-4 py-3 cursor-not-allowed">
+                <input type="checkbox" name="soroban" value="【ソロマットそろばん購入】ワンタッチ23桁そろばん（カバ）8,800円[送料実費]" class="accent-green-500 w-4 h-4 flex-shrink-0 mt-0.5" disabled />
+                <span class="text-sm text-gray-400 line-through">ワンタッチ23桁そろばん（カバ）<span class="font-medium ml-2">8,800円</span></span>
               </label>
             </div>
 
