@@ -668,10 +668,10 @@ const BREAKEVEN_TOTAL = 30; // 全社黒字化ライン（生徒数）
 async function handleStaffStats(env) {
   const SCHOOLS = ["早宮校", "氷川台校", "中村校"];
 
-  // 体験参加名簿（過去・当日のみ、欠席除く）
-  const taikenQuery = `所属組織 in ("アルファーブレイン") and 体験参加日 <= TODAY() and 出欠 != "欠席" order by 体験参加日 asc limit 500`;
+  // 体験参加名簿（過去・当日のみ）。欠席除外はJS側で処理
+  const taikenQuery = `所属組織 in ("アルファーブレイン") and 体験参加日 <= TODAY() order by 体験参加日 asc limit 500`;
   const taikenData = await kintoneGet(APP.TAIKEN, taikenQuery, env.TOKEN_TAIKEN);
-  const taikenRecs = taikenData.records ?? [];
+  const taikenRecs = (taikenData.records ?? []).filter(r => r["出欠"]?.value !== "欠席");
 
   // 在籍生徒（退会していないもの全件）
   const seitoQuery = `所属組織 in ("アルファーブレイン") and (退会日 = "" or 退会日 >= TODAY()) order by 生徒番号 asc limit 500`;
