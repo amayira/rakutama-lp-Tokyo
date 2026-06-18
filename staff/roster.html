@@ -69,10 +69,15 @@
         onclick="switchTab('kesseki')">
         欠席・振替
       </button>
+      <button data-tab="stats"
+        class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
+        onclick="switchTab('stats')">
+        実績
+      </button>
     </div>
 
-    <!-- 校フィルター -->
-    <div class="flex flex-wrap gap-2 mb-5">
+    <!-- 校フィルター（実績タブでは非表示） -->
+    <div id="schoolFilter" class="flex flex-wrap gap-2 mb-5">
       <button data-school="all"
         class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary transition school-active"
         onclick="switchSchool('all')">全校</button>
@@ -87,8 +92,8 @@
         onclick="switchSchool('中村校')">中村校</button>
     </div>
 
-    <!-- 件数・更新ボタン -->
-    <div class="flex items-center justify-between mb-3">
+    <!-- 件数・更新ボタン（実績タブでは非表示） -->
+    <div id="countBar" class="flex items-center justify-between mb-3">
       <p class="text-sm text-gray-500">
         <span id="countLabel">読み込み中…</span>
       </p>
@@ -130,6 +135,68 @@
       該当するデータがありません
     </div>
 
+    <!-- 実績パネル -->
+    <div id="statsArea" class="hidden space-y-6">
+
+      <!-- 生徒数カード -->
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="bg-white rounded-2xl shadow-sm p-4 col-span-2 sm:col-span-1">
+          <p class="text-xs text-gray-400 mb-1">全校 在籍生徒</p>
+          <p class="text-3xl font-bold text-gray-800" id="st-total">—</p>
+          <p class="text-xs text-gray-400 mt-1">名</p>
+          <div id="st-breakeven-msg" class="mt-2 text-xs font-medium"></div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="text-xs mb-1" style="color:#3b82f6">早宮校</p>
+          <p class="text-2xl font-bold text-gray-800" id="st-hayamiya">—</p>
+          <p class="text-xs text-gray-400">名</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="text-xs mb-1" style="color:#14b8a6">氷川台校</p>
+          <p class="text-2xl font-bold text-gray-800" id="st-hikawadai">—</p>
+          <p class="text-xs text-gray-400">名</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="text-xs mb-1" style="color:#a855f7">中村校</p>
+          <p class="text-2xl font-bold text-gray-800" id="st-nakamura">—</p>
+          <p class="text-xs text-gray-400">名</p>
+        </div>
+      </div>
+
+      <!-- 月別入会率テーブル -->
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+        <div class="px-4 pt-4 pb-2 flex items-center justify-between">
+          <p class="text-sm font-bold text-gray-700">月別入会率</p>
+          <p class="text-xs text-gray-400">入会者数 ÷ 体験参加者数（2回目除く）</p>
+        </div>
+        <table class="w-full text-sm border-collapse" id="statsTable">
+          <thead>
+            <tr class="bg-primary text-white text-left">
+              <th class="px-4 py-2 font-medium whitespace-nowrap">月</th>
+              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">全体</th>
+              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">早宮校</th>
+              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">氷川台校</th>
+              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">中村校</th>
+            </tr>
+          </thead>
+          <tbody id="statsTableBody"></tbody>
+        </table>
+        <div id="statsEmpty" class="hidden text-center py-10 text-gray-400 text-sm">データがありません</div>
+      </div>
+
+      <!-- 更新ボタン -->
+      <div class="text-right">
+        <button onclick="loadData()" class="text-sm text-primary hover:text-[#3a86a0] flex items-center gap-1 transition ml-auto">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          更新
+        </button>
+      </div>
+
+    </div>
+
   </main>
 
   <script>
@@ -157,6 +224,9 @@
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('tab-active', btn.dataset.tab === tab);
       });
+      const isStats = tab === 'stats';
+      document.getElementById('schoolFilter').classList.toggle('hidden', isStats);
+      document.getElementById('countBar').classList.toggle('hidden', isStats);
       loadData();
     }
 
@@ -175,6 +245,23 @@
     // ── データ取得 ────────────────────────────────────────────────
     async function loadData() {
       showState('loading');
+
+      if (currentTab === 'stats') {
+        try {
+          const res = await fetch(`${API}/api/staff/stats`, {
+            headers: { 'Authorization': `Bearer ${staffKey}` },
+          });
+          if (res.status === 401) { sessionStorage.removeItem('staffKey'); location.href = 'index.html'; return; }
+          const data = await res.json();
+          if (!data.success) throw new Error(data.error);
+          renderStats(data);
+        } catch (err) {
+          document.getElementById('errorText').textContent =
+            'データの取得に失敗しました: ' + (err.message || '不明なエラー');
+          showState('error');
+        }
+        return;
+      }
 
       const endpoint = currentTab === 'taiken' ? '/api/staff/taiken'
                      : currentTab === 'seito'  ? '/api/staff/seito'
@@ -306,12 +393,63 @@
       showState('table');
     }
 
+    // ── 実績描画 ──────────────────────────────────────────────────
+    function renderStats(data) {
+      const { seito_count, breakeven, monthly } = data;
+
+      document.getElementById('st-total').textContent = seito_count.total;
+      document.getElementById('st-hayamiya').textContent = seito_count['早宮校'] ?? 0;
+      document.getElementById('st-hikawadai').textContent = seito_count['氷川台校'] ?? 0;
+      document.getElementById('st-nakamura').textContent = seito_count['中村校'] ?? 0;
+
+      const msg = document.getElementById('st-breakeven-msg');
+      const remaining = breakeven - seito_count.total;
+      if (remaining <= 0) {
+        msg.textContent = '🎉 黒字化達成！';
+        msg.className = 'mt-2 text-xs font-medium text-green-600';
+      } else {
+        msg.textContent = `黒字化まであと ${remaining} 名`;
+        msg.className = 'mt-2 text-xs font-medium text-orange-500';
+      }
+
+      const tbody = document.getElementById('statsTableBody');
+      const statsEmpty = document.getElementById('statsEmpty');
+      const statsTable = document.getElementById('statsTable');
+
+      if (!monthly || monthly.length === 0) {
+        statsTable.classList.add('hidden');
+        statsEmpty.classList.remove('hidden');
+      } else {
+        statsTable.classList.remove('hidden');
+        statsEmpty.classList.add('hidden');
+        tbody.innerHTML = monthly.map((row, i) => {
+          const bg = i % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+          return `<tr class="${bg} hover:bg-blue-50 transition">
+            <td class="px-4 py-2 whitespace-nowrap text-gray-700">${row.month.replace('-', '/')}</td>
+            ${['全体', '早宮校', '氷川台校', '中村校'].map(label => {
+              const d = row[label] ?? { taiken: 0, nyukai: 0 };
+              const rate = d.taiken > 0 ? Math.round(d.nyukai / d.taiken * 100) : null;
+              const rateStr = rate !== null ? `${rate}%` : '―';
+              const color = rate === null ? 'text-gray-400' : rate >= 50 ? 'text-green-600 font-bold' : rate >= 30 ? 'text-amber-600' : 'text-gray-700';
+              return `<td class="px-4 py-2 text-right whitespace-nowrap">
+                <span class="${color}">${rateStr}</span>
+                <span class="text-xs text-gray-400 ml-1">${d.nyukai}/${d.taiken}</span>
+              </td>`;
+            }).join('')}
+          </tr>`;
+        }).join('');
+      }
+
+      showState('stats');
+    }
+
     // ── UI ヘルパー ───────────────────────────────────────────────
     function showState(state) {
       document.getElementById('loading').classList.toggle('hidden', state !== 'loading');
       document.getElementById('errorArea').classList.toggle('hidden', state !== 'error');
       document.getElementById('tableArea').classList.toggle('hidden', state !== 'table');
       document.getElementById('emptyArea').classList.toggle('hidden', state !== 'empty');
+      document.getElementById('statsArea').classList.toggle('hidden', state !== 'stats');
       if (state === 'loading') {
         document.getElementById('countLabel').textContent = '読み込み中…';
       }

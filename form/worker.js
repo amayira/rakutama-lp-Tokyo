@@ -657,6 +657,85 @@ async function handleStaffKesseki(params, env) {
   return { success: true, records };
 }
 
+const BREAKEVEN_TOTAL = 30; // 全社黒字化ライン（生徒数）
+
+/**
+ * GET /api/staff/stats
+ * Returns KPI stats:
+ *   - seito_count: { total, 早宮校, 氷川台校, 中村校 }
+ *   - monthly: [ { month: "2026-06", 全体: {taiken, nyukai}, 早宮校: {...}, ... } ]
+ */
+async function handleStaffStats(env) {
+  const SCHOOLS = ["早宮校", "氷川台校", "中村校"];
+
+  // 体験参加名簿（全件・全期間）
+  const taikenQuery = `所属組織 in ("アルファーブレイン") order by 体験参加日 asc limit 500`;
+  const taikenData = await kintoneGet(APP.TAIKEN, taikenQuery, env.TOKEN_TAIKEN);
+  const taikenRecs = taikenData.records ?? [];
+
+  // 在籍生徒（退会していないもの全件）
+  const seitoQuery = `所属組織 in ("アルファーブレイン") and (退会日 = "" or 退会日 >= TODAY()) order by 生徒番号 asc limit 500`;
+  const seitoData = await kintoneGet(APP.SEITO_NEW, seitoQuery, env.TOKEN_SEITO_NEW);
+  const seitoRecs = seitoData.records ?? [];
+
+  // ── 生徒数集計 ──────────────────────────────────────────────────
+  const seitoCount = { total: seitoRecs.length };
+  for (const school of SCHOOLS) {
+    seitoCount[school] = seitoRecs.filter(r => r["教室名"]?.value === school).length;
+  }
+
+  // ── 月別集計 ────────────────────────────────────────────────────
+  // 体験: 2回目を除く（反響媒体に「2回目」を含まない）
+  const monthSet = new Set();
+
+  // { "2026-06_早宮校": { taiken: N, nyukai: N } }
+  const byMonthSchool = {};
+
+  for (const rec of taikenRecs) {
+    const date = rec["体験参加日"]?.value ?? "";
+    const media = rec["反響媒体"]?.value ?? "";
+    if (!date || media.includes("2回目")) continue;
+    const month = date.slice(0, 7); // "YYYY-MM"
+    const school = rec["教室名"]?.value ?? "";
+    monthSet.add(month);
+    const keys = [`${month}_全体`, `${month}_${school}`];
+    for (const k of keys) {
+      if (!byMonthSchool[k]) byMonthSchool[k] = { taiken: 0, nyukai: 0 };
+      byMonthSchool[k].taiken++;
+    }
+  }
+
+  for (const rec of seitoRecs) {
+    const date = rec["初回授業日"]?.value ?? "";
+    if (!date) continue;
+    const month = date.slice(0, 7);
+    const school = rec["教室名"]?.value ?? "";
+    monthSet.add(month);
+    const keys = [`${month}_全体`, `${month}_${school}`];
+    for (const k of keys) {
+      if (!byMonthSchool[k]) byMonthSchool[k] = { taiken: 0, nyukai: 0 };
+      byMonthSchool[k].nyukai++;
+    }
+  }
+
+  const months = [...monthSet].sort();
+  const monthly = months.map(month => {
+    const row = { month };
+    for (const label of ["全体", ...SCHOOLS]) {
+      const d = byMonthSchool[`${month}_${label}`] ?? { taiken: 0, nyukai: 0 };
+      row[label] = d;
+    }
+    return row;
+  });
+
+  return {
+    success: true,
+    seito_count: seitoCount,
+    breakeven: BREAKEVEN_TOTAL,
+    monthly,
+  };
+}
+
 // ─── Main fetch handler ──────────────────────────────────────────────────────
 
 export default {
@@ -699,6 +778,11 @@ export default {
             return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
           }
           result = await handleStaffKesseki(params, env);
+        } else if (path === "/api/staff/stats") {
+          if (!isValidStaffAuth(request, env)) {
+            return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
+          }
+          result = await handleStaffStats(env);
         } else {
           return errorResponse("Not Found", 404, origin);
         }
