@@ -714,7 +714,8 @@ async function handleStaffStats(env) {
     }
   }
 
-  for (const rec of seitoRecs) {
+  // サブ番号（"-"含む）を除外して入会数を集計
+  for (const rec of countableRecs) {
     const date = rec["作成日時"]?.value ?? "";
     if (!date) continue;
     const month = date.slice(0, 7); // "2026-06T..." → "2026-06"

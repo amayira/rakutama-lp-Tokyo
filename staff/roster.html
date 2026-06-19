@@ -389,7 +389,11 @@
         }).join('');
       }
 
-      document.getElementById('countLabel').textContent = `${records.length}件`;
+      // 在籍生徒タブは生徒番号に"-"を含むサブ番号レコードを件数から除外
+      const countBase = currentTab === 'seito'
+        ? records.filter(r => !String(r.生徒番号 || '').includes('-')).length
+        : records.length;
+      document.getElementById('countLabel').textContent = `${countBase}件`;
       showState('table');
     }
 
