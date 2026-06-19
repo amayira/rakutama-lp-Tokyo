@@ -215,8 +215,9 @@ function errorResponse(message, status = 500, origin = ALLOWED_ORIGIN) {
 
 /**
  * POST /api/lookup
- * { studentNumber: "S00001" }
- * Returns student basic info + active 授業IDs from 受講テーブル subtable.
+ * { studentNumber: "A0001" }
+ * Returns student basic info + active 授業IDs.
+ * 週2コース（A0001 + A0001-2）は両レコードをまとめて返す。
  */
 async function handleLookup(body, env) {
   const { studentNumber } = body;
@@ -224,28 +225,34 @@ async function handleLookup(body, env) {
     return { success: false, error: "studentNumber は必須です", status: 400 };
   }
 
-  const query = `生徒番号 = "${studentNumber}"`;
+  // 完全一致 + サブ番号（A0001-2 など）を前方一致で取得
+  const query = `生徒番号 = "${studentNumber}" or 生徒番号 like "${studentNumber}-%" order by 生徒番号 asc limit 10`;
   const data = await kintoneGet(APP.SEITO_NEW, query, env.TOKEN_SEITO_NEW);
 
   if (!data.records || data.records.length === 0) {
     return { success: false, error: "生徒番号が見つかりません", status: 404 };
   }
 
-  const rec = data.records[0];
+  const firstRec = data.records[0];
 
-  // App 19 stores classes in コマ1〜コマ4 fields (no subtable)
-  const jugyoIds = ["コマ1", "コマ2", "コマ3", "コマ4"]
-    .map(f => rec[f]?.value)
-    .filter(v => v && v.trim() !== "");
+  const records = data.records.map(rec => {
+    const jugyoIds = ["コマ1", "コマ2", "コマ3", "コマ4"]
+      .map(f => rec[f]?.value)
+      .filter(v => v && v.trim() !== "");
+    return {
+      studentNumber: rec["生徒番号"]?.value ?? "",
+      classroom: rec["教室名"]?.value ?? "",
+      billingId: rec["請求先ID"]?.value ?? rec["請求ID"]?.value ?? "",
+      jugyoIds,
+    };
+  });
 
   return {
     success: true,
     student: {
-      familyName: rec["氏"]?.value ?? "",
-      givenName: rec["名"]?.value ?? "",
-      classroom: rec["教室名"]?.value ?? "",
-      billingId: rec["請求先ID"]?.value ?? rec["請求ID"]?.value ?? "",
-      jugyoIds,
+      familyName: firstRec["氏"]?.value ?? "",
+      givenName: firstRec["名"]?.value ?? "",
+      records,
     },
   };
 }
@@ -334,8 +341,9 @@ async function handleFurikaeTickets(params, env) {
     return { success: false, error: "studentNumber と date は必須です", status: 400 };
   }
 
+  // メイン番号（A0001）＋サブ番号（A0001-2 など）の両チケットを取得
   const conditions = [
-    `生徒番号 = "${studentNumber}"`,
+    `(生徒番号 = "${studentNumber}" or 生徒番号 like "${studentNumber}-%")`,
     `振替受講日 = ""`,
     `振替期日_始_ <= "${date}"`,
     `振替期日_終_ >= "${date}"`,
@@ -678,10 +686,11 @@ async function handleStaffStats(env) {
   const seitoData = await kintoneGet(APP.SEITO_NEW, seitoQuery, env.TOKEN_SEITO_NEW);
   const seitoRecs = seitoData.records ?? [];
 
-  // ── 生徒数集計 ──────────────────────────────────────────────────
-  const seitoCount = { total: seitoRecs.length };
+  // ── 生徒数集計（生徒番号に"-"を含むサブ番号レコードは除外）──────────────
+  const countableRecs = seitoRecs.filter(r => !String(r["生徒番号"]?.value ?? "").includes("-"));
+  const seitoCount = { total: countableRecs.length };
   for (const school of SCHOOLS) {
-    seitoCount[school] = seitoRecs.filter(r => r["教室名"]?.value === school).length;
+    seitoCount[school] = countableRecs.filter(r => r["教室名"]?.value === school).length;
   }
 
   // ── 月別集計 ────────────────────────────────────────────────────

@@ -210,10 +210,32 @@
       substituteDeadlineEnd = toYMD(end);
       document.getElementById('deadline-display').textContent = `${formatDate(start)} 〜 ${formatDate(end)}`;
     }
-    document.getElementById('absence-date').addEventListener('change', (e) => updateDeadline(e.target.value));
+    document.getElementById('absence-date').addEventListener('change', async (e) => {
+      updateDeadline(e.target.value);
+      // 週2コースの場合、欠席日の曜日に対応する教室を自動切替
+      const rec = resolveActiveRecord(e.target.value);
+      if (rec?.classroom) {
+        const sel = document.getElementById('furikae-classroom');
+        if (!sel.disabled) {
+          sel.value = rec.classroom;
+          await loadTimeSlots(rec.classroom);
+        }
+      }
+    });
     updateDeadline('');
 
     let studentData = null;
+
+    // 欠席日の曜日から該当レコード（メイン or サブ）を返す
+    const DOW = ['日','月','火','水','木','金','土'];
+    function resolveActiveRecord(absenceDateValue) {
+      if (!studentData) return null;
+      const records = studentData.student.records;
+      if (!records || records.length === 0) return null;
+      if (records.length === 1 || !absenceDateValue) return records[0];
+      const dow = DOW[new Date(absenceDateValue + 'T00:00:00').getDay()];
+      return records.find(r => r.jugyoIds.some(j => j.startsWith(dow))) ?? records[0];
+    }
 
     // 未定チェック：振替受講日・時刻フィールドの表示切替
     document.getElementById('miteijou').addEventListener('change', function () {
@@ -304,15 +326,19 @@
         studentData = data;
         const s = data.student;
 
-        document.getElementById('info-classroom').textContent = s.classroom || '―';
-        document.getElementById('info-jugyo').textContent = s.jugyoIds && s.jugyoIds.length > 0 ? s.jugyoIds.join('、') : '―';
+        // 全レコードの教室名・コマをまとめて表示
+        const allClassrooms = [...new Set(s.records.map(r => r.classroom).filter(Boolean))];
+        const allJugyo = s.records.flatMap(r => r.jugyoIds);
+        document.getElementById('info-classroom').textContent = allClassrooms.join('・') || '―';
+        document.getElementById('info-jugyo').textContent = allJugyo.length > 0 ? allJugyo.join('、') : '―';
         studentInfo.classList.remove('hidden');
         document.getElementById('submit-btn').disabled = false;
         document.getElementById('submit-hint').classList.add('hidden');
 
-        // 教室セレクタを有効化してホーム教室をプリセット
+        // 教室セレクタを有効化してメインレコードの教室をプリセット
         classroomSelect.disabled = false;
-        if (s.classroom) classroomSelect.value = s.classroom;
+        const activeRec = resolveActiveRecord(document.getElementById('absence-date').value);
+        if (activeRec?.classroom) classroomSelect.value = activeRec.classroom;
         await loadTimeSlots(classroomSelect.value);
 
       } catch (err) {
@@ -357,6 +383,7 @@
       }
 
       const s = studentData.student;
+      const activeRec = resolveActiveRecord(absenceDate) ?? s.records[0];
       const submitBtn = document.getElementById('submit-btn');
       const submitText = document.getElementById('submit-text');
       const submitSpinner = document.getElementById('submit-spinner');
@@ -369,9 +396,9 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            生徒番号: studentNumber,
-            請求ID: s.billingId,
-            教室名: s.classroom,
+            生徒番号: activeRec.studentNumber,
+            請求ID: activeRec.billingId,
+            教室名: activeRec.classroom,
             氏: s.familyName,
             名: s.givenName,
             欠席日: absenceDate,

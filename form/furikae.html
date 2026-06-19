@@ -179,6 +179,11 @@
     let studentData = null;
     let ticketReqId = 0;
 
+    // 週2コース：メインの生徒番号（"-"より前）を返す
+    function baseStudentNumber(num) {
+      return String(num).split('-')[0];
+    }
+
     // 授業ID/名から "HH:MM" を抽出（例: "早宮校-火1700" → "17:00", "16時クラス" → "16:00"）
     function extractTime(cls) {
       const mId = String(cls.id).match(/(\d{2})(\d{2})$/);
@@ -217,7 +222,8 @@
 
       if (!studentData || !date) return;
 
-      const studentNumber = document.getElementById('student-number').value.trim();
+      // サブ番号（A0001-2）でも入力できるよう、ベース番号でまとめて検索
+      const studentNumber = baseStudentNumber(document.getElementById('student-number').value.trim());
       ticketSpinner.classList.remove('hidden');
 
       try {
@@ -335,15 +341,16 @@
         studentData = data;
         const s = data.student;
 
-        document.getElementById('info-classroom').textContent = s.classroom || '―';
-        document.getElementById('info-jugyo').textContent = s.jugyoIds && s.jugyoIds.length > 0 ? s.jugyoIds.join('、') : '―';
+        // 全レコードの教室名・コマをまとめて表示
+        const allClassrooms = [...new Set(s.records.map(r => r.classroom).filter(Boolean))];
+        const allJugyo = s.records.flatMap(r => r.jugyoIds);
+        document.getElementById('info-classroom').textContent = allClassrooms.join('・') || '―';
+        document.getElementById('info-jugyo').textContent = allJugyo.length > 0 ? allJugyo.join('、') : '―';
         studentInfo.classList.remove('hidden');
 
-        // 教室セレクタを有効化してホーム教室をプリセット
+        // 教室セレクタを有効化してメインレコードの教室をプリセット
         classroomSelect.disabled = false;
-        if (s.classroom) {
-          classroomSelect.value = s.classroom;
-        }
+        if (s.records[0]?.classroom) classroomSelect.value = s.records[0].classroom;
         await loadTimeSlots(classroomSelect.value);
 
         // 振替受講日がすでに入力済みならチケットを再取得
