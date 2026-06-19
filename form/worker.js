@@ -706,9 +706,9 @@ async function handleStaffStats(env) {
   }
 
   for (const rec of seitoRecs) {
-    const date = rec["初回授業日"]?.value ?? "";
+    const date = rec["作成日時"]?.value ?? "";
     if (!date) continue;
-    const month = date.slice(0, 7);
+    const month = date.slice(0, 7); // "2026-06T..." → "2026-06"
     const school = rec["教室名"]?.value ?? "";
     monthSet.add(month);
     const keys = [`${month}_全体`, `${month}_${school}`];
