@@ -37,6 +37,7 @@
     .grid-th-time { background: #f3f4f6; font-weight: 600; color: #374151; text-align: center; padding: 8px 6px; width: 36px; font-size: 0.8rem; }
     .grid-cell { padding: 4px; min-height: 60px; }
     .student-card { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 5px; padding: 4px 6px; margin: 2px 0; }
+    .student-card.future { background: #fefce8; border-color: #fde68a; }
     .student-name { font-weight: 700; color: #111827; font-size: 0.82rem; }
     .student-kana { color: #6b7280; font-size: 0.68rem; margin-top: 1px; }
     .student-grade { color: #1d4ed8; font-size: 0.7rem; font-weight: 600; margin-top: 1px; }
@@ -674,13 +675,17 @@
             if (students.length === 0) {
               return `<td><div style="color:#d1d5db;text-align:center;padding:10px;font-size:0.75rem;">—</div></td>`;
             }
-            const cards = students.map(s => `
-              <div class="student-card">
+            const today = new Date(); today.setHours(0,0,0,0);
+            const cards = students.map(s => {
+              const isFuture = s.初回授業日 && new Date(s.初回授業日) > today;
+              return `
+              <div class="student-card${isFuture ? ' future' : ''}">
                 <div class="student-name">${s.氏} ${s.名}</div>
                 <div class="student-kana">${s.フリガナ || ''}</div>
                 <div class="student-grade">${s.学年 || ''}</div>
                 ${s.初回授業日 ? `<div class="student-since">${s.初回授業日.replace(/-/g, '/')}</div>` : ''}
-              </div>`).join('');
+              </div>`;
+            }).join('');
             return `<td><div class="grid-cell">${cards}</div></td>`;
           }).join('')}
         </tr>`).join('');
