@@ -633,6 +633,11 @@ async function handleStaffSeito(params, env) {
     初回授業日: rec["初回授業日"]?.value ?? "",
     退会日: rec["退会日"]?.value ?? "",
     教室名: rec["教室名"]?.value ?? "",
+    コマ1: rec["コマ1"]?.value ?? "",
+    コマ2: rec["コマ2"]?.value ?? "",
+    コマ3: rec["コマ3"]?.value ?? "",
+    コマ4: rec["コマ4"]?.value ?? "",
+    コマ5: rec["コマ5"]?.value ?? "",
   }));
 
   return { success: true, records };

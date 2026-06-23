@@ -29,6 +29,18 @@
     body { font-family: 'Noto Sans JP', sans-serif; }
     .tab-active { border-bottom: 3px solid #4A96AE; color: #4A96AE; font-weight: 700; }
     .school-active { background-color: #4A96AE; color: #fff; }
+    /* グリッドビュー */
+    .grid-table { border-collapse: collapse; width: 100%; background: #fff; font-size: 0.8rem; }
+    .grid-table th, .grid-table td { border: 1px solid #d1d5db; vertical-align: top; }
+    .grid-th-school { background: #1e6fa3; color: #fff; font-weight: 700; text-align: center; padding: 6px 4px; font-size: 0.82rem; }
+    .grid-th-day { background: #dbeafe; color: #1e6fa3; font-weight: 600; text-align: center; padding: 5px 4px; font-size: 0.78rem; }
+    .grid-th-time { background: #f3f4f6; font-weight: 600; color: #374151; text-align: center; padding: 8px 6px; width: 36px; font-size: 0.8rem; }
+    .grid-cell { padding: 4px; min-height: 60px; }
+    .student-card { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 5px; padding: 4px 6px; margin: 2px 0; }
+    .student-name { font-weight: 700; color: #111827; font-size: 0.82rem; }
+    .student-kana { color: #6b7280; font-size: 0.68rem; margin-top: 1px; }
+    .student-grade { color: #1d4ed8; font-size: 0.7rem; font-weight: 600; margin-top: 1px; }
+    .student-since { color: #9ca3af; font-size: 0.65rem; margin-top: 1px; }
   </style>
 </head>
 <body class="min-h-screen bg-base">
@@ -92,6 +104,19 @@
         onclick="switchSchool('中村校')">中村校</button>
     </div>
 
+    <!-- 在籍生徒ビュー切り替え -->
+    <div id="seitoViewToggle" class="hidden mb-4 flex items-center gap-2">
+      <span class="text-sm text-gray-500">表示：</span>
+      <button onclick="setSeitoView('grid')" id="btnGrid"
+        class="view-btn text-xs px-3 py-1.5 rounded-full border border-primary bg-primary text-white font-medium transition">
+        コマ別グリッド
+      </button>
+      <button onclick="setSeitoView('list')" id="btnList"
+        class="view-btn text-xs px-3 py-1.5 rounded-full border border-primary text-primary transition">
+        リスト
+      </button>
+    </div>
+
     <!-- 件数・更新ボタン（実績タブでは非表示） -->
     <div id="countBar" class="flex items-center justify-between mb-3">
       <p class="text-sm text-gray-500">
@@ -127,6 +152,29 @@
       <table class="w-full bg-white text-sm border-collapse">
         <thead id="tableHead" class="bg-primary text-white text-left"></thead>
         <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- グリッドビュー（在籍生徒） -->
+    <div id="gridArea" class="hidden overflow-x-auto rounded-xl shadow-sm">
+      <table class="grid-table" id="gridTable">
+        <thead>
+          <tr>
+            <th class="grid-th-time" rowspan="2"></th>
+            <th class="grid-th-school" colspan="2">早宮校</th>
+            <th class="grid-th-school" colspan="2">氷川台校</th>
+            <th class="grid-th-school" colspan="2">中村校</th>
+          </tr>
+          <tr>
+            <th class="grid-th-day">火</th>
+            <th class="grid-th-day">金</th>
+            <th class="grid-th-day">月</th>
+            <th class="grid-th-day">水</th>
+            <th class="grid-th-day">月</th>
+            <th class="grid-th-day">木</th>
+          </tr>
+        </thead>
+        <tbody id="gridBody"></tbody>
       </table>
     </div>
 
@@ -241,6 +289,18 @@
     let currentTab = 'taiken';
     let currentSchool = 'all';
     let staffKey = '';
+    let seitoView = 'grid'; // 'grid' or 'list'
+    let cachedSeitoRecords = null;
+
+    const GRID_COLS = [
+      { school: '早宮校',  day: '火' },
+      { school: '早宮校',  day: '金' },
+      { school: '氷川台校', day: '月' },
+      { school: '氷川台校', day: '水' },
+      { school: '中村校',  day: '月' },
+      { school: '中村校',  day: '木' },
+    ];
+    const GRID_TIMES = ['16', '17'];
 
     // ── 認証チェック ──────────────────────────────────────────────
     staffKey = sessionStorage.getItem('staffKey');
@@ -257,13 +317,30 @@
     // ── タブ切り替え ──────────────────────────────────────────────
     function switchTab(tab) {
       currentTab = tab;
+      cachedSeitoRecords = null;
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('tab-active', btn.dataset.tab === tab);
       });
       const isStats = tab === 'stats';
-      document.getElementById('schoolFilter').classList.toggle('hidden', isStats);
+      const isSeito = tab === 'seito';
+      document.getElementById('schoolFilter').classList.toggle('hidden', isStats || isSeito);
       document.getElementById('countBar').classList.toggle('hidden', isStats);
+      document.getElementById('seitoViewToggle').classList.toggle('hidden', !isSeito);
       loadData();
+    }
+
+    // ── 在籍生徒ビュー切り替え ───────────────────────────────────
+    function setSeitoView(view) {
+      seitoView = view;
+      document.getElementById('btnGrid').className =
+        'view-btn text-xs px-3 py-1.5 rounded-full border border-primary transition ' +
+        (view === 'grid' ? 'bg-primary text-white font-medium' : 'text-primary');
+      document.getElementById('btnList').className =
+        'view-btn text-xs px-3 py-1.5 rounded-full border border-primary transition ' +
+        (view === 'list' ? 'bg-primary text-white font-medium' : 'text-primary');
+      if (cachedSeitoRecords) {
+        renderTable(cachedSeitoRecords);
+      }
     }
 
     // ── 校フィルター ──────────────────────────────────────────────
@@ -318,6 +395,7 @@
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
 
+        if (currentTab === 'seito') cachedSeitoRecords = data.records;
         renderTable(data.records);
       } catch (err) {
         document.getElementById('errorText').textContent =
@@ -361,6 +439,15 @@
           </tr>`).join('');
 
       } else if (currentTab === 'seito') {
+        if (seitoView === 'grid') {
+          renderGrid(records);
+          const countBase = records.filter(r => !String(r.生徒番号 || '').includes('-')).length;
+          document.getElementById('countLabel').textContent = `${countBase}件`;
+          showState('grid');
+          return;
+        }
+
+        // リストビュー
         records.sort((a, b) => {
           const s = (a.教室名 || '').localeCompare(b.教室名 || '', 'ja');
           if (s !== 0) return s;
@@ -555,11 +642,56 @@
       container.innerHTML = svg;
     }
 
+    // ── グリッド描画 ──────────────────────────────────────────────
+    function renderGrid(records) {
+      // grid[school][day][time] = [student, ...]
+      const grid = {};
+      for (const col of GRID_COLS) {
+        if (!grid[col.school]) grid[col.school] = {};
+        if (!grid[col.school][col.day]) grid[col.school][col.day] = {};
+        for (const t of GRID_TIMES) grid[col.school][col.day][t] = [];
+      }
+
+      for (const r of records) {
+        const school = r.教室名;
+        if (!grid[school]) continue;
+        const komas = [r.コマ1, r.コマ2, r.コマ3, r.コマ4, r.コマ5].filter(Boolean);
+        for (const koma of komas) {
+          const day = koma.charAt(0);
+          const time = koma.slice(1);
+          if (grid[school][day] && grid[school][day][time] !== undefined) {
+            grid[school][day][time].push(r);
+          }
+        }
+      }
+
+      const tbody = document.getElementById('gridBody');
+      tbody.innerHTML = GRID_TIMES.map(time => `
+        <tr>
+          <th class="grid-th-time">${time}</th>
+          ${GRID_COLS.map(col => {
+            const students = grid[col.school]?.[col.day]?.[time] ?? [];
+            if (students.length === 0) {
+              return `<td><div style="color:#d1d5db;text-align:center;padding:10px;font-size:0.75rem;">—</div></td>`;
+            }
+            const cards = students.map(s => `
+              <div class="student-card">
+                <div class="student-name">${s.氏} ${s.名}</div>
+                <div class="student-kana">${s.フリガナ || ''}</div>
+                <div class="student-grade">${s.学年 || ''}</div>
+                ${s.初回授業日 ? `<div class="student-since">${s.初回授業日.replace(/-/g, '/')}</div>` : ''}
+              </div>`).join('');
+            return `<td><div class="grid-cell">${cards}</div></td>`;
+          }).join('')}
+        </tr>`).join('');
+    }
+
     // ── UI ヘルパー ───────────────────────────────────────────────
     function showState(state) {
       document.getElementById('loading').classList.toggle('hidden', state !== 'loading');
       document.getElementById('errorArea').classList.toggle('hidden', state !== 'error');
       document.getElementById('tableArea').classList.toggle('hidden', state !== 'table');
+      document.getElementById('gridArea').classList.toggle('hidden', state !== 'grid');
       document.getElementById('emptyArea').classList.toggle('hidden', state !== 'empty');
       document.getElementById('statsArea').classList.toggle('hidden', state !== 'stats');
       if (state === 'loading') {
