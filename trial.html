@@ -536,9 +536,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const daysAhead = 90;
         const earliest = new Date(2026, 5, 1);
         earliest.setHours(0, 0, 0, 0);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const base = today < earliest ? new Date(earliest) : new Date(today);
+        const now = new Date();
+        const minOffset = now.getHours() < 18 ? 1 : 2; // 18時以降は翌々日から
+        const minDate = new Date(now);
+        minDate.setDate(minDate.getDate() + minOffset);
+        minDate.setHours(0, 0, 0, 0);
+        const base = minDate < earliest ? new Date(earliest) : new Date(minDate);
         sel.innerHTML = '';
         const ph = document.createElement('option');
         ph.value = '';

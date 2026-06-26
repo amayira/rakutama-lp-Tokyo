@@ -257,6 +257,65 @@ async function handleLookup(body, env) {
   };
 }
 
+// ─── Resend メール送信 ────────────────────────────────────────────────────────
+
+async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboDaiji, env) {
+  if (!env.RESEND_API_KEY || !to) return;
+
+  const namePart = familyName || givenName ? `${familyName} ${givenName}`.trim() + " さん" : "ご保護者様";
+  const kyoshitsuLine = kyoshitsu ? `\n■ ご希望の教室：${kyoshitsu}` : "";
+  const kiboLine = kiboDaiji ? `\n■ ご希望日時：${kiboDaiji}` : "";
+
+  const textBody = `${namePart}
+
+このたびは楽珠そろばん教室の体験授業にお申し込みいただき、ありがとうございます。
+
+以下の内容でお申し込みを受け付けました。${kyoshitsuLine}${kiboLine}
+
+担当者より **1営業日以内** に体験日時の確定メールをお送りします。
+今しばらくお待ちください。
+
+※ お急ぎの場合は、公式LINEまたはメールにてお問い合わせください。
+　公式LINE：https://lin.ee/oW7wspr
+　メール：info@rakutama-tokyo.com
+
+━━━━━━━━━━━━━━━━━━━━━━
+楽珠そろばん教室（東京・練馬）
+運営：アルファーブレイン合同会社
+━━━━━━━━━━━━━━━━━━━━━━`;
+
+  const htmlBody = `<p>${namePart}</p>
+<p>このたびは楽珠そろばん教室の体験授業にお申し込みいただき、ありがとうございます。</p>
+<p>以下の内容でお申し込みを受け付けました。</p>
+<table style="border-collapse:collapse;margin:16px 0;">
+  ${kyoshitsu ? `<tr><td style="padding:4px 12px 4px 0;color:#555;white-space:nowrap;">ご希望の教室</td><td style="padding:4px 0;">${kyoshitsu}</td></tr>` : ""}
+  ${kiboDaiji ? `<tr><td style="padding:4px 12px 4px 0;color:#555;white-space:nowrap;">ご希望日時</td><td style="padding:4px 0;">${kiboDaiji}</td></tr>` : ""}
+</table>
+<p>担当者より <strong>1営業日以内</strong> に体験日時の確定メールをお送りします。<br>今しばらくお待ちください。</p>
+<hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+<p style="font-size:13px;color:#555;">
+  お急ぎの場合は、公式LINEまたはメールにてお問い合わせください。<br>
+  公式LINE：<a href="https://lin.ee/oW7wspr">https://lin.ee/oW7wspr</a><br>
+  メール：<a href="mailto:info@rakutama-tokyo.com">info@rakutama-tokyo.com</a>
+</p>
+<p style="font-size:12px;color:#aaa;">楽珠そろばん教室（東京・練馬）｜運営：アルファーブレイン合同会社</p>`;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "楽珠そろばん教室 <info@rakutama-tokyo.com>",
+      to: [to],
+      subject: "【体験申込受付】楽珠そろばん教室 東京・練馬",
+      text: textBody,
+      html: htmlBody,
+    }),
+  });
+}
+
 /**
  * POST /api/taiken
  * Creates a record in 体験参加名簿 (App 17).
@@ -284,6 +343,21 @@ async function handleTaiken(body, env) {
   });
 
   await kintonePost(APP.TAIKEN, record, token);
+
+  // kintone登録成功後に確認メール送信（失敗しても申込自体はエラーにしない）
+  try {
+    await sendConfirmationEmail(
+      body["メールアドレス"],
+      body["氏"] ?? "",
+      body["名"] ?? "",
+      body["教室名"] ?? "",
+      body["希望日時"] ?? "",
+      env,
+    );
+  } catch (e) {
+    console.error("確認メール送信エラー:", e);
+  }
+
   return { success: true };
 }
 
