@@ -666,7 +666,9 @@ async function handleStaffTaiken(params, env) {
   const query = `${conditions.join(" and ")} order by 体験参加日 asc, 教室名 asc, 時刻 asc limit 500`;
 
   const data = await kintoneGet(APP.TAIKEN, query, env.TOKEN_TAIKEN);
-  const records = (data.records ?? []).map(rec => ({
+  const records = (data.records ?? [])
+    .filter(rec => !(rec["出欠"]?.value ?? []).includes("欠席"))
+    .map(rec => ({
     体験参加日: rec["体験参加日"]?.value ?? "",
     時刻: rec["時刻"]?.value ?? "",
     氏: rec["氏"]?.value ?? "",
