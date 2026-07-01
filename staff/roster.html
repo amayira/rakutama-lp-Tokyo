@@ -100,7 +100,12 @@
       <button data-tab="kesseki"
         class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
         onclick="switchTab('kesseki')">
-        欠席・振替
+        欠席
+      </button>
+      <button data-tab="furikae"
+        class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
+        onclick="switchTab('furikae')">
+        振替
       </button>
       <button data-tab="stats"
         class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
@@ -312,6 +317,7 @@
     let staffKey = '';
     let seitoView = 'grid'; // 'grid' or 'list'
     let cachedSeitoRecords = null;
+    let cachedKessekiRecords = null;
 
     const GRID_COLS = [
       { school: '早宮校',  day: '火' },
@@ -347,6 +353,8 @@
       document.getElementById('schoolFilter').classList.toggle('hidden', isStats || isSeito);
       document.getElementById('countBar').classList.toggle('hidden', isStats);
       document.getElementById('seitoViewToggle').classList.toggle('hidden', !isSeito);
+      // 欠席・振替タブ共用キャッシュをクリア
+      cachedKessekiRecords = null;
       loadData();
     }
 
@@ -367,6 +375,7 @@
     // ── 校フィルター ──────────────────────────────────────────────
     function switchSchool(school) {
       currentSchool = school;
+      cachedKessekiRecords = null;
       document.querySelectorAll('.school-btn').forEach(btn => {
         const active = btn.dataset.school === school;
         btn.classList.toggle('school-active', active);
@@ -402,6 +411,12 @@
                      : '/api/staff/kesseki';
       const url = `${API}${endpoint}?school=${encodeURIComponent(currentSchool)}`;
 
+      // 欠席・振替タブはキャッシュを共用（同じAPIエンドポイントのため）
+      if ((currentTab === 'kesseki' || currentTab === 'furikae') && cachedKessekiRecords) {
+        renderTable(cachedKessekiRecords);
+        return;
+      }
+
       try {
         const res = await fetch(url, {
           headers: { 'Authorization': `Bearer ${staffKey}` },
@@ -417,6 +432,7 @@
         if (!data.success) throw new Error(data.error);
 
         if (currentTab === 'seito') cachedSeitoRecords = data.records;
+        if (currentTab === 'kesseki' || currentTab === 'furikae') cachedKessekiRecords = data.records;
         renderTable(data.records);
       } catch (err) {
         document.getElementById('errorText').textContent =
@@ -501,36 +517,59 @@
             <td class="px-4 py-3 whitespace-nowrap text-gray-600">${formatDate(r.初回授業日)}</td>
           </tr>`).join('');
 
-      } else {
+      } else if (currentTab === 'kesseki') {
+        // 欠席タブ：欠席日・振替状況・期限のみ（列を絞って縦に読みやすく）
         thead.innerHTML = `
           <tr>
             <th class="px-4 py-3 font-medium whitespace-nowrap">教室</th>
             <th class="px-4 py-3 font-medium whitespace-nowrap">氏名</th>
             <th class="px-4 py-3 font-medium whitespace-nowrap">欠席日</th>
             <th class="px-4 py-3 font-medium whitespace-nowrap">振替状況</th>
-            <th class="px-4 py-3 font-medium whitespace-nowrap">振替受講日・時刻</th>
-            <th class="px-4 py-3 font-medium whitespace-nowrap">振替先教室</th>
             <th class="px-4 py-3 font-medium whitespace-nowrap">振替期限</th>
           </tr>`;
 
-        tbody.innerHTML = records.map((r, i) => {
-          const furikaeSchool = r.振替教室名 && r.振替教室名 !== r.教室名
-            ? schoolBadge(r.振替教室名)
-            : (r.振替教室名 ? schoolBadge(r.振替教室名) : '―');
-          const furikaeTime = r.振替受講日
-            ? formatDateWithDay(r.振替受講日) + (r.時刻 ? '&nbsp;' + r.時刻.slice(0, 5) : '')
-            : '―';
-          return `
+        tbody.innerHTML = records.map((r, i) => `
           <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition">
             <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.教室名)}</td>
             <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${formatDateWithDay(r.欠席日)}</td>
             <td class="px-4 py-3 whitespace-nowrap">${furikaeBadge(r.振替受講日)}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${furikaeTime}</td>
-            <td class="px-4 py-3 whitespace-nowrap">${furikaeSchool}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${formatDate(r.振替期日_終_)}</td>
+          </tr>`).join('');
+
+      } else {
+        // 振替タブ：振替受講日が確定しているものだけ表示
+        const furikaeRecords = records.filter(r => r.振替受講日);
+        if (furikaeRecords.length === 0) {
+          document.getElementById('countLabel').textContent = '0件';
+          showState('empty');
+          return;
+        }
+
+        thead.innerHTML = `
+          <tr>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">振替先教室</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">氏名</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">振替受講日</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">時刻</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">ホーム教室</th>
           </tr>`;
-        }).join('');
+
+        // 振替受講日順に並べる
+        furikaeRecords.sort((a, b) => (a.振替受講日 || '').localeCompare(b.振替受講日 || ''));
+
+        tbody.innerHTML = furikaeRecords.map((r, i) => `
+          <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition">
+            <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.振替教室名 || r.教室名)}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${formatDateWithDay(r.振替受講日)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.時刻 ? r.時刻.slice(0, 5) : '―'}</td>
+            <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.教室名)}</td>
+          </tr>`).join('');
+
+        document.getElementById('countLabel').textContent = `${furikaeRecords.length}件`;
+        showState('table');
+        return;
       }
 
       // 在籍生徒タブは生徒番号に"-"を含むサブ番号レコードを件数から除外
