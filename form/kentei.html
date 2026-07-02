@@ -56,7 +56,7 @@
     <div id="form-card" class="bg-white rounded-2xl shadow-md p-6 md:p-8">
       <div class="mb-6">
         <h1 class="text-xl font-black text-gray-800 font-display mb-2">検定 申込フォーム</h1>
-        <p class="text-sm text-gray-500">珠算・暗算検定のお申し込みはこちらから。</p>
+        <p class="text-sm text-gray-500">受験日と受験級を選択してください。級を選ぶと検定費が表示されます。</p>
       </div>
 
       <!-- Error Box -->
@@ -110,12 +110,6 @@
               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
           </div>
 
-          <!-- 受験会場 -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">受験会場 <span class="text-red-500">*</span></label>
-            <input type="text" id="exam-venue" placeholder="例：早宮校" required
-              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
-          </div>
         </div>
 
         <!-- Section: 受験する種目 -->
@@ -142,15 +136,10 @@
                 <option>準2級</option><option>2級</option><option>準1級</option>
                 <option>1級</option><option>段位</option>
               </select>
-              <label class="block text-xs text-gray-500 mt-3 mb-1">暗算受験時刻</label>
-              <select id="anzan-time"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white">
-                <option value="">選択してください</option>
-                <option value="10:00">10時00分</option>
-                <option value="11:00">11時00分</option>
-                <option value="13:00">13時00分</option>
-                <option value="14:00">14時00分</option>
-              </select>
+              <div id="anzan-fee" class="hidden mt-3 flex items-center justify-between bg-[#EAF6FB] rounded-lg px-3 py-2">
+                <span class="text-xs text-gray-500">暗算検定費</span>
+                <span id="anzan-fee-value" class="text-sm font-black text-[#4A96AE]"></span>
+              </div>
             </div>
           </div>
 
@@ -171,16 +160,17 @@
                 <option>準2級</option><option>2級</option><option>準1級</option>
                 <option>1級</option><option>段位</option>
               </select>
-              <label class="block text-xs text-gray-500 mt-3 mb-1">珠算受験時刻</label>
-              <select id="shuzan-time"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white">
-                <option value="">選択してください</option>
-                <option value="10:20">10時20分</option>
-                <option value="11:20">11時20分</option>
-                <option value="13:20">13時20分</option>
-                <option value="14:20">14時20分</option>
-              </select>
+              <div id="shuzan-fee" class="hidden mt-3 flex items-center justify-between bg-[#EAF6FB] rounded-lg px-3 py-2">
+                <span class="text-xs text-gray-500">珠算検定費</span>
+                <span id="shuzan-fee-value" class="text-sm font-black text-[#4A96AE]"></span>
+              </div>
             </div>
+          </div>
+
+          <!-- Fee total -->
+          <div id="fee-total-box" class="hidden border-2 border-[#4A96AE] rounded-xl px-4 py-3 flex items-center justify-between">
+            <span class="text-sm font-bold text-gray-700 font-display">検定費 合計</span>
+            <span id="fee-total-value" class="text-xl font-black text-[#4A96AE]"></span>
           </div>
         </div>
 
@@ -223,10 +213,57 @@
     // Toggle grade selects
     document.getElementById('shuzan-check').addEventListener('change', (e) => {
       document.getElementById('shuzan-grade-field').classList.toggle('hidden', !e.target.checked);
+      updateFee();
     });
     document.getElementById('anzan-check').addEventListener('change', (e) => {
       document.getElementById('anzan-grade-field').classList.toggle('hidden', !e.target.checked);
+      updateFee();
     });
+
+    // 検定費（http://k3skill.com/jyuken.html より）
+    const SHUZAN_FEE = {
+      '10級': 1000, '9級': 1000, '8級': 1000, '7級': 1000, '6級': 1000, '5級': 1000, '4級': 1000,
+      '準3級': 1500, '3級': 1500, '準2級': 1500, '2級': 1500, '準1級': 1500, '1級': 1500,
+      '段位': 2000,
+    };
+    const ANZAN_FEE = {
+      '10級': 1000, '9級': 1000, '8級': 1000, '7級': 1000, '6級': 1000, '5級': 1000, '4級': 1000,
+      '準3級': 1000, '3級': 1000, '準2級': 1000, '2級': 1000, '準1級': 1000, '1級': 1000,
+      '段位': 1500,
+    };
+
+    function updateFee() {
+      const shuzanChecked = document.getElementById('shuzan-check').checked;
+      const anzanChecked = document.getElementById('anzan-check').checked;
+      const shuzanGrade = document.getElementById('shuzan-grade').value;
+      const anzanGrade = document.getElementById('anzan-grade').value;
+
+      const shuzanFeeBox = document.getElementById('shuzan-fee');
+      const anzanFeeBox = document.getElementById('anzan-fee');
+      let shuzanFee = shuzanChecked ? SHUZAN_FEE[shuzanGrade] : undefined;
+      let anzanFee = anzanChecked ? ANZAN_FEE[anzanGrade] : undefined;
+
+      shuzanFeeBox.classList.toggle('hidden', shuzanFee === undefined);
+      if (shuzanFee !== undefined) {
+        document.getElementById('shuzan-fee-value').textContent = `¥${shuzanFee.toLocaleString()}`;
+      }
+      anzanFeeBox.classList.toggle('hidden', anzanFee === undefined);
+      if (anzanFee !== undefined) {
+        document.getElementById('anzan-fee-value').textContent = `¥${anzanFee.toLocaleString()}`;
+      }
+
+      const feeTotalBox = document.getElementById('fee-total-box');
+      if (shuzanFee === undefined && anzanFee === undefined) {
+        feeTotalBox.classList.add('hidden');
+        return;
+      }
+      const total = (shuzanFee ?? 0) + (anzanFee ?? 0);
+      document.getElementById('fee-total-value').textContent = `¥${total.toLocaleString()}`;
+      feeTotalBox.classList.remove('hidden');
+    }
+
+    document.getElementById('shuzan-grade').addEventListener('change', updateFee);
+    document.getElementById('anzan-grade').addEventListener('change', updateFee);
 
     // Lookup
     document.getElementById('lookup-btn').addEventListener('click', async () => {
@@ -303,24 +340,18 @@
       errorBox.textContent = '';
 
       const examDate = document.getElementById('exam-date').value;
-      const examVenue = document.getElementById('exam-venue').value.trim();
       const shuzanChecked = document.getElementById('shuzan-check').checked;
       const anzanChecked = document.getElementById('anzan-check').checked;
       const shuzanGrade = document.getElementById('shuzan-grade').value;
-      const shuzanTime = document.getElementById('shuzan-time').value;
       const anzanGrade = document.getElementById('anzan-grade').value;
-      const anzanTime = document.getElementById('anzan-time').value;
       const studentNumber = document.getElementById('student-number').value.trim();
 
       const errors = [];
       if (!studentData) errors.push('生徒番号を検索してください');
       if (!examDate) errors.push('受験日を選択してください');
-      if (!examVenue) errors.push('受験会場を入力してください');
       if (!shuzanChecked && !anzanChecked) errors.push('受験する種目を少なくとも1つ選択してください');
       if (shuzanChecked && !shuzanGrade) errors.push('珠算受験級を選択してください');
-      if (shuzanChecked && !shuzanTime) errors.push('珠算受験時刻を選択してください');
       if (anzanChecked && !anzanGrade) errors.push('暗算受験級を選択してください');
-      if (anzanChecked && !anzanTime) errors.push('暗算受験時刻を選択してください');
 
       if (errors.length > 0) {
         errorBox.innerHTML = errors.join('<br />');
@@ -348,11 +379,9 @@
             氏: s.familyName,
             名: s.givenName,
             受験日: examDate,
-            受験会場: examVenue,
+            受験会場: s.classroom,
             珠算受験級: shuzanChecked ? shuzanGrade : '',
-            珠算受験時刻: shuzanChecked ? shuzanTime : '',
             暗算受験級: anzanChecked ? anzanGrade : '',
-            暗算受験時刻: anzanChecked ? anzanTime : '',
           }),
         });
 
