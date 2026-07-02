@@ -308,8 +308,11 @@
         studentData = data;
         const s = data.student;
 
-        document.getElementById('info-classroom').textContent = s.classroom || '―';
-        document.getElementById('info-jugyo').textContent = s.jugyoIds && s.jugyoIds.length > 0 ? s.jugyoIds.join('、') : '―';
+        // 全レコードの教室名・コマをまとめて表示（週2コースは複数レコードを持つ）
+        const allClassrooms = [...new Set(s.records.map(r => r.classroom).filter(Boolean))];
+        const allJugyo = s.records.flatMap(r => r.jugyoIds);
+        document.getElementById('info-classroom').textContent = allClassrooms.join('・') || '―';
+        document.getElementById('info-jugyo').textContent = allJugyo.length > 0 ? allJugyo.join('、') : '―';
         studentInfo.classList.remove('hidden');
         document.getElementById('submit-btn').disabled = false;
         document.getElementById('submit-hint').classList.add('hidden');
@@ -361,6 +364,7 @@
       }
 
       const s = studentData.student;
+      const rec = s.records[0];
       const submitBtn = document.getElementById('submit-btn');
       const submitText = document.getElementById('submit-text');
       const submitSpinner = document.getElementById('submit-spinner');
@@ -373,13 +377,13 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            生徒番号: studentNumber,
-            請求ID: s.billingId,
-            教室名: s.classroom,
+            生徒番号: rec.studentNumber || studentNumber,
+            請求ID: rec.billingId,
+            教室名: rec.classroom,
             氏: s.familyName,
             名: s.givenName,
             受験日: examDate,
-            受験会場: s.classroom,
+            受験会場: rec.classroom,
             珠算受験級: shuzanChecked ? shuzanGrade : '',
             暗算受験級: anzanChecked ? anzanGrade : '',
           }),
