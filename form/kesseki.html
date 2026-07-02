@@ -192,7 +192,8 @@
       return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
     }
     function toYMD(d) {
-      return d.toISOString().split('T')[0];
+      // toISOString()はUTC変換で日本時間だと前日にずれるため、ローカル日付で組み立てる
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
     function updateDeadline(dateValue) {
       if (!dateValue) {

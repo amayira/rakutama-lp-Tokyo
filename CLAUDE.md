@@ -187,13 +187,14 @@ TOKEN_GAKUHI
 
 全在学生向けフォームで共通の動作：
 1. 生徒番号を入力して「検索」→ `/api/lookup` (POST) を呼ぶ
-2. 返却値: `{ student: { familyName, givenName, classroom, billingId, jugyoIds[] } }`
+2. 返却値: `{ success, student: { familyName, givenName, records: [{ studentNumber, classroom, billingId, jugyoIds[] }] } }`
+   ※ 週2コース（A0001 + A0001-2）は `records` に複数レコードが入る
 3. 検索成功後にフォームフィールドが有効化される（それまで submit 不可）
 
 ### 共通：教室選択 → 時刻プルダウン連動
 
 振替・欠席フォームともに教室セレクタを持つ：
-- 生徒番号検索後にホーム教室をプリセット（`s.classroom`）、`disabled` 解除
+- 生徒番号検索後にホーム教室をプリセット（`s.records[0].classroom`）、`disabled` 解除
 - 別教室に変更すると `/api/jugyo?classroom=<name>` を再取得し時刻を再描画
 - 時刻の表示形式: `「16時」「17時」`（cls.name から `/(\d+)時/` で抽出・重複除去）
 - 送信値: `「16時」` のまま送信 → worker.js の `toKintoneTime()` で変換

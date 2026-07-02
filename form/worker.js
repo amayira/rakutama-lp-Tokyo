@@ -36,13 +36,22 @@ const DOMAIN_ORG_MAP = {
 function getOrgCode(origin) {
   try {
     const host = new URL(origin).host;
-    return DOMAIN_ORG_MAP[host] ?? "alphabrain";
+    return DOMAIN_ORG_MAP[host] ?? "アルファーブレイン";
   } catch {
-    return "alphabrain";
+    return "アルファーブレイン";
   }
 }
 
 // ─── kintone helpers ────────────────────────────────────────────────────────
+
+/**
+ * kintoneクエリの文字列リテラル用エスケープ。
+ * ユーザー入力（生徒番号・教室名など）に " や \ が含まれても
+ * クエリが壊れないように無害化する。
+ */
+function escapeQueryValue(val) {
+  return String(val).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
 
 /**
  * Convert a flat { key: value } object into kintone record format.
@@ -197,7 +206,7 @@ function corsHeaders(origin) {
   };
 }
 
-function jsonResponse(body, status = 200, origin = ALLOWED_ORIGIN) {
+function jsonResponse(body, status = 200, origin = "") {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
@@ -207,7 +216,7 @@ function jsonResponse(body, status = 200, origin = ALLOWED_ORIGIN) {
   });
 }
 
-function errorResponse(message, status = 500, origin = ALLOWED_ORIGIN) {
+function errorResponse(message, status = 500, origin = "") {
   return jsonResponse({ success: false, error: message }, status, origin);
 }
 
@@ -226,7 +235,8 @@ async function handleLookup(body, env) {
   }
 
   // 完全一致 + サブ番号（A0001-2 など）を前方一致で取得
-  const query = `生徒番号 = "${studentNumber}" or 生徒番号 like "${studentNumber}-%" order by 生徒番号 asc limit 10`;
+  const sn = escapeQueryValue(studentNumber);
+  const query = `生徒番号 = "${sn}" or 生徒番号 like "${sn}-%" order by 生徒番号 asc limit 10`;
   const data = await kintoneGet(APP.SEITO_NEW, query, env.TOKEN_SEITO_NEW);
 
   if (!data.records || data.records.length === 0) {
@@ -416,11 +426,13 @@ async function handleFurikaeTickets(params, env) {
   }
 
   // メイン番号（A0001）＋サブ番号（A0001-2 など）の両チケットを取得
+  const sn = escapeQueryValue(studentNumber);
+  const dt = escapeQueryValue(date);
   const conditions = [
-    `(生徒番号 = "${studentNumber}" or 生徒番号 like "${studentNumber}-%")`,
+    `(生徒番号 = "${sn}" or 生徒番号 like "${sn}-%")`,
     `振替受講日 = ""`,
-    `振替期日_始_ <= "${date}"`,
-    `振替期日_終_ >= "${date}"`,
+    `振替期日_始_ <= "${dt}"`,
+    `振替期日_終_ >= "${dt}"`,
   ].join(" and ");
   const query = `${conditions} order by 欠席日 asc limit 50`;
 
@@ -578,7 +590,7 @@ async function handleJugyo(params, env) {
     return { success: false, error: "classroom は必須です", status: 400 };
   }
 
-  const query = `教室名 = "${classroom}" and 開講状況 in ("開講中") order by 曜日 asc, 開始時刻 asc limit 100`;
+  const query = `教室名 = "${escapeQueryValue(classroom)}" and 開講状況 in ("開講中") order by 曜日 asc, 開始時刻 asc limit 100`;
   const data = await kintoneGet(APP.JUGYO, query, env.TOKEN_JUGYO);
 
   const classes = (data.records ?? []).map((rec) => ({
@@ -599,7 +611,7 @@ async function handleGakuhi(params, env) {
     return { success: false, error: "orgCode は必須です", status: 400 };
   }
 
-  const query = `所属組織 in ("${orgCode}") order by コース名 asc limit 100`;
+  const query = `所属組織 in ("${escapeQueryValue(orgCode)}") order by コース名 asc limit 100`;
   const data = await kintoneGet(APP.GAKUHI, query, env.TOKEN_GAKUHI);
 
   const fees = (data.records ?? []).map((rec) => ({
@@ -662,7 +674,7 @@ async function handleStaffAuth(body, env) {
 async function handleStaffTaiken(params, env) {
   const school = params.get("school") ?? "all";
   const conditions = [`所属組織 in ("アルファーブレイン")`, `(体験参加日 >= TODAY() or 体験参加日 = "")`];
-  if (school !== "all") conditions.unshift(`教室名 = "${school}"`);
+  if (school !== "all") conditions.unshift(`教室名 = "${escapeQueryValue(school)}"`);
   const query = `${conditions.join(" and ")} order by 体験参加日 asc, 教室名 asc, 時刻 asc limit 500`;
 
   const data = await kintoneGet(APP.TAIKEN, query, env.TOKEN_TAIKEN);
@@ -694,7 +706,7 @@ async function handleStaffSeito(params, env) {
     `所属組織 in ("アルファーブレイン")`,
     `(退会日 = "" or 退会日 >= TODAY())`,
   ];
-  if (school !== "all") conditions.unshift(`教室名 = "${school}"`);
+  if (school !== "all") conditions.unshift(`教室名 = "${escapeQueryValue(school)}"`);
   const query = `${conditions.join(" and ")} order by 生徒番号 asc limit 500`;
 
   const data = await kintoneGet(APP.SEITO_NEW, query, env.TOKEN_SEITO_NEW);
@@ -727,7 +739,7 @@ async function handleStaffSeito(params, env) {
 async function handleStaffKesseki(params, env) {
   const school = params.get("school") ?? "all";
   const conditions = [`(欠席日 >= TODAY() or 振替受講日 >= TODAY())`];
-  if (school !== "all") conditions.unshift(`教室名 = "${school}"`);
+  if (school !== "all") conditions.unshift(`教室名 = "${escapeQueryValue(school)}"`);
   const query = `${conditions.join(" and ")} order by 欠席日 asc limit 500`;
 
   const data = await kintoneGet(APP.FURIKAE, query, env.TOKEN_FURIKAE);

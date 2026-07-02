@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // 本番Worker名（https://rakutama-kintone.k-ariyama.workers.dev）に合わせる。
+  // 名前を変えると別Workerとして新規デプロイされてしまうので注意。
+  "name": "rakutama-kintone",
+  "main": "worker.js",
+  // ダッシュボード側で設定済みの環境変数（TOKEN_*等）をデプロイ時に消さない
+  "keep_vars": true,
+  "compatibility_date": "2026-06-26",
+  "observability": {
+    "enabled": true
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+  // APIトークン等の環境変数（TOKEN_* / RESEND_API_KEY / STAFF_PASSWORD）は
+  // Cloudflareダッシュボードまたは `wrangler secret put` で管理する。
+}
