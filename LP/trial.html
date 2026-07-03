@@ -99,10 +99,10 @@
                 <div class="block">
                     <div class="shimmer-badge inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-md">
                         <span class="text-white text-display font-black text-xs leading-none">✨</span>
-                        <span class="text-white text-display font-black text-xs tracking-wide whitespace-nowrap">開校キャンペーン実施中　今だけ入会金0円！</span>
+                        <span class="text-white text-display font-black text-xs tracking-wide whitespace-nowrap">入会特典実施中</span>
                         <span class="text-white text-display font-black text-xs leading-none">✨</span>
                     </div>
-                    <span class="block text-white/60 text-xs mt-1 text-center">※条件あり</span>
+                    <span class="block text-white/60 text-xs mt-1 text-center">※教室により内容が異なります</span>
                 </div>
             </div>
 
@@ -163,7 +163,7 @@
                     <!-- ① 開校記念バッジ（右カラム最上部） -->
                     <div class="shimmer-badge inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-md">
                         <span class="text-white text-display font-black text-xs leading-none">✨</span>
-                        <span class="text-white text-display font-black text-sm tracking-wide whitespace-nowrap">開校キャンペーン実施中　今だけ入会金0円！</span>
+                        <span class="text-white text-display font-black text-sm tracking-wide whitespace-nowrap">入会特典実施中</span>
                         <span class="text-white text-display font-black text-xs leading-none">✨</span>
                     </div>
                     <!-- ② ノートバッジ（OPEN） -->
@@ -563,7 +563,7 @@
                         <div class="p-5 text-sm text-gray-600 leading-relaxed border-t">
                             A. コースにより異なりますが、目安は以下の通りです（すべて税込）。<br><br>
                             <ul class="list-disc pl-5 space-y-1">
-                                <li><strong>入会時：</strong>入会金は開校キャンペーンで<strong>0円</strong>（通常5,500円）／データ登録料 1,100円／初期教材費 3,300円（※そろばん経験者は不要）／初期合計 <strong>4,400円</strong>（キャンペーン適用時）</li>
+                                <li><strong>入会時：</strong>データ登録料 1,100円／初期教材費 3,300円（※そろばん経験者は不要）に加え、入会金5,500円が教室ごとの入会特典で異なります。早宮校は先着10名まで入会金無料、氷川台校・中村校は入会金無料または2回目無料体験（55分）からお選びいただけます（入会金無料選択時の初期合計は<strong>4,400円</strong>）</li>
                                 <li><strong>月額料金：</strong>
                                     <ul class="list-none pl-2 mt-1 space-y-1 text-gray-500 text-xs sm:text-sm">
                                         <li>・週1回コース：6,050円/月（月4回授業）</li>
@@ -1021,8 +1021,8 @@
                 { name: '氷川台校(水)17時クラス' },
             ],
             '中村校': [
-                { name: '中村校(火)16時クラス' },
-                { name: '中村校(火)17時クラス' },
+                { name: '中村校(月)16時クラス' },
+                { name: '中村校(月)17時クラス' },
                 { name: '中村校(木)16時クラス' },
                 { name: '中村校(木)17時クラス' },
             ],
@@ -1033,9 +1033,19 @@
         let lastJugyoByDay = null;
         let currentClassroom = null;
 
-        const BLOCKED_DATES_BY_CLASSROOM = {
-            '早宮校': new Set(['2026-06-05', '2026-06-12'])
-        };
+        // 年間スケジュール（Pictures/2026schedule.pdf）で「休」「祝休」となっている全教室共通の休校日（教室ごとの開講曜日でない日は allowedDays 側で自然に除外される）
+        const BLOCKED_DATES = new Set([
+            '2026-04-29', '2026-04-30', '2026-05-01', '2026-05-02', '2026-05-04', '2026-05-05', '2026-05-06',
+            '2026-06-27', '2026-07-03', '2026-07-20',
+            '2026-08-11', '2026-08-12', '2026-08-13', '2026-08-14', '2026-08-15',
+            '2026-09-21', '2026-09-22', '2026-09-23',
+            '2026-10-09', '2026-10-12', '2026-10-29',
+            '2026-11-03', '2026-11-23',
+            '2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31',
+            '2027-01-01', '2027-01-02', '2027-01-11',
+            '2027-02-11', '2027-02-23',
+            '2027-03-10'
+        ]);
         const EXTRA_DATES_BY_CLASSROOM = {
             '早宮校': [
                 { date: new Date(2026, 5, 4),  label: '2026年6月4日(木)',  display: '6月4日（木）【臨時】',  times: ['16:00', '17:00'] },
@@ -1072,7 +1082,7 @@
             else ph.textContent = '開講情報を取得できませんでした';
             sel.appendChild(ph);
             if (!allowedDays || !allowedDays.size) return;
-            const blocked = BLOCKED_DATES_BY_CLASSROOM[classroom] || new Set();
+            const blocked = BLOCKED_DATES;
             const extras = EXTRA_DATES_BY_CLASSROOM[classroom] || [];
             let extraIdx = 0;
             for (let i = 0; i < daysAhead; i++) {
