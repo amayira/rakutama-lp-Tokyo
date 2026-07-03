@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>楽珠講師ポータル</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; background: #f5f5f5; color: #333; }
+
+    /* ヘッダー */
+    header { background: #2c5f8a; color: #fff; padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+    header h1 { font-size: 1.1rem; font-weight: 700; }
+    .last-updated { font-size: 0.75rem; opacity: 0.8; margin-left: auto; }
+
+    /* タブ */
+    .tabs { display: flex; gap: 0; border-bottom: 2px solid #2c5f8a; padding: 0 16px; background: #fff; }
+    .tab { padding: 10px 24px; cursor: pointer; font-size: 0.9rem; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+    .tab.active { color: #2c5f8a; border-bottom-color: #2c5f8a; font-weight: 600; }
+
+    /* コンテンツ */
+    .content { padding: 16px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* 在籍生徒テーブル */
+    .students-table-wrap { overflow-x: auto; }
+    table.students { border-collapse: collapse; min-width: 900px; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    table.students th, table.students td { border: 1px solid #ccc; padding: 0; text-align: center; vertical-align: top; }
+
+    /* 校ヘッダー */
+    .th-school { background: #2c5f8a; color: #fff; font-size: 0.85rem; font-weight: 700; padding: 6px 4px; }
+    .th-day { background: #e8f0f7; font-size: 0.8rem; font-weight: 600; color: #2c5f8a; padding: 5px 4px; }
+    .th-time { background: #f0f4f8; font-size: 0.8rem; font-weight: 600; color: #444; padding: 8px 6px; width: 40px; }
+
+    /* 生徒セル */
+    .student-cell { padding: 4px; min-height: 60px; vertical-align: top; }
+    .student-card { background: #f8fbff; border: 1px solid #d0e4f5; border-radius: 4px; padding: 4px 6px; margin: 2px; text-align: left; }
+    .student-name { font-size: 0.85rem; font-weight: 600; color: #1a1a1a; white-space: nowrap; }
+    .student-kana { font-size: 0.7rem; color: #666; white-space: nowrap; }
+    .student-grade { font-size: 0.7rem; color: #2c5f8a; font-weight: 600; margin-top: 1px; }
+    .empty-cell { color: #ccc; font-size: 0.75rem; padding: 8px; }
+
+    /* ローディング */
+    .loading { text-align: center; padding: 40px; color: #666; }
+    .error { text-align: center; padding: 20px; color: #c0392b; }
+
+    /* 凡例 */
+    .legend { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; font-size: 0.8rem; color: #555; }
+    .legend-count { background: #2c5f8a; color: #fff; border-radius: 12px; padding: 2px 10px; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎯 楽珠講師ポータル</h1>
+  <span class="last-updated" id="lastUpdated">読み込み中...</span>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('students')">在籍生徒</div>
+  <div class="tab" onclick="switchTab('schedule')">時間割</div>
+</div>
+
+<div class="content">
+  <!-- 在籍生徒タブ -->
+  <div class="tab-panel active" id="tab-students">
+    <div id="studentsLoading" class="loading">kintoneからデータを読み込んでいます...</div>
+    <div id="studentsError" class="error" style="display:none;"></div>
+    <div id="studentsContent" style="display:none;">
+      <div class="legend">
+        <span>在籍生徒数：</span>
+        <span class="legend-count" id="totalCount">-</span>
+        <span style="margin-left:auto; color:#999;">※複数コマ受講の生徒は複数箇所に表示されます</span>
+      </div>
+      <div class="students-table-wrap">
+        <table class="students" id="studentsTable">
+          <thead>
+            <tr>
+              <th class="th-time" rowspan="2"></th>
+              <th class="th-school" colspan="2">早宮校</th>
+              <th class="th-school" colspan="2">氷川台校</th>
+              <th class="th-school" colspan="2">中村校</th>
+            </tr>
+            <tr>
+              <th class="th-day">火</th>
+              <th class="th-day">金</th>
+              <th class="th-day">月</th>
+              <th class="th-day">水</th>
+              <th class="th-day">月</th>
+              <th class="th-day">木</th>
+            </tr>
+          </thead>
+          <tbody id="studentsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 時間割タブ（将来用） -->
+  <div class="tab-panel" id="tab-schedule">
+    <p style="padding:20px; color:#999;">準備中</p>
+  </div>
+</div>
+
+<script>
+const KINTONE_DOMAIN = 'o81m0gfyv532.cybozu.com';
+const APP_ID = 19;
+const API_TOKEN = '5dxJxynfwOYIaH4wDpCnY6NUlEeeXZSafFAOqGfT';
+
+// 校・曜日の定義
+const SCHOOLS = {
+  '早宮校': ['火', '金'],
+  '氷川台校': ['月', '水'],
+  '中村校': ['月', '木'],
+};
+const TIMES = ['16', '17'];
+
+// 列順序（テーブルのth順）
+const COL_ORDER = [
+  { school: '早宮校', day: '火' },
+  { school: '早宮校', day: '金' },
+  { school: '氷川台校', day: '月' },
+  { school: '氷川台校', day: '水' },
+  { school: '中村校', day: '月' },
+  { school: '中村校', day: '木' },
+];
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const tabs = ['students', 'schedule'];
+  const idx = tabs.indexOf(name);
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+async function fetchAllRecords() {
+  const fields = ['氏', '名', 'フリガナ', '学年', '教室名', 'コマ1', 'コマ2', 'コマ3', 'コマ4', 'コマ5', '在籍ステータス'];
+  const fieldParams = fields.map((f, i) => `fields[${i}]=${encodeURIComponent(f)}`).join('&');
+  const query = encodeURIComponent('在籍ステータス in ("教室") order by 教室名 asc limit 500');
+  const url = `https://${KINTONE_DOMAIN}/k/v1/records.json?app=${APP_ID}&${fieldParams}&query=${query}`;
+
+  const res = await fetch(url, {
+    headers: { 'X-Cybozu-API-Token': API_TOKEN }
+  });
+  if (!res.ok) throw new Error(`kintone API error: ${res.status}`);
+  const data = await res.json();
+  return data.records;
+}
+
+function buildGrid(records) {
+  // grid[school][day][time] = [student, ...]
+  const grid = {};
+  for (const s of Object.keys(SCHOOLS)) {
+    grid[s] = {};
+    for (const d of SCHOOLS[s]) {
+      grid[s][d] = { '16': [], '17': [] };
+    }
+  }
+
+  for (const r of records) {
+    const school = r['教室名'].value;
+    const lastName = r['氏'].value || '';
+    const firstName = r['名'].value || '';
+    const kana = r['フリガナ'].value || '';
+    const grade = r['学年'].value || '';
+    const komas = [r['コマ1'], r['コマ2'], r['コマ3'], r['コマ4'], r['コマ5']].map(k => k.value).filter(Boolean);
+
+    if (!grid[school]) continue;
+
+    for (const koma of komas) {
+      // コマ値は例: "月17", "火16"
+      const day = koma.slice(0, 1);  // 最初の1文字が曜日
+      const time = koma.slice(1);    // 残りが時刻
+
+      if (grid[school][day] && grid[school][day][time]) {
+        grid[school][day][time].push({ lastName, firstName, kana, grade });
+      }
+    }
+  }
+  return grid;
+}
+
+function renderStudentCard(student) {
+  const div = document.createElement('div');
+  div.className = 'student-card';
+  div.innerHTML = `
+    <div class="student-name">${student.lastName} ${student.firstName}</div>
+    <div class="student-kana">${student.kana}</div>
+    <div class="student-grade">${student.grade}</div>
+  `;
+  return div;
+}
+
+function renderTable(grid) {
+  const tbody = document.getElementById('studentsBody');
+  tbody.innerHTML = '';
+
+  for (const time of TIMES) {
+    const tr = document.createElement('tr');
+    const timeTh = document.createElement('th');
+    timeTh.className = 'th-time';
+    timeTh.textContent = time;
+    tr.appendChild(timeTh);
+
+    for (const col of COL_ORDER) {
+      const td = document.createElement('td');
+      const students = grid[col.school]?.[col.day]?.[time] || [];
+      if (students.length === 0) {
+        td.innerHTML = '<div class="empty-cell">—</div>';
+      } else {
+        const cell = document.createElement('div');
+        cell.className = 'student-cell';
+        students.forEach(s => cell.appendChild(renderStudentCard(s)));
+        td.appendChild(cell);
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+}
+
+async function init() {
+  try {
+    const records = await fetchAllRecords();
+    const grid = buildGrid(records);
+    renderTable(grid);
+    document.getElementById('totalCount').textContent = records.length;
+    document.getElementById('lastUpdated').textContent = `更新: ${new Date().toLocaleString('ja-JP')}`;
+    document.getElementById('studentsLoading').style.display = 'none';
+    document.getElementById('studentsContent').style.display = 'block';
+  } catch (e) {
+    document.getElementById('studentsLoading').style.display = 'none';
+    const err = document.getElementById('studentsError');
+    err.style.display = 'block';
+    err.textContent = 'データの読み込みに失敗しました: ' + e.message;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
