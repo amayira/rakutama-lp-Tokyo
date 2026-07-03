@@ -451,6 +451,43 @@
     };
     const orgCode = DOMAIN_ORG_MAP[window.location.hostname] ?? 'アルファーブレイン';
 
+    // ── 教室一覧を教室マスタから動的取得 ──────────────────────────────────────
+    // 成功時はHTML直書きの選択肢を置き換える。失敗時は直書きのままフォールバック。
+    // 希望入会日は選択教室の開校日より前を選べないよう min を切り替える。
+    let classroomOpenDates = {}; // 教室名 → 開校日(YYYY-MM-DD)
+
+    async function loadClassrooms() {
+      try {
+        const res = await fetch(`${API_BASE}/api/classrooms?orgCode=${encodeURIComponent(orgCode)}`);
+        const data = await res.json();
+        if (!res.ok || !data.success || !Array.isArray(data.classrooms) || !data.classrooms.length) return;
+        const sel = document.getElementById('classroom');
+        const current = sel.value;
+        sel.innerHTML = '<option value="">選択してください</option>';
+        classroomOpenDates = {};
+        data.classrooms.forEach(c => {
+          const opt = document.createElement('option');
+          opt.textContent = c.name;
+          sel.appendChild(opt);
+          if (c.openDate) classroomOpenDates[c.name] = c.openDate;
+        });
+        if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
+      } catch { /* フォールバック：HTML直書きの選択肢のまま */ }
+    }
+    loadClassrooms();
+
+    function applyOpenDateMin(classroom) {
+      const dateInput = document.getElementById('first-lesson-date');
+      if (!dateInput) return;
+      const openDate = classroom ? classroomOpenDates[classroom] : '';
+      if (openDate) {
+        dateInput.min = openDate;
+        if (dateInput.value && dateInput.value < openDate) dateInput.value = '';
+      } else {
+        dateInput.removeAttribute('min');
+      }
+    }
+
     // ── Toggle 級・段 field ──────────────────────────────────────────────────
     document.querySelectorAll('input[name="experience"]').forEach(radio => {
       radio.addEventListener('change', () => {
@@ -462,6 +499,7 @@
     // ── 希望教室 → fetch jugyo list (チェックボックス形式) ───────────────────
     document.getElementById('classroom').addEventListener('change', async function () {
       const classroom = this.value;
+      applyOpenDateMin(classroom);
       const jugyoSection = document.getElementById('jugyo-section');
       const jugyoCheckboxes = document.getElementById('jugyo-checkboxes');
       const jugyoSpinner = document.getElementById('jugyo-spinner');

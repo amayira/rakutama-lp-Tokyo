@@ -14,6 +14,7 @@ const APP = {
   CLASS_CHANGE: 18, // クラス変更
   SEITO_NEW: 19,   // 生徒名簿（新・統合）
   SONOTA: 16,      // その他請求
+  KYOSHITSU: 5,    // 教室マスタ
 };
 
 const ALLOWED_ORIGINS = [
@@ -602,6 +603,33 @@ async function handleJugyo(params, env) {
 }
 
 /**
+ * GET /api/classrooms?orgCode=所属組織コード
+ * Returns classrooms for the given org from 教室マスタ (App 7).
+ * openDate（開校日）より前の日付はフォーム側で選択不可になる。
+ */
+async function handleClassrooms(params, env) {
+  const orgCode = params.get("orgCode");
+  if (!orgCode) {
+    return { success: false, error: "orgCode は必須です", status: 400 };
+  }
+
+  // 教室マスタは全組織共通（関西等も含む）のため組織選択で絞る。
+  // 開校日が未入力の教室（開校日未定の準備中など）はフォームに出さない。
+  const query = `組織選択 in ("${escapeQueryValue(orgCode)}") and 開校日 != "" order by レコード番号 asc limit 100`;
+  const data = await kintoneGet(APP.KYOSHITSU, query, env.TOKEN_KYOSHITSU);
+
+  const classrooms = (data.records ?? [])
+    .filter((rec) => !String(rec["開校状況"]?.value ?? "").includes("閉"))
+    .map((rec) => ({
+      name: rec["教室名"]?.value ?? "",
+      openDate: rec["開校日"]?.value ?? "",
+    }))
+    .filter((c) => c.name);
+
+  return { success: true, classrooms };
+}
+
+/**
  * GET /api/gakuhi?orgCode=所属組織コード
  * Returns list of fee courses for the given org from 月謝マスタ (App 10).
  */
@@ -862,6 +890,8 @@ export default {
       try {
         if (path === "/api/jugyo") {
           result = await handleJugyo(params, env);
+        } else if (path === "/api/classrooms") {
+          result = await handleClassrooms(params, env);
         } else if (path === "/api/gakuhi") {
           result = await handleGakuhi(params, env);
         } else if (path === "/api/furikae-tickets") {

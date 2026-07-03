@@ -279,6 +279,37 @@
   <script>
     const API_BASE = 'https://rakutama-kintone.k-ariyama.workers.dev';
 
+    // ── 教室一覧を教室マスタから動的取得 ──
+    // 成功時はHTML直書きの選択肢を置き換える。失敗時は直書きのままフォールバック。
+    const DOMAIN_ORG_MAP = {
+      'form.rakutama-tokyo.com': 'アルファーブレイン',
+      'rakutama-tokyo.com': 'アルファーブレイン',
+      'form.rakutama-soroban.com': '本部',
+      'amayira.github.io': 'アルファーブレイン',
+    };
+    const ORG_CODE = DOMAIN_ORG_MAP[window.location.hostname] ?? 'アルファーブレイン';
+    let classroomOpenDates = {}; // 教室名 → 開校日(YYYY-MM-DD)。開校日より前の日付は選択不可
+
+    async function loadClassrooms() {
+      try {
+        const res = await fetch(`${API_BASE}/api/classrooms?orgCode=${encodeURIComponent(ORG_CODE)}`);
+        const data = await res.json();
+        if (!res.ok || !data.success || !Array.isArray(data.classrooms) || !data.classrooms.length) return;
+        const sel = document.getElementById('classroom');
+        const current = sel.value;
+        sel.innerHTML = '<option value="">選択してください</option>';
+        classroomOpenDates = {};
+        data.classrooms.forEach(c => {
+          const opt = document.createElement('option');
+          opt.textContent = c.name;
+          sel.appendChild(opt);
+          if (c.openDate) classroomOpenDates[c.name] = c.openDate;
+        });
+        if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
+      } catch { /* フォールバック：HTML直書きの選択肢のまま */ }
+    }
+    loadClassrooms();
+
     const FALLBACK_JUGYO_BY_CLASSROOM = {
       '早宮校': [
         { name: '早宮校(火)16時クラス' },
@@ -341,8 +372,9 @@
     function buildDateSelectForSchedule(sel, allowedDays, noClassroomYet, classroom) {
       const wdays = ['日', '月', '火', '水', '木', '金', '土'];
       const daysAhead = 90;
-      const earliest = new Date(2026, 5, 1);
-      earliest.setHours(0, 0, 0, 0);
+      // 開校日（教室マスタ）より前は選択不可。開校日が未取得の教室は制限なし
+      const openDate = classroom ? classroomOpenDates[classroom] : '';
+      const earliest = openDate ? new Date(`${openDate}T00:00:00`) : new Date(0);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const base = today < earliest ? new Date(earliest) : new Date(today);

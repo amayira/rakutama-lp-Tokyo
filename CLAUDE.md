@@ -103,6 +103,7 @@ Cloudflare Workers が静的 GitHub Pages と Kintone の間の API Proxy とし
 | メソッド | パス | 用途 | Kintone App |
 |---------|------|------|------------|
 | GET | `/api/jugyo` | 教室別クラス一覧 | App 6（授業マスタ） |
+| GET | `/api/classrooms` | 組織別教室一覧＋開校日 | App 5（教室マスタ） |
 | GET | `/api/gakuhi` | 組織別月謝コース一覧 | App 10（月謝マスタ） |
 | GET | `/api/furikae-tickets` | 有効振替チケット一覧 | App 14 |
 | POST | `/api/lookup` | 生徒番号で生徒情報検索 | App 19（生徒名簿） |
@@ -181,6 +182,18 @@ TOKEN_GAKUHI
 
 ---
 
+### GET /api/classrooms の仕様
+
+- クエリ: `orgCode`（必須。フォーム側が `DOMAIN_ORG_MAP[hostname]` で決定）
+- 返却: `{ success, classrooms: [{ name, openDate }] }`
+- 抽出条件: `組織選択 in (orgCode)` **かつ 開校日が入力済み** かつ 開校状況に「閉」を含まない
+  - → **教室マスタに開校日を入れた教室だけがフォームに出る**（開校日未定の準備中校は出ない）
+- フォーム側の使い方: 教室セレクタを動的生成＋開校日より前の日付を選択不可にクランプ
+  - trial.html / LP/trial.html / form/taiken.html：日付プルダウンの開始日 = max(最短予約日, 開校日)
+  - form/nyukai.html：希望入会日 input の `min` に開校日を設定
+  - API失敗時はHTML直書きの教室選択肢にフォールバック（各HTMLに直書きも残してある）
+- **新教室の追加手順**: kintone教室マスタに登録（組織選択・開校日必須）→ 授業マスタにクラス登録 → フォームは自動反映（HTML修正不要）
+
 ## フォーム仕様（form/）
 
 ### 共通：生徒番号検索（Lookup）
@@ -229,6 +242,7 @@ TOKEN_GAKUHI
 
 | App ID | 用途 |
 |--------|------|
+| 5 | 教室マスタ（全組織共通45教室。組織選択・開校日・開校状況） |
 | 6 | 授業マスタ（授業ID・曜日・開始時刻） |
 | 10 | 月謝マスタ（コース名・料金・組織別） |
 | 12 | 検定申込 |
@@ -283,6 +297,7 @@ Cloudflare Workers（form/worker.js）の変更は別途 `wrangler deploy` が�
 - 新規ページを追加する場合は `tailwind.config.js` の `content` に追加が必要な場合がある。
 - 全ページに GTM スニペットを必ず入れること。
 - `form/` 配下のページは在学生向けのため、LP とはデザイン・トーンが異なる。
+- **OneDrive上の.gitに注意**：OneDriveのストレージ節約機能で `.git/objects` がdataless（クラウド退避）化すると `git push` が固まる（2026-07-03発生）。対処：①Finderでこのフォルダを「このデバイス上に常に保持」に設定、②pushが固まる場合は GitHubから浅くclone → `git show main:ファイル` で変更ファイルを移植 → cloneからpush → 元リポジトリで `git fetch && git reset --soft origin/main`。
 
 ---
 
