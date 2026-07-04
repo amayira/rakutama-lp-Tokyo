@@ -24,32 +24,33 @@
 ├── courses.html            # コース・料金一覧
 ├── features.html           # 特徴・メリット
 ├── faq.html                # よくある質問
-├── critical-input.html     # Critical CSS 用 FV 断片（最適化用）
+├── 404.html                # 404ページ
 │
 ├── LP/
 │   ├── trial.html          # LP版 体験申込（広告流入用）
 │   ├── trial-thanks.html   # LP版 申込完了
-│   ├── campaign.html       # キャンペーン情報
-│   └── coupon.html         # LINEクーポン
+│   └── nakamura-workshop.html  # 終了済み体験会LP → trial.html へのリダイレクトスタブ（チラシQR流入の受け皿）
 │
 ├── form/
 │   ├── index.html          # フォーム選択メニュー
 │   ├── taiken.html         # 体験授業申込
+│   ├── taiken-nakamura.html # 終了済み体験会フォーム → trial.html へのリダイレクトスタブ
 │   ├── nyukai.html         # 新規入会申込
 │   ├── furikae.html        # 振替受講申込（在学生）
 │   ├── kesseki.html        # 欠席報告（在学生）
 │   ├── kentei.html         # 検定申込（在学生）
 │   ├── class-change.html   # クラス変更申込（在学生）
 │   ├── flash-anzan.html    # フラッシュ暗算商品申込（在学生）
-│   └── worker.js           # Cloudflare Workers API Proxy
+│   ├── schedule.html       # 年間スケジュール
+│   ├── worker.js           # Cloudflare Workers API Proxy
+│   └── wrangler.jsonc      # Workers デプロイ設定
 │
+├── staff/                  # 講師ポータル（ログイン・名簿。noindex）
 ├── Pictures/               # 画像素材（教室写真・商品画像）
 ├── tailwind.config.js      # Tailwind CSS 設定
 ├── tailwind.css            # ビルド済みCSS（編集しない）
 ├── tailwind-input.css      # Tailwind ビルド入力ファイル
-├── tailwind-critical.config.js  # Critical CSS 用設定
-├── critical.css            # ビルド済み Critical CSS
-├── package.json
+├── package.json            # npm run build:css で tailwind.css を再生成
 └── CNAME                   # rakutama-tokyo.com
 ```
 
@@ -59,7 +60,7 @@
 
 | 種別 | 技術 |
 |------|------|
-| CSS | Tailwind CSS v3.4.19（CDN ではなく CLI ビルド） |
+| CSS | Tailwind CSS v3.4.19（LP/trial.html は CLI ビルド、他ページは暫定的に CDN 版 → CLI に一本化予定） |
 | アイコン | Font Awesome 6.4.0（CDN） |
 | フォント | Noto Sans JP / Zen Kaku Gothic New / Inter（Google Fonts） |
 | JS | Vanilla JavaScript（フォーム処理・API通信） |
@@ -78,17 +79,16 @@
 
 ## CSS ビルド
 
-Tailwind CSS は CLI でビルド。CDN版ではないため、クラスを追加したら必ずビルドすること。
+**現状（2026-07 時点）**: CLIビルド済み `tailwind.css` を使うのは `LP/trial.html` のみ。他の約20ページは CDN 版（`cdn.tailwindcss.com`）＋ページ内インライン `tailwind.config` で動いている。CLIビルドへの一本化は REFACTORING_PLAN.md フェーズ2 で対応予定。
+
+`LP/trial.html` などビルド版を使うページのクラスを追加・変更したら必ずビルドすること：
 
 ```bash
-# 通常のCSS（tailwind.css）
-npx tailwindcss -c tailwind.config.js -i tailwind-input.css -o tailwind.css
-
-# Critical CSS（critical.css）
-npx tailwindcss -c tailwind-critical.config.js -i tailwind-input.css -o critical.css
+npm run build:css
+# = npx tailwindcss -c tailwind.config.js -i tailwind-input.css -o tailwind.css
 ```
 
-`tailwind.css` と `critical.css` は自動生成ファイルのため直接編集しない。
+`tailwind.css` は自動生成ファイルのため直接編集しない。
 
 ---
 
@@ -269,7 +269,6 @@ GTMスニペットは `<head>` 内（同期）と `<body>` 直後（`<noscript>`
 - フォーム送信完了後は必ずこのページにリダイレクトすること
   - `trial.html`（体験申込）→ `trial-thanks.html`
   - `LP/trial.html`（LP版体験申込）→ `LP/trial-thanks.html`（LP版サンクス）※LP版はLP内で完結
-  - `form/taiken-nakamura.html`（中村校体験会）→ `../trial-thanks.html`
 
 ### 広告ランディングページ
 
@@ -292,7 +291,7 @@ Cloudflare Workers（form/worker.js）の変更は別途 `wrangler deploy` が�
 
 ## 注意事項
 
-- `tailwind.css` / `critical.css` はビルド成果物。直接編集しない。
+- `tailwind.css` はビルド成果物。直接編集しない。
 - `worker.js` のデプロイは GitHub Push では反映されない（Cloudflare Workers 側の作業が必要）。
 - 新規ページを追加する場合は `tailwind.config.js` の `content` に追加が必要な場合がある。
 - 全ページに GTM スニペットを必ず入れること。
