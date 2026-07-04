@@ -194,6 +194,15 @@ TOKEN_GAKUHI
   - API失敗時はHTML直書きの教室選択肢にフォールバック（各HTMLに直書きも残してある）
 - **新教室の追加手順**: kintone教室マスタに登録（組織選択・開校日必須）→ 授業マスタにクラス登録 → フォームは自動反映（HTML修正不要）
 
+### 加盟店（FC）サブフォルダ対応（別リポジトリ rakutama-form）
+
+`form.rakutama-soroban.com`（リポジトリ: amayira/rakutama-form）配下に加盟店ごとのフォルダ（例: `/koyomi`）を置き、FC全体に展開している。worker.js はこのリポジトリと共通で、**本リポジトリ（rakutama-lp-Tokyo）の form/worker.js が正**。
+
+- **組織判定**: 加盟店フォームは同一ホストで配信されるため Origin では組織を判別できない。rakutama-form 側は `js/franchise.js` の `PATH_ORG_MAP`（フォルダ名→組織コード）で `ORG_CODE` を決め、`/api/classrooms?orgCode=` `/api/gakuhi?orgCode=` に渡す。
+- **登録系の組織スタンプ**: `handleNyukai` は `body["所属組織"] || getOrgCode(origin)` の順で組織を決める。加盟店フォームは POST に `所属組織: ORG_CODE` を必ず入れる。`handleTaiken` は組織を打たず、教室名ルックアップ経由でkintone側が所属組織を補完する（体験は worker 変更不要）。
+- **新加盟店の追加**: rakutama-form 側でフォルダを複製＋`PATH_ORG_MAP` に1行追加＋kintone教室マスタに「組織選択=その組織・開校日」の教室を登録するだけ。
+- ⚠️ worker.js を変更したら `wrangler deploy` が必要（git push では反映されない）。
+
 ## フォーム仕様（form/）
 
 ### 共通JSモジュール（`/js/`）

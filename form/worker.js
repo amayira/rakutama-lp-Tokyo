@@ -507,7 +507,9 @@ async function handleKentei(body, env) {
  */
 async function handleNyukai(body, env, origin) {
   const { guardian, student } = body;
-  const orgCode = getOrgCode(origin);
+  // 加盟店サブフォルダ（form.rakutama-soroban.com/<店>/）は同一ホストで配信されるため
+  // Origin ヘッダーだけでは組織を判別できない。フォームが body.所属組織 を送ってきたら優先する。
+  const orgCode = body["所属組織"] || getOrgCode(origin);
 
   if (!student) {
     return { success: false, error: "生徒情報が不足しています", status: 400 };
