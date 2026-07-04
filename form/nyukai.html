@@ -381,9 +381,8 @@
     <p>&copy; 2026 Alpha-Brain LLC.</p>
   </footer>
 
+  <script src="/js/form-common.js"></script>
   <script>
-    const API_BASE = 'https://rakutama-kintone.k-ariyama.workers.dev';
-
     // ── Lightbox ────────────────────────────────────────────────────────────
     function openLightbox(img) {
       const lb = document.getElementById('lightbox');
@@ -427,38 +426,9 @@
     }
 
 
-    // ── orgCode: determined by current domain ────────────────────────────────
-    const DOMAIN_ORG_MAP = {
-      'form.rakutama-tokyo.com':   'アルファーブレイン',
-      'rakutama-tokyo.com':        'アルファーブレイン',
-      'form.rakutama-soroban.com': '本部',
-    };
-    const orgCode = DOMAIN_ORG_MAP[window.location.hostname] ?? 'アルファーブレイン';
-
-    // ── 教室一覧を教室マスタから動的取得 ──────────────────────────────────────
-    // 成功時はHTML直書きの選択肢を置き換える。失敗時は直書きのままフォールバック。
+    // ── 教室セレクタを教室マスタから動的生成（/js/form-common.js）──────────────
     // 希望入会日は選択教室の開校日より前を選べないよう min を切り替える。
-    let classroomOpenDates = {}; // 教室名 → 開校日(YYYY-MM-DD)
-
-    async function loadClassrooms() {
-      try {
-        const res = await fetch(`${API_BASE}/api/classrooms?orgCode=${encodeURIComponent(orgCode)}`);
-        const data = await res.json();
-        if (!res.ok || !data.success || !Array.isArray(data.classrooms) || !data.classrooms.length) return;
-        const sel = document.getElementById('classroom');
-        const current = sel.value;
-        sel.innerHTML = '<option value="">選択してください</option>';
-        classroomOpenDates = {};
-        data.classrooms.forEach(c => {
-          const opt = document.createElement('option');
-          opt.textContent = c.name;
-          sel.appendChild(opt);
-          if (c.openDate) classroomOpenDates[c.name] = c.openDate;
-        });
-        if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
-      } catch { /* フォールバック：HTML直書きの選択肢のまま */ }
-    }
-    loadClassrooms();
+    loadClassroomsInto('classroom');
 
     function applyOpenDateMin(classroom) {
       const dateInput = document.getElementById('first-lesson-date');
@@ -559,7 +529,7 @@
       gakuhiSpinner.classList.remove('hidden');
 
       try {
-        const res = await fetch(`${API_BASE}/api/gakuhi?orgCode=${encodeURIComponent(orgCode)}`);
+        const res = await fetch(`${API_BASE}/api/gakuhi?orgCode=${encodeURIComponent(ORG_CODE)}`);
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || '月謝情報の取得に失敗しました');
 

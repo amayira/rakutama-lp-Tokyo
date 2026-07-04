@@ -163,9 +163,8 @@
     <p>&copy; 2026 Alpha-Brain LLC.</p>
   </footer>
 
+  <script src="/js/form-common.js"></script>
   <script>
-    const API_BASE = 'https://rakutama-kintone.k-ariyama.workers.dev';
-
     const NOTICES = {
       course: '※コース変更は翌月分からとなります。変更希望の前月10日までにお申し込みください。',
       class:  '※クラス変更は翌週月曜日以降から可能です。ご希望の開始日を選択してください。',
@@ -254,73 +253,10 @@
       });
     });
 
-    let studentData = null;
-
-    // Lookup
-    document.getElementById('lookup-btn').addEventListener('click', async () => {
-      const studentNumber = document.getElementById('student-number').value.trim();
-      const lookupError = document.getElementById('lookup-error');
-      const studentInfo = document.getElementById('student-info');
-      const lookupBtn = document.getElementById('lookup-btn');
-      const lookupText = document.getElementById('lookup-text');
-      const lookupSpinner = document.getElementById('lookup-spinner');
-
-      lookupError.classList.add('hidden');
-      studentInfo.classList.add('hidden');
-      studentData = null;
-      document.getElementById('submit-btn').disabled = true;
-      document.getElementById('submit-hint').classList.remove('hidden');
-
-      if (!studentNumber) {
-        lookupError.textContent = '生徒番号を入力してください';
-        lookupError.classList.remove('hidden');
-        return;
-      }
-
-      lookupBtn.disabled = true;
-      lookupText.textContent = '検索中...';
-      lookupSpinner.classList.remove('hidden');
-
-      try {
-        const response = await fetch(`${API_BASE}/api/lookup`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ studentNumber }),
-        });
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('生徒番号が見つかりませんでした。番号をご確認ください。');
-          }
-          throw new Error(`エラーが発生しました（${response.status}）`);
-        }
-
-        const data = await response.json();
-        studentData = data;
-        const s = data.student;
-
-        document.getElementById('info-classroom').textContent = s.classroom || '―';
-        document.getElementById('info-jugyo').textContent = s.jugyoIds && s.jugyoIds.length > 0 ? s.jugyoIds.join('、') : '―';
-        studentInfo.classList.remove('hidden');
-        document.getElementById('submit-btn').disabled = false;
-        document.getElementById('submit-hint').classList.add('hidden');
-
-      } catch (err) {
-        lookupError.textContent = err.message || '検索中にエラーが発生しました。';
-        lookupError.classList.remove('hidden');
-      } finally {
-        lookupBtn.disabled = false;
-        lookupText.textContent = '検索';
-        lookupSpinner.classList.add('hidden');
-      }
-    });
-
-    document.getElementById('student-number').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('lookup-btn').click();
-      }
-    });
+    // 生徒番号検索（共通処理 /js/form-common.js）
+    // ※旧実装は s.classroom / s.jugyoIds を直接参照していたが、/api/lookup は
+    //   records[] 形式を返すため表示・送信データが欠落していた（共通化で修正）
+    setupStudentLookup();
 
     // Form submission
     document.getElementById('change-form').addEventListener('submit', async (e) => {
@@ -349,6 +285,7 @@
       }
 
       const s = studentData.student;
+      const rec = s.records[0];
       const submitBtn = document.getElementById('submit-btn');
       const submitText = document.getElementById('submit-text');
       const submitSpinner = document.getElementById('submit-spinner');
@@ -362,11 +299,11 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             生徒番号: studentNumber,
-            請求ID: s.billingId,
-            教室名: s.classroom,
+            請求ID: rec.billingId,
+            教室名: rec.classroom,
             氏: s.familyName,
             名: s.givenName,
-            現在の授業ID: s.jugyoIds ? s.jugyoIds.join('、') : '',
+            現在の授業ID: s.records.flatMap(r => r.jugyoIds).join('、'),
             変更種別: changeType,
             変更希望内容: changeRequest,
             希望時期: desiredTiming,

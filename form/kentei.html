@@ -188,12 +188,8 @@
     <p>&copy; 2026 Alpha-Brain LLC.</p>
   </footer>
 
+  <script src="/js/form-common.js"></script>
   <script>
-    const API_BASE = 'https://rakutama-kintone.k-ariyama.workers.dev';
-
-
-    let studentData = null;
-
     // Toggle grade selects
     document.getElementById('shuzan-check').addEventListener('change', (e) => {
       document.getElementById('shuzan-grade-field').classList.toggle('hidden', !e.target.checked);
@@ -249,74 +245,8 @@
     document.getElementById('shuzan-grade').addEventListener('change', updateFee);
     document.getElementById('anzan-grade').addEventListener('change', updateFee);
 
-    // Lookup
-    document.getElementById('lookup-btn').addEventListener('click', async () => {
-      const studentNumber = document.getElementById('student-number').value.trim();
-      const lookupError = document.getElementById('lookup-error');
-      const studentInfo = document.getElementById('student-info');
-      const lookupBtn = document.getElementById('lookup-btn');
-      const lookupText = document.getElementById('lookup-text');
-      const lookupSpinner = document.getElementById('lookup-spinner');
-
-      lookupError.classList.add('hidden');
-      studentInfo.classList.add('hidden');
-      studentData = null;
-      document.getElementById('submit-btn').disabled = true;
-      document.getElementById('submit-hint').classList.remove('hidden');
-
-      if (!studentNumber) {
-        lookupError.textContent = '生徒番号を入力してください';
-        lookupError.classList.remove('hidden');
-        return;
-      }
-
-      lookupBtn.disabled = true;
-      lookupText.textContent = '検索中...';
-      lookupSpinner.classList.remove('hidden');
-
-      try {
-        const response = await fetch(`${API_BASE}/api/lookup`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ studentNumber }),
-        });
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('生徒番号が見つかりませんでした。番号をご確認ください。');
-          }
-          throw new Error(`エラーが発生しました（${response.status}）`);
-        }
-
-        const data = await response.json();
-        studentData = data;
-        const s = data.student;
-
-        // 全レコードの教室名・コマをまとめて表示（週2コースは複数レコードを持つ）
-        const allClassrooms = [...new Set(s.records.map(r => r.classroom).filter(Boolean))];
-        const allJugyo = s.records.flatMap(r => r.jugyoIds);
-        document.getElementById('info-classroom').textContent = allClassrooms.join('・') || '―';
-        document.getElementById('info-jugyo').textContent = allJugyo.length > 0 ? allJugyo.join('、') : '―';
-        studentInfo.classList.remove('hidden');
-        document.getElementById('submit-btn').disabled = false;
-        document.getElementById('submit-hint').classList.add('hidden');
-
-      } catch (err) {
-        lookupError.textContent = err.message || '検索中にエラーが発生しました。';
-        lookupError.classList.remove('hidden');
-      } finally {
-        lookupBtn.disabled = false;
-        lookupText.textContent = '検索';
-        lookupSpinner.classList.add('hidden');
-      }
-    });
-
-    document.getElementById('student-number').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('lookup-btn').click();
-      }
-    });
+    // 生徒番号検索（共通処理 /js/form-common.js）
+    setupStudentLookup();
 
     // Form submission
     document.getElementById('kentei-form').addEventListener('submit', async (e) => {
