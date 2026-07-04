@@ -63,7 +63,7 @@
 | CSS | Tailwind CSS v3.4.19（CLI ビルドの `/tailwind.css` を全ページ共有。CDN 版は使用禁止） |
 | アイコン | Font Awesome 6.4.0（CDN） |
 | フォント | Noto Sans JP / Zen Kaku Gothic New / Inter（Google Fonts） |
-| JS | Vanilla JavaScript（フォーム処理・API通信） |
+| JS | Vanilla JavaScript（フォーム処理・API通信）。共通ロジックは `/js/form-common.js`・`/js/trial-schedule.js` に集約 |
 | API | Cloudflare Workers（form/worker.js） |
 | DB | Kintone（cybozu.com） |
 | トラッキング | Google Tag Manager（GTM-5K7GZCTN）、Microsoft Clarity |
@@ -196,9 +196,23 @@ TOKEN_GAKUHI
 
 ## フォーム仕様（form/）
 
+### 共通JSモジュール（`/js/`）
+
+フォームのコピペJSは2ファイルに共通化済み（2026-07-04・REFACTORING_PLAN.md フェーズ4）。ページ側は固有の送信ペイロード・バリデーション・計測だけを持つ。
+
+| ファイル | 提供するもの | 利用ページ |
+|---------|------------|-----------|
+| `js/form-common.js` | `API_BASE` / `DOMAIN_ORG_MAP`・`ORG_CODE` / `loadClassroomsInto(selectId)`（教室マスタ動的取得＋開校日保持）/ `loadTimeSlotsInto(selectId, classroom)`（教室→時刻連動）/ `setupStudentLookup({onReset,onSuccess,enableSubmitOnSuccess})`（生徒番号検索）/ グローバル `studentData`・`classroomOpenDates` | 在学生6フォーム＋nyukai・taiken |
+| `js/trial-schedule.js` | `BLOCKED_DATES`（休講日）/ `EXTRA_DATES_BY_CLASSROOM`（臨時開講）/ `FALLBACK_JUGYO_BY_CLASSROOM` / `initTrialSchedule({classroomSelectId, minDateMode})`（希望日時プルダウン一式） | trial.html / LP/trial.html / form/taiken.html |
+
+- **依存順**: 各ページで `form-common.js` → `trial-schedule.js` → ページ固有スクリプトの順に読み込む。
+- **休講日を直すとき**は `js/trial-schedule.js` の `BLOCKED_DATES` だけ直せば体験3ページ全てに反映される（従来は3ページ個別修正だった）。
+- `minDateMode`: `'nextDay18'`（trial.html＝翌日から・18時以降は翌々日）/ `'today'`（LP/trial・taiken＝当日から）。
+- LP/trial.html の教室セレクタIDだけ `classroom-select`（他は `classroom`）。
+
 ### 共通：生徒番号検索（Lookup）
 
-全在学生向けフォームで共通の動作：
+全在学生向けフォームで共通の動作（実装は `setupStudentLookup()` in `js/form-common.js`）：
 1. 生徒番号を入力して「検索」→ `/api/lookup` (POST) を呼ぶ
 2. 返却値: `{ success, student: { familyName, givenName, records: [{ studentNumber, classroom, billingId, jugyoIds[] }] } }`
    ※ 週2コース（A0001 + A0001-2）は `records` に複数レコードが入る

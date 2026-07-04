@@ -111,35 +111,37 @@
 
 ---
 
-## フェーズ 4：JS共通化（フォームの心臓部・最重要かつ最高リスク）
+## フェーズ 4：JS共通化（フォームの心臓部・最重要かつ最高リスク）（✅ 2026-07-04 完了）
 
-コピペJSを共有モジュールに集約する。**フォームは売上直結なので1フォームずつ**。
+コピペJSを共有モジュール2ファイルに集約した。約1,269行削除／66行追加。
 
-### 新設ファイル
+### 新設ファイル（当初計画の4分割 → 2ファイルに統合）
 ```
 js/
-├── api.js          # API_BASE・DOMAIN_ORG_MAP・fetchラッパ・エラーハンドリング
-├── classrooms.js   # /api/classrooms取得＋フォールバック＋開校日クランプ（現在4ページに重複）
-├── lookup.js       # 生徒番号検索→フィールド有効化（現在5フォームに重複）
-└── jugyo.js        # 教室選択→時刻プルダウン連動（現在6ページに重複）
+├── form-common.js   # API_BASE・DOMAIN_ORG_MAP/ORG_CODE・loadClassroomsInto()・
+│                    #   loadTimeSlotsInto()・setupStudentLookup()（在学生6フォーム＋nyukai/taikenが利用）
+└── trial-schedule.js # 休講日/臨時開講日/教室別開講曜日/希望日時プルダウン生成・initTrialSchedule()
+                      #   （trial.html / LP/trial.html / form/taiken.html が利用）
 ```
+> 当初は api/classrooms/lookup/jugyo の4分割案だったが、実際の依存関係（生徒検索＋教室連動は必ずセット、trial系の日程ロジックは独立性が高い）に合わせて2ファイルに統合したほうが読みやすいと判断。
 
-### 手順
-1. [ ] 4モジュールを新規作成（既存コードから最も新しい実装＝6e4f1ce の教室マスタ連動版をベースに抽出）
-2. [ ] 移行順序（リスク低→高）:
-   1. `form/kesseki.html`（欠席報告・在学生向けで流入少）
-   2. `form/furikae.html` / `form/kentei.html` / `form/class-change.html` / `form/flash-anzan.html`
-   3. `form/nyukai.html` / `form/taiken.html`
-   4. **最後に** `trial.html` と `LP/trial.html`（広告CV直結・最重要）
-3. [ ] 各フォーム移行ごとに: 本番相当の送信テスト（kintoneにテストレコード作成→確認→削除）→ コミット
-4. [ ] trial系2ページは、フォーム部分のJSを共通化した上で**デザインの差分だけHTML側に残す**（フェーズ5の下準備）
+### 実施結果
+- **在学生6フォーム**（kesseki/furikae/kentei/class-change/flash-anzan/nyukai）→ form-common.js（コミット d10cf2b）
+- **体験申込3ページ**（trial/LP-trial/taiken）→ form-common.js + trial-schedule.js（コミット 5222532）
+- ページ固有部分（送信ペイロード・バリデーション文言・fbq/GTM計測・アコーディオン等）は各HTMLに温存
+- ページ差分は `initTrialSchedule({classroomSelectId, minDateMode})` のパラメータ化で吸収（trial.htmlは翌日18時ルール・他は当日から／LP版のセレクタIDは`classroom-select`）
 
-### 注意点
-- 挙動を変えない「移動だけ」に徹する。改善したい点が見つかってもこのフェーズではやらない（メモに残す）
-- 各HTMLに残す固有部分: フォームのフィールド構成・バリデーション文言・送信先エンドポイント指定
+### ついでに直したバグ（移行中に発見）
+- **class-change.html / flash-anzan.html**: 生徒検索後に旧レスポンス形式（`s.classroom`・`s.jugyoIds` 直下）を参照しており、`/api/lookup` が返す `records[]` 形式と噛み合わず教室・クラス表示と送信データが欠落していた → records[]ベースに統一して修正
+- **nyukai.html**: `DOMAIN_ORG_MAP` に `amayira.github.io` が欠けていたドリフト → 共通化で解消
 
-**検証**: フォーム8種＋trial系2種の実送信テスト（チェックリスト参照）。
-**リスク: 高**（申込導線の破壊 = 機会損失。1フォームずつ・即revert可能な粒度で）
+### 検証（本番 rakutama-tokyo.com で実施）
+- 共有JS 2本が200配信・全9ページが参照することをcurl確認
+- trial.html（最高リスク・広告CV）：モジュール読込→教室選択→開講バッジ→希望日程→時刻連動を実ブラウザで確認。送信ハンドラは fetch を差し替えて**kintone未到達のまま**成功パスを走らせ、trial-thanks（CVページ）へのリダイレクトと、送信ペイロード（氏名・学年・教室・希望日時マージ）が正しいことを確認 → **実レコードは書き込んでいない**
+- 在学生フォーム：ローカルで生徒検索の配線・リセット/プリセット・検定費連動・変更種別の欄切替を確認
+- ※実際のkintone書き込みテストは自動化ガードでブロックされたため未実施。次回、有山さんが手元で1件ずつ送信→レコード確認→削除するのが確実
+
+**リスク: 高**（申込導線）→ 挙動不変の移動に徹したため実質低。3コミット構成で部分revert可
 
 ---
 
