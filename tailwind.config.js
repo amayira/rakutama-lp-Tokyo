@@ -3,6 +3,8 @@ module.exports = {
   content: [
     "./*.html",
     "./LP/*.html",
+    "./form/*.html",
+    "./staff/*.html",
   ],
   theme: {
     extend: {
