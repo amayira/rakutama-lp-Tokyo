@@ -60,7 +60,7 @@
 
 | 種別 | 技術 |
 |------|------|
-| CSS | Tailwind CSS v3.4.19（LP/trial.html は CLI ビルド、他ページは暫定的に CDN 版 → CLI に一本化予定） |
+| CSS | Tailwind CSS v3.4.19（CLI ビルドの `/tailwind.css` を全ページ共有。CDN 版は使用禁止） |
 | アイコン | Font Awesome 6.4.0（CDN） |
 | フォント | Noto Sans JP / Zen Kaku Gothic New / Inter（Google Fonts） |
 | JS | Vanilla JavaScript（フォーム処理・API通信） |
@@ -79,9 +79,9 @@
 
 ## CSS ビルド
 
-**現状（2026-07 時点）**: CLIビルド済み `tailwind.css` を使うのは `LP/trial.html` のみ。他の約20ページは CDN 版（`cdn.tailwindcss.com`）＋ページ内インライン `tailwind.config` で動いている。CLIビルドへの一本化は REFACTORING_PLAN.md フェーズ2 で対応予定。
+全ページが CLIビルド済み `/tailwind.css` を参照する（2026-07-04 に CDN 版から一本化完了）。CDN 版（`cdn.tailwindcss.com`）やページ内インライン `tailwind.config` は使わないこと。色・フォントの定義は `tailwind.config.js` に一元管理。
 
-`LP/trial.html` などビルド版を使うページのクラスを追加・変更したら必ずビルドすること：
+どのページでもクラスを追加・変更したら必ずビルドすること：
 
 ```bash
 npm run build:css

@@ -64,9 +64,16 @@
 
 ---
 
-## フェーズ 2：CSS一本化（CDN Tailwind → CLIビルド）★効果最大
+## フェーズ 2：CSS一本化（CDN Tailwind → CLIビルド）★効果最大（✅ 2026-07-04 完了）
 
-21ページの CDN Tailwind をビルド済み `tailwind.css` に置き換える。表示速度改善の本丸。
+19ページ（Phase1でLP4枚削除済みのため21→19）の CDN Tailwind をビルド済み `tailwind.css` に置き換えた。
+
+**実施結果**:
+- 全19ページから CDN JITコンパイラ（約110KBのブロッキングJS）＋インラインconfigを除去し、`/tailwind.css`（51KB・全ページ共有キャッシュ）への参照に置換
+- form系configの `primary`(#22C55E) 衝突は form/schedule.html の6トークンのみ → 同一hexの `green-500` に置換（accent使用は0件）。他のformページは元からリテラル色クラス使用で無影響
+- `text-base` の色名衝突はビルド版でもfont-sizeに解決されることを実ビルドで検証済み
+- 全ページ×全クラスのカバレッジを機械検証（JS動的クラス・arbitrary value含め漏れ0）
+- ローカル目視＋computed style検証（#4A96AE / #22C55E 完全一致）→ 3コミット（6ba06bf/977fed0/2f688fa）で本番反映・全19ページの配信内容をcurl検証済み
 
 ### 手順
 1. [ ] `tailwind.config.js` の `content` に全HTML（`./*.html`, `./LP/*.html`, `./form/*.html`, `./staff/*.html`）が含まれるか確認・追記
