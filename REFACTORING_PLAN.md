@@ -96,17 +96,18 @@
 
 ---
 
-## フェーズ 3：画像最適化（26MB → 目標3MB台）
+## フェーズ 3：画像最適化（✅ 2026-07-04 完了：26MB → 3.6MB）
 
-- [ ] 巨大PNG3枚を優先処理: `background3.png` 8MB・`nakamura_inside.png` 8.3MB・`tamakurou.png` 3.3MB → 表示サイズに合わせてリサイズ＋WebP化（JPEGフォールバック不要・全モダンブラウザ対応済み）
-- [ ] `favicon.png` 565KB → 32〜180pxの適正サイズに（apple-touch-icon含め数KB台へ）
-- [ ] 残りのJPEG群（300〜500KB台）を一括で品質80・幅1200px上限に再圧縮
-- [ ] `2026schedule.pdf` 2.6MB → 画像化 or 圧縮（Ghostscript）を検討
-- [ ] 全 `<img>` に `loading="lazy"`（ファーストビュー以外）と `width`/`height` 属性を付与（CLS対策）
-- [ ] ツール: `sips`（macOS標準）＋ `cwebp`。元画像はOneDrive側に退避してからリポジトリ内は最適化版のみに
+- [x] 巨大画像をWebP化＋リサイズ: `background3.png` 7.6MB→64KB（1920w）、`nakamura_inside.png` 7.9MB→100KB（1200h）※`tamakurou.png` はPhase1で削除済み
+- [x] `favicon.png` 552KB→29KB（180px・ファイル名維持のためHTML26ファイル無修正）
+- [x] JPEG群18枚を表示サイズ基準でWebP化（講師写真は最大128px表示→512wで各20〜28KB、School写真900w、商品写真は等倍）
+- [x] `hayamiya_inside.jpg` は中身が既にWebPだった（拡張子詐称）→ .webpに正規化
+- [x] ロゴ（title.png）・ヒーロー（fetchpriority付きfv）を除く32箇所に `loading="lazy" decoding="async"` 付与
+- [ ] `2026schedule.pdf` 2.6MB → Ghostscript未インストールのため見送り（リンク先文書でページ表示速度に影響なし。気になったら `brew install ghostscript` 後に圧縮）
+- 元画像は git 履歴（`pre-refactor-20260704`）に全て保持。OneDrive退避は不要と判断
 
-**検証**: 各ページの画像表示確認 ＋ index.html のLCP改善をLighthouseで確認。
-**リスク: 低**（画質劣化だけ目視チェック）
+**検証結果**: 全ページ `naturalWidth` チェックで破損0・本番WebP配信curl確認済み。index.html の画像総重量は約10MB→約0.7MB
+**メモ**: og:image / twitter:image が全ページ未設定（SNSシェア時にサムネが出ない）。リファクタとは別の改善候補
 
 ---
 
