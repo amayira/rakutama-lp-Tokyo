@@ -337,6 +337,9 @@ const MAIL_FROM = "楽珠そろばん教室 <info@rakutama-tokyo.com>";
 const MAIL_LINE = "https://lin.ee/oW7wspr";
 const MAIL_ADDR = "info@rakutama-tokyo.com";
 
+// 受付完了メールは自社（東京直営）のみ送信する。FC加盟店・本部には送らない。
+const MAIL_ORG = "アルファーブレイン";
+
 /**
  * 受付完了メールの汎用送信関数。
  * rows = [[ラベル, 値], ...]（値が空・null の行は自動で省略）。
@@ -412,6 +415,7 @@ async function getStudentContact(studentNumber, env) {
     email: rec["メールアドレス"]?.value ?? "",
     familyName: rec["氏"]?.value ?? "",
     givenName: rec["名"]?.value ?? "",
+    org: rec["所属組織"]?.value?.[0]?.code ?? "",
   };
 }
 
@@ -423,6 +427,8 @@ async function sendStudentReceipt({ studentNumber, familyName, givenName, subjec
   try {
     const contact = await getStudentContact(studentNumber, env);
     if (!contact || !contact.email) return;
+    // 自社（東京直営）のみ送信。所属組織が別組織なら送らない（空は東京扱い）。
+    if (contact.org && contact.org !== MAIL_ORG) return;
     const name = `${familyName || contact.familyName || ""} ${givenName || contact.givenName || ""}`.trim();
     await sendReceiptEmail({ to: contact.email, name, subject, lead, rows, env });
   } catch (e) {
@@ -434,7 +440,7 @@ async function sendStudentReceipt({ studentNumber, familyName, givenName, subjec
  * POST /api/taiken
  * Creates a record in 体験参加名簿 (App 17).
  */
-async function handleTaiken(body, env) {
+async function handleTaiken(body, env, origin) {
   // 教室名はルックアップ型のため、TOKEN_TAIKENとTOKEN_KYOSHITSUを両方渡して
   // 教室マスタへの閲覧権限を付与したマルチトークンで送信する
   const token = env.TOKEN_KYOSHITSU
@@ -459,15 +465,18 @@ async function handleTaiken(body, env) {
   await kintonePost(APP.TAIKEN, record, token);
 
   // kintone登録成功後に確認メール送信（失敗しても申込自体はエラーにしない）
+  // 自社（東京直営）のみ送信。加盟店・本部（form.rakutama-soroban.com）には送らない。
   try {
-    await sendConfirmationEmail(
-      body["メールアドレス"],
-      body["氏"] ?? "",
-      body["名"] ?? "",
-      body["教室名"] ?? "",
-      body["希望日時"] ?? "",
-      env,
-    );
+    if (getOrgCode(origin) === MAIL_ORG) {
+      await sendConfirmationEmail(
+        body["メールアドレス"],
+        body["氏"] ?? "",
+        body["名"] ?? "",
+        body["教室名"] ?? "",
+        body["希望日時"] ?? "",
+        env,
+      );
+    }
   } catch (e) {
     console.error("確認メール送信エラー:", e);
   }
@@ -744,7 +753,7 @@ async function handleNyukai(body, env, origin) {
 
   // 入会受付メール（東京直営のみ。加盟店は運営会社・連絡先が異なるため送らない）
   try {
-    if (orgCode === "アルファーブレイン" && g["メールアドレス"]) {
+    if (orgCode === MAIL_ORG && g["メールアドレス"]) {
       await sendReceiptEmail({
         to: g["メールアドレス"],
         name: `${student["氏"] ?? ""} ${student["名"] ?? ""}`.trim(),
@@ -1148,7 +1157,7 @@ export default {
           result = await handleLookup(body, env);
           break;
         case "/api/taiken":
-          result = await handleTaiken(body, env);
+          result = await handleTaiken(body, env, origin);
           break;
         case "/api/kesseki":
           result = await handleKesseki(body, env);
