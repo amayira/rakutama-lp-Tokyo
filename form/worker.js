@@ -327,6 +327,109 @@ async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboD
   });
 }
 
+// ─── フォーム受付完了メール（体験以外の全フォーム共通） ─────────────────────────
+//
+// 在学生・入会フォームは「フォーム入力完了メールが欲しい」という保護者要望を受けて
+// 受付時に自動返信を送る（2026-07-06）。在学生フォームはメール欄を持たないため、
+// worker 側で生徒番号 → 生徒名簿(App19) の保護者メールを引いて送信する。
+
+const MAIL_FROM = "楽珠そろばん教室 <info@rakutama-tokyo.com>";
+const MAIL_LINE = "https://lin.ee/oW7wspr";
+const MAIL_ADDR = "info@rakutama-tokyo.com";
+
+/**
+ * 受付完了メールの汎用送信関数。
+ * rows = [[ラベル, 値], ...]（値が空・null の行は自動で省略）。
+ * RESEND_API_KEY 未設定 or 宛先無しなら何もしない。
+ */
+async function sendReceiptEmail({ to, name, subject, lead, rows, env }) {
+  if (!env.RESEND_API_KEY || !to) return;
+
+  const namePart = name ? `${name} さん` : "ご保護者様";
+  const filled = (rows || []).filter(([, v]) => v != null && String(v).trim() !== "");
+
+  const textRows = filled.map(([k, v]) => `■ ${k}：${v}`).join("\n");
+  const textBody = `${namePart}
+
+${lead}
+
+以下の内容で受け付けました。
+${textRows}
+
+内容を確認のうえ、必要に応じて担当者よりご連絡いたします。
+※ このメールは送信専用の自動返信です。ご返信いただいてもお応えできません。
+
+ご不明な点は、公式LINEまたはメールにてお問い合わせください。
+　公式LINE：${MAIL_LINE}
+　メール：${MAIL_ADDR}
+
+━━━━━━━━━━━━━━━━━━━━━━
+楽珠そろばん教室（東京・練馬）
+運営：アルファーブレイン合同会社
+━━━━━━━━━━━━━━━━━━━━━━`;
+
+  const htmlRows = filled
+    .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:#555;white-space:nowrap;vertical-align:top;">${k}</td><td style="padding:4px 0;">${String(v).replace(/\n/g, "<br>")}</td></tr>`)
+    .join("");
+  const htmlBody = `<p>${namePart}</p>
+<p>${lead}</p>
+<p>以下の内容で受け付けました。</p>
+<table style="border-collapse:collapse;margin:16px 0;">
+  ${htmlRows}
+</table>
+<p>内容を確認のうえ、必要に応じて担当者よりご連絡いたします。<br>
+<span style="color:#888;font-size:13px;">※ このメールは送信専用の自動返信です。ご返信いただいてもお応えできません。</span></p>
+<hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+<p style="font-size:13px;color:#555;">
+  ご不明な点は、公式LINEまたはメールにてお問い合わせください。<br>
+  公式LINE：<a href="${MAIL_LINE}">${MAIL_LINE}</a><br>
+  メール：<a href="mailto:${MAIL_ADDR}">${MAIL_ADDR}</a>
+</p>
+<p style="font-size:12px;color:#aaa;">楽珠そろばん教室（東京・練馬）｜運営：アルファーブレイン合同会社</p>`;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from: MAIL_FROM, to: [to], subject, text: textBody, html: htmlBody }),
+  });
+}
+
+/**
+ * 生徒番号から保護者の連絡先（メール・氏名）を生徒名簿(App19)から取得する。
+ * 週2のサブ番号（A0001-2）でもメイン番号のレコードを引く。
+ */
+async function getStudentContact(studentNumber, env) {
+  if (!studentNumber) return null;
+  const main = String(studentNumber).split("-")[0];
+  const query = `生徒番号 = "${escapeQueryValue(main)}" limit 1`;
+  const data = await kintoneGet(APP.SEITO_NEW, query, env.TOKEN_SEITO_NEW);
+  const rec = data.records?.[0];
+  if (!rec) return null;
+  return {
+    email: rec["メールアドレス"]?.value ?? "",
+    familyName: rec["氏"]?.value ?? "",
+    givenName: rec["名"]?.value ?? "",
+  };
+}
+
+/**
+ * 在学生フォームの受付完了メールを送る。
+ * body に氏名が無い場合は生徒名簿から補完。メール送信の失敗は申込自体を止めない。
+ */
+async function sendStudentReceipt({ studentNumber, familyName, givenName, subject, lead, rows, env }) {
+  try {
+    const contact = await getStudentContact(studentNumber, env);
+    if (!contact || !contact.email) return;
+    const name = `${familyName || contact.familyName || ""} ${givenName || contact.givenName || ""}`.trim();
+    await sendReceiptEmail({ to: contact.email, name, subject, lead, rows, env });
+  } catch (e) {
+    console.error("受付メール送信エラー:", e);
+  }
+}
+
 /**
  * POST /api/taiken
  * Creates a record in 体験参加名簿 (App 17).
@@ -394,6 +497,23 @@ async function handleKesseki(body, env) {
 
   const furikaeToken = [env.TOKEN_FURIKAE, env.TOKEN_SEITO_NEW, env.TOKEN_KYOSHITSU].filter(Boolean).join(",");
   await kintonePost(APP.FURIKAE, record, furikaeToken);
+
+  await sendStudentReceipt({
+    studentNumber: body["生徒番号"],
+    familyName: body["氏"],
+    givenName: body["名"],
+    subject: "【欠席受付】楽珠そろばん教室 東京・練馬",
+    lead: "欠席のご連絡を受け付けました。",
+    rows: [
+      ["欠席日", body["欠席日"]],
+      ["振替受講日", body["振替受講日"]],
+      ["振替受講教室", body["振替教室名"]],
+      ["時刻", body["時刻"]],
+      ["備考", body["備考"]],
+    ],
+    env,
+  });
+
   return { success: true };
 }
 
@@ -412,6 +532,18 @@ async function handleFlashAnzan(body, env) {
 
   const sonotaToken = [env.TOKEN_SONOTA, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
   await kintonePost(APP.SONOTA, record, sonotaToken);
+
+  await sendStudentReceipt({
+    studentNumber: body["生徒番号"],
+    subject: "【フラッシュ暗算申込受付】楽珠そろばん教室 東京・練馬",
+    lead: "フラッシュ暗算のお申し込みを受け付けました。",
+    rows: [
+      ["項目", body["項目名"]],
+      ["金額", body["金額"] ? `${String(body["金額"]).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}円` : ""],
+    ],
+    env,
+  });
+
   return { success: true };
 }
 
@@ -468,6 +600,20 @@ async function handleFurikae(body, env) {
 
   const furikaeToken = [env.TOKEN_FURIKAE, env.TOKEN_SEITO_NEW, env.TOKEN_KYOSHITSU].filter(Boolean).join(",");
   await kintoneUpdate(APP.FURIKAE, ticketId, record, furikaeToken);
+
+  await sendStudentReceipt({
+    studentNumber: body["生徒番号"],
+    subject: "【振替受付】楽珠そろばん教室 東京・練馬",
+    lead: "振替受講のお申し込みを受け付けました。",
+    rows: [
+      ["振替受講日", body["振替受講日"]],
+      ["振替受講教室", body["振替受講教室"]],
+      ["時刻", body["時刻"]],
+      ["備考", body["備考"]],
+    ],
+    env,
+  });
+
   return { success: true };
 }
 
@@ -495,6 +641,22 @@ async function handleKentei(body, env) {
   const record = buildRecord(fields);
   const kenteiToken = [env.TOKEN_KENTEI, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
   await kintonePost(APP.KENTEI, record, kenteiToken);
+
+  await sendStudentReceipt({
+    studentNumber: body["生徒番号"],
+    familyName: body["氏"],
+    givenName: body["名"],
+    subject: "【検定申込受付】楽珠そろばん教室 東京・練馬",
+    lead: "検定のお申し込みを受け付けました。",
+    rows: [
+      ["受験日", body["受験日"]],
+      ["受験会場", body["受験会場"]],
+      ["珠算 受験級", body["珠算受験級"]],
+      ["暗算 受験級", body["暗算受験級"]],
+    ],
+    env,
+  });
+
   return { success: true };
 }
 
@@ -579,6 +741,26 @@ async function handleNyukai(body, env, origin) {
   const token = [env.TOKEN_SEITO_NEW, env.TOKEN_KYOSHITSU, env.TOKEN_GAKUHI]
     .filter(Boolean).join(",");
   await kintonePost(APP.SEITO_NEW, record, token);
+
+  // 入会受付メール（東京直営のみ。加盟店は運営会社・連絡先が異なるため送らない）
+  try {
+    if (orgCode === "アルファーブレイン" && g["メールアドレス"]) {
+      await sendReceiptEmail({
+        to: g["メールアドレス"],
+        name: `${student["氏"] ?? ""} ${student["名"] ?? ""}`.trim(),
+        subject: "【入会申込受付】楽珠そろばん教室 東京・練馬",
+        lead: "ご入会のお申し込みを受け付けました。担当者が内容を確認し、追ってご連絡いたします。",
+        rows: [
+          ["教室", student["教室名"]],
+          ["初回授業日", student["初回授業日"]],
+          ["コース", student["gakuhiName"]],
+        ],
+        env,
+      });
+    }
+  } catch (e) {
+    console.error("入会受付メール送信エラー:", e);
+  }
 
   return { success: true };
 }
@@ -673,6 +855,21 @@ async function handleClassChange(body, env) {
   });
 
   await kintonePost(APP.CLASS_CHANGE, record, token);
+
+  await sendStudentReceipt({
+    studentNumber: body["生徒番号"],
+    familyName: body["氏"],
+    givenName: body["名"],
+    subject: "【クラス変更申込受付】楽珠そろばん教室 東京・練馬",
+    lead: "クラス変更のお申し込みを受け付けました。",
+    rows: [
+      ["変更希望内容", body["変更希望内容"]],
+      ["希望時期", body["希望時期"]],
+      ["備考", body["備考"]],
+    ],
+    env,
+  });
+
   return { success: true };
 }
 

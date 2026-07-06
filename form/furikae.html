@@ -319,6 +319,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ticketId,
+            生徒番号: studentData?.records?.[0]?.studentNumber ?? '',
             振替受講日: furikaeDate,
             振替受講教室: furikaeClassroom,
             時刻: furikaeTime,
