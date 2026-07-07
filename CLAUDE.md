@@ -319,7 +319,7 @@ Cloudflare Workers（form/worker.js）の変更は別途 `wrangler deploy` が�
 - 新規ページを追加する場合は `tailwind.config.js` の `content` に追加が必要な場合がある。
 - 全ページに GTM スニペットを必ず入れること。
 - `form/` 配下のページは在学生向けのため、LP とはデザイン・トーンが異なる。
-- **OneDrive上の.gitに注意**：OneDriveのストレージ節約機能で `.git/objects` がdataless（クラウド退避）化すると `git push` が固まる（2026-07-03発生）。対処：①Finderでこのフォルダを「このデバイス上に常に保持」に設定、②pushが固まる場合は GitHubから浅くclone → `git show main:ファイル` で変更ファイルを移植 → cloneからpush → 元リポジトリで `git fetch && git reset --soft origin/main`。
+- **リポジトリは `~/dev/`（ローカル）に置く**。OneDrive・Google Drive等のクラウド同期フォルダに置くと `.git/objects` がdataless化して `git push` が固まる（2026-07-03にOneDriveで発生済み）。バックアップはGitHubへのpushで行う。
 
 ---
 
