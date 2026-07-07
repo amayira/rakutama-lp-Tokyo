@@ -130,6 +130,41 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .fade-in { opacity: 0; transform: translateY(16px); transition: opacity 0.55s ease, transform 0.55s ease; }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
 
+        /* ---- hero badge ---- */
+        .badge-hero {
+            background: #fff;
+            border-radius: 16px;
+            padding: 10px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-align: center;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.18);
+        }
+        .badge-hero-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #F59E0B;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+        .badge-hero .badge-hero-sub { white-space: nowrap; }
+        @media (min-width: 768px) {
+            .badge-hero {
+                flex-direction: row;
+                text-align: left;
+                gap: 9px;
+                padding: 12px 13px;
+            }
+            .badge-hero-icon { width: 36px; height: 36px; font-size: 14px; }
+        }
+
         /* ---- hero text shadow ---- */
         .hero-text h1 { text-shadow: none; }
         .hero-text p  { text-shadow: 0 1px 5px rgba(0,0,0,0.4); }
@@ -216,26 +251,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
 
                 <!-- バッジ -->
-                <div class="grid grid-cols-3 gap-2 mt-8">
-                    <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-2 py-2.5 md:px-4 md:py-3 flex flex-col md:flex-row items-center gap-1 md:gap-2 text-center md:text-left">
-                        <i class="fa-solid fa-users text-secondary text-sm md:text-lg shrink-0"></i>
+                <div class="grid grid-cols-3 gap-2 md:gap-3 mt-8">
+                    <div class="badge-hero">
+                        <div class="badge-hero-icon"><i class="fa-solid fa-users"></i></div>
                         <div>
-                            <div class="text-white font-black text-[11px] md:text-sm leading-tight whitespace-nowrap">少人数制</div>
-                            <div class="text-white/70 text-[9px] md:text-xs leading-tight mt-0.5 hidden md:block">先生の目が届く</div>
+                            <div class="text-gray-800 font-display font-black text-[11px] md:text-sm leading-tight whitespace-nowrap">少人数制</div>
+                            <div class="badge-hero-sub text-gray-500 text-[9px] md:text-[10px] leading-tight mt-0.5 hidden md:block">先生の目が届く</div>
                         </div>
                     </div>
-                    <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-2 py-2.5 md:px-4 md:py-3 flex flex-col md:flex-row items-center gap-1 md:gap-2 text-center md:text-left">
-                        <i class="fa-solid fa-calendar-check text-secondary text-sm md:text-lg shrink-0"></i>
+                    <div class="badge-hero">
+                        <div class="badge-hero-icon"><i class="fa-solid fa-calendar-check"></i></div>
                         <div>
-                            <div class="text-white font-black text-[11px] md:text-sm leading-tight whitespace-nowrap">週1回〜OK</div>
-                            <div class="text-white/70 text-[9px] md:text-xs leading-tight mt-0.5 hidden md:block">振替制度あり</div>
+                            <div class="text-gray-800 font-display font-black text-[11px] md:text-sm leading-tight whitespace-nowrap">週1回〜OK</div>
+                            <div class="badge-hero-sub text-gray-500 text-[9px] md:text-[10px] leading-tight mt-0.5 hidden md:block">振替制度あり</div>
                         </div>
                     </div>
-                    <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-2 py-2.5 md:px-4 md:py-3 flex flex-col md:flex-row items-center gap-1 md:gap-2 text-center md:text-left">
-                        <i class="fa-solid fa-map-marker-alt text-secondary text-sm md:text-lg shrink-0"></i>
+                    <div class="badge-hero">
+                        <div class="badge-hero-icon"><i class="fa-solid fa-map-marker-alt"></i></div>
                         <div>
-                            <div class="text-white font-black text-[11px] md:text-sm leading-tight whitespace-nowrap">練馬3教室</div>
-                            <div class="text-white/70 text-[9px] md:text-xs leading-tight mt-0.5 hidden md:block">早宮・氷川台・中村</div>
+                            <div class="text-gray-800 font-display font-black text-[11px] md:text-sm leading-tight whitespace-nowrap">練馬3教室</div>
+                            <div class="badge-hero-sub text-gray-500 text-[9px] md:text-[10px] leading-tight mt-0.5 hidden md:block">早宮・氷川台・中村</div>
                         </div>
                     </div>
                 </div>
@@ -732,20 +767,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </p>
 
             <div class="grid sm:grid-cols-3 gap-4 mb-10 text-left">
-                <div class="bg-white/15 backdrop-blur-sm rounded-2xl p-5">
-                    <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-black text-lg mb-3">1</div>
-                    <h3 class="font-black text-white text-sm mb-1">フォームに入力</h3>
-                    <p class="text-white/70 text-xs">お子様の情報・希望日時を入力</p>
+                <div class="bg-white rounded-2xl p-5" style="box-shadow:0 4px 0 rgba(0,0,0,0.25);">
+                    <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-black text-lg mb-3 font-number">1</div>
+                    <h3 class="font-display font-black text-gray-800 text-sm mb-1">フォームに入力</h3>
+                    <p class="text-gray-500 text-xs">お子様の情報・希望日時を入力</p>
                 </div>
-                <div class="bg-white/15 backdrop-blur-sm rounded-2xl p-5">
-                    <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-black text-lg mb-3">2</div>
-                    <h3 class="font-black text-white text-sm mb-1">希望日時を送る</h3>
-                    <p class="text-white/70 text-xs">教室・都合の良い日時を連絡</p>
+                <div class="bg-white rounded-2xl p-5" style="box-shadow:0 4px 0 rgba(0,0,0,0.25);">
+                    <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-black text-lg mb-3 font-number">2</div>
+                    <h3 class="font-display font-black text-gray-800 text-sm mb-1">希望日時を送る</h3>
+                    <p class="text-gray-500 text-xs">教室・都合の良い日時を連絡</p>
                 </div>
-                <div class="bg-white/15 backdrop-blur-sm rounded-2xl p-5">
-                    <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-black text-lg mb-3">3</div>
-                    <h3 class="font-black text-white text-sm mb-1">手ぶらで来校</h3>
-                    <p class="text-white/70 text-xs">持ち物不要。約30分の体験</p>
+                <div class="bg-white rounded-2xl p-5" style="box-shadow:0 4px 0 rgba(0,0,0,0.25);">
+                    <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-black text-lg mb-3 font-number">3</div>
+                    <h3 class="font-display font-black text-gray-800 text-sm mb-1">手ぶらで来校</h3>
+                    <p class="text-gray-500 text-xs">持ち物不要。約30分の体験</p>
                 </div>
             </div>
 
