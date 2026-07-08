@@ -447,6 +447,13 @@ async function handleTaiken(body, env, origin) {
     ? `${env.TOKEN_TAIKEN},${env.TOKEN_KYOSHITSU}`
     : env.TOKEN_TAIKEN;
 
+  // 備考フィールドを組み立て（備考 → 紹介者）
+  const referrer = body["紹介者"] ?? "";
+  const bikoLines = [];
+  if (body["備考"]) bikoLines.push(body["備考"]);
+  if (referrer) bikoLines.push(`紹介者：${referrer}`);
+  const biko = bikoLines.join("\n\n");
+
   const record = buildRecord({
     氏: body["氏"] ?? "",
     名: body["名"] ?? "",
@@ -459,7 +466,7 @@ async function handleTaiken(body, env, origin) {
     "級・段": body["級・段"] ?? "",
     教室名: body["教室名"] ?? "",
     希望日時: body["希望日時"] ?? "",
-    備考: body["備考"] ?? "",
+    備考: biko,
   });
 
   await kintonePost(APP.TAIKEN, record, token);

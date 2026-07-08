@@ -896,6 +896,12 @@
                         </div>
 
                         <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">紹介者 <span class="text-gray-400 text-xs font-normal">任意</span></label>
+                            <input type="text" id="referrer" placeholder="ご紹介者がいる場合はお名前をご入力ください"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                        </div>
+
+                        <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">備考 <span class="text-gray-400 text-xs font-normal">任意</span></label>
                             <textarea id="notes" rows="3"
                                 placeholder="ご質問・その他お気軽にどうぞ"
@@ -1032,6 +1038,7 @@
             const pref2d = document.getElementById('pref2-date').value.trim();
             const pref2t = document.getElementById('pref2-time').value.trim();
             const preferredDatetime = mergePreferredDatetimeForKintone();
+            const referrer = document.getElementById('referrer').value.trim();
             const notes = document.getElementById('notes').value.trim();
 
             const errors = [];
@@ -1076,6 +1083,7 @@
                         教室名: classroom,
                         希望日時: preferredDatetime,
                         備考: notes,
+                        紹介者: referrer,
                     }),
                 });
 
