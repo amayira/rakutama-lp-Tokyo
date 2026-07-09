@@ -803,6 +803,24 @@ async function handleJugyo(params, env) {
 }
 
 /**
+ * GET /api/active-classrooms
+ * 授業マスタ(App6)に「開講中」クラスが1件以上ある教室名の一覧を返す。
+ * 本部フォームのハードコード教室リストから、閉校（＝開講中クラスなし）を隠す用。
+ */
+async function handleActiveClassrooms(env) {
+  const query = `開講状況 in ("開講中") order by 教室名 asc limit 500`;
+  const data = await kintoneGet(APP.JUGYO, query, env.TOKEN_JUGYO);
+
+  const classrooms = [...new Set(
+    (data.records ?? [])
+      .map((rec) => rec["教室名"]?.value ?? "")
+      .filter(Boolean)
+  )];
+
+  return { success: true, classrooms };
+}
+
+/**
  * GET /api/classrooms?orgCode=所属組織コード
  * Returns classrooms for the given org from 教室マスタ (App 7).
  * openDate（開校日）より前の日付はフォーム側で選択不可になる。
@@ -1105,6 +1123,8 @@ export default {
       try {
         if (path === "/api/jugyo") {
           result = await handleJugyo(params, env);
+        } else if (path === "/api/active-classrooms") {
+          result = await handleActiveClassrooms(env);
         } else if (path === "/api/classrooms") {
           result = await handleClassrooms(params, env);
         } else if (path === "/api/gakuhi") {
