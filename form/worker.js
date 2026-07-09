@@ -583,7 +583,7 @@ function lastDayOfMonth(y, m) {
 /**
  * GET /api/absence-count?studentNumber=A0000
  * 今月・来月の欠席報告件数を 振替管理(App 14) から集計して返す。
- * 「欠席連絡フォームから報告された欠席」＝自己都合の欠席（休講日は対象外・別管理）。
+ * 種別＝「自己都合」のレコードのみカウントする（体調不良・その他は対象外）。
  */
 async function handleAbsenceCount(params, env) {
   const studentNumber = params.get("studentNumber");
@@ -605,6 +605,7 @@ async function handleAbsenceCount(params, env) {
   const sn = escapeQueryValue(studentNumber);
   const query = [
     `(生徒番号 = "${sn}" or 生徒番号 like "${sn}-%")`,
+    `種別 in ("自己都合")`,
     `欠席日 >= "${thisMonthStart}"`,
     `欠席日 <= "${nextMonthEnd}"`,
   ].join(" and ") + " order by 欠席日 asc limit 100";
@@ -871,6 +872,29 @@ async function handleActiveClassrooms(env) {
       .map((rec) => rec["教室名"]?.value ?? "")
       .filter(Boolean)
   )];
+
+  return { success: true, classrooms };
+}
+
+/**
+ * GET /api/all-classrooms
+ * 教室マスタ(App5)の全組織・非閉校の教室を、所属組織コード付きで返す。
+ * 本部フォームで本部＋全FC加盟店の教室を組織ごとにまとめて表示する用。
+ * 入会はこの org を所属組織として登録し、体験は教室名ルックアップで自動転記される。
+ */
+async function handleAllClassrooms(env) {
+  const query = `開校日 != "" order by レコード番号 asc limit 500`;
+  const data = await kintoneGet(APP.KYOSHITSU, query, env.TOKEN_KYOSHITSU);
+
+  const classrooms = (data.records ?? [])
+    .filter((rec) => !String(rec["開校状況"]?.value ?? "").includes("閉"))
+    .map((rec) => ({
+      name: rec["教室名"]?.value ?? "",
+      org: rec["組織選択"]?.value?.[0]?.code ?? "",
+      orgName: rec["組織選択"]?.value?.[0]?.name ?? "",
+      openDate: rec["開校日"]?.value ?? "",
+    }))
+    .filter((c) => c.name);
 
   return { success: true, classrooms };
 }
@@ -1180,6 +1204,8 @@ export default {
           result = await handleJugyo(params, env);
         } else if (path === "/api/active-classrooms") {
           result = await handleActiveClassrooms(env);
+        } else if (path === "/api/all-classrooms") {
+          result = await handleAllClassrooms(env);
         } else if (path === "/api/classrooms") {
           result = await handleClassrooms(params, env);
         } else if (path === "/api/gakuhi") {
