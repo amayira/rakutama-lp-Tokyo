@@ -71,6 +71,16 @@
               <div id="info-jugyo" class="text-sm font-medium text-gray-800"></div>
             </div>
           </div>
+          <div class="grid grid-cols-2 gap-2 mt-2">
+            <div class="bg-gray-50 rounded-lg p-2">
+              <div class="text-xs text-gray-400 mb-0.5">今月の欠席（自己都合）</div>
+              <div id="info-absence-this" class="text-sm font-medium text-gray-800">―</div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-2">
+              <div class="text-xs text-gray-400 mb-0.5">来月の欠席（自己都合）</div>
+              <div id="info-absence-next" class="text-sm font-medium text-gray-800">―</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -247,6 +257,8 @@
         classroomSelect.value = '';
         classroomSelect.disabled = true;
         document.getElementById('furikae-time').innerHTML = '<option value="">生徒番号を検索すると選択肢が表示されます</option>';
+        document.getElementById('info-absence-this').textContent = '―';
+        document.getElementById('info-absence-next').textContent = '―';
       },
       onSuccess: async () => {
         // 教室セレクタを有効化してメインレコードの教室をプリセット
@@ -255,6 +267,17 @@
         const activeRec = resolveActiveRecord(document.getElementById('absence-date').value);
         if (activeRec?.classroom) classroomSelect.value = activeRec.classroom;
         await loadTimeSlotsInto('furikae-time', classroomSelect.value);
+
+        // 今月・来月の自己都合欠席回数を取得
+        const studentNumber = document.getElementById('student-number').value.trim();
+        try {
+          const res = await fetch(`${API_BASE}/api/absence-count?studentNumber=${encodeURIComponent(studentNumber)}`);
+          const data = await res.json();
+          if (res.ok && data.success) {
+            document.getElementById('info-absence-this').textContent = `${data.thisMonth}回`;
+            document.getElementById('info-absence-next').textContent = `${data.nextMonth}回`;
+          }
+        } catch { /* 取得失敗は「―」のまま */ }
       },
     });
 

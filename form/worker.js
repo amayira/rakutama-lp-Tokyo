@@ -564,6 +564,61 @@ async function handleFlashAnzan(body, env) {
 }
 
 /**
+ * 日本時間（Asia/Tokyo）での「今日」を YYYY-MM-DD で返す
+ */
+function tokyoToday() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+/** 指定年月（y, m: mは1-indexed）の末日を返す */
+function lastDayOfMonth(y, m) {
+  return new Date(Date.UTC(y, m, 0)).getUTCDate();
+}
+
+/**
+ * GET /api/absence-count?studentNumber=A0000
+ * 今月・来月の欠席報告件数を 振替管理(App 14) から集計して返す。
+ * 「欠席連絡フォームから報告された欠席」＝自己都合の欠席（休講日は対象外・別管理）。
+ */
+async function handleAbsenceCount(params, env) {
+  const studentNumber = params.get("studentNumber");
+  if (!studentNumber) {
+    return { success: false, error: "studentNumber は必須です", status: 400 };
+  }
+
+  const today = tokyoToday();
+  const [y, m] = today.split("-").map(Number);
+  const nextY = m === 12 ? y + 1 : y;
+  const nextM = m === 12 ? 1 : m + 1;
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const thisMonthStart = `${y}-${pad(m)}-01`;
+  const thisMonthEnd = `${y}-${pad(m)}-${pad(lastDayOfMonth(y, m))}`;
+  const nextMonthStart = `${nextY}-${pad(nextM)}-01`;
+  const nextMonthEnd = `${nextY}-${pad(nextM)}-${pad(lastDayOfMonth(nextY, nextM))}`;
+
+  const sn = escapeQueryValue(studentNumber);
+  const query = [
+    `(生徒番号 = "${sn}" or 生徒番号 like "${sn}-%")`,
+    `欠席日 >= "${thisMonthStart}"`,
+    `欠席日 <= "${nextMonthEnd}"`,
+  ].join(" and ") + " order by 欠席日 asc limit 100";
+
+  const data = await kintoneGet(APP.FURIKAE, query, env.TOKEN_FURIKAE);
+  const dates = (data.records ?? []).map((rec) => rec["欠席日"]?.value ?? "").filter(Boolean);
+
+  const thisMonth = dates.filter((d) => d >= thisMonthStart && d <= thisMonthEnd).length;
+  const nextMonth = dates.filter((d) => d >= nextMonthStart && d <= nextMonthEnd).length;
+
+  return { success: true, thisMonth, nextMonth };
+}
+
+/**
  * GET /api/furikae-tickets?studentNumber=A0000&date=2026-04-17
  * Returns available 振替tickets from App 14 that cover the given date.
  */
@@ -1131,6 +1186,8 @@ export default {
           result = await handleGakuhi(params, env);
         } else if (path === "/api/furikae-tickets") {
           result = await handleFurikaeTickets(params, env);
+        } else if (path === "/api/absence-count") {
+          result = await handleAbsenceCount(params, env);
         } else if (path === "/api/staff/taiken") {
           if (!isValidStaffAuth(request, env)) {
             return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
