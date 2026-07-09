@@ -892,6 +892,7 @@ async function handleAllClassrooms(env) {
       name: rec["教室名"]?.value ?? "",
       org: rec["組織選択"]?.value?.[0]?.code ?? "",
       orgName: rec["組織選択"]?.value?.[0]?.name ?? "",
+      pref: rec["都道府県"]?.value ?? "",
       openDate: rec["開校日"]?.value ?? "",
     }))
     .filter((c) => c.name);
