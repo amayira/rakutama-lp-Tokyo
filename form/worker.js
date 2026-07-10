@@ -749,6 +749,23 @@ async function handleNyukai(body, env, origin) {
     return { success: false, error: "生徒情報が不足しています", status: 400 };
   }
 
+  // ── 必須項目チェック ─────────────────────────────────────────────────────
+  // フォーム側のバリデーション漏れ・改変リクエストで空のまま登録される事故を防ぐ。
+  // ここに追加する項目は「東京直営＋FC加盟店の全 nyukai フォームが必ず送るもの」に限ること
+  // （worker は全組織共通のため、一部フォームにしかない項目を必須にすると他組織の申込が全滅する）。
+  const requiredStudent = ["氏", "名", "教室名", "初回授業日"];
+  const missing = requiredStudent.filter((f) => !String(student[f] ?? "").trim());
+  if (missing.length > 0) {
+    return {
+      success: false,
+      error: `必須項目が未入力です：${missing.join("・")}。お手数ですが入力のうえ再度送信してください。`,
+      status: 400,
+    };
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(student["初回授業日"]).trim())) {
+    return { success: false, error: "希望入会日の形式が不正です", status: 400 };
+  }
+
   // ── 生徒番号: 「要修正&{5桁乱数}」で仮登録 ─────────────────────────────────
   const rand5 = String(Math.floor(Math.random() * 100000)).padStart(5, "0");
   const tempStudentId = `要修正&${rand5}`;
