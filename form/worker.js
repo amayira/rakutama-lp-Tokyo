@@ -685,8 +685,9 @@ async function handleAbsenceCount(params, env) {
 
 /**
  * GET /api/furikae-tickets?studentNumber=A0000
- * Returns unused 振替tickets from App 14 for the student (振替受講日が未確定のもの)。
- * 振替受講日を選ぶ前にチケットを選択できるよう、日付での絞り込みは行わない。
+ * Returns unused, not-yet-expired 振替tickets from App 14 for the student
+ * (振替受講日が未確定かつ振替期日_終_が本日以降のもの)。
+ * 振替受講日を選ぶ前にチケットを選択できるよう、特定日付での絞り込みは行わない。
  */
 async function handleFurikaeTickets(params, env) {
   const studentNumber = params.get("studentNumber");
@@ -699,6 +700,7 @@ async function handleFurikaeTickets(params, env) {
   const conditions = [
     `(生徒番号 = "${sn}" or 生徒番号 like "${sn}-%")`,
     `振替受講日 = ""`,
+    `振替期日_終_ >= TODAY()`,
   ].join(" and ");
   const query = `${conditions} order by 欠席日 asc limit 50`;
 
