@@ -81,12 +81,25 @@
             <span class="text-xs font-black border-2 border-[#4A96AE] text-[#4A96AE] rounded-full px-4 py-1 font-display">振替受講の内容</span>
           </div>
 
+          <!-- 使用するチケット -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">使用するチケット <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <select id="ticket-select" required disabled
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white disabled:bg-gray-100 disabled:text-gray-400">
+                <option value="">生徒番号を検索してください</option>
+              </select>
+              <i id="ticket-spinner" class="fa-solid fa-spinner fa-spin hidden absolute right-3 top-3 text-gray-400 text-xs"></i>
+            </div>
+            <p id="ticket-error" class="hidden mt-1 text-xs text-red-500"></p>
+          </div>
+
           <!-- 振替受講教室 -->
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">振替受講教室 <span class="text-red-500">*</span></label>
             <select id="furikae-classroom" disabled
               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white disabled:bg-gray-100 disabled:text-gray-400">
-              <option value="">生徒番号を検索してください</option>
+              <option value="">チケットを選択してください</option>
               <option value="早宮校">早宮校（火・金）</option>
               <option value="氷川台校">氷川台校（月・水）</option>
               <option value="中村校">中村校（月・木）</option>
@@ -97,21 +110,9 @@
           <!-- 振替受講日 -->
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">振替受講日 <span class="text-red-500">*</span></label>
-            <input type="date" id="furikae-date" required
-              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
-          </div>
-
-          <!-- 使用するチケット -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">使用するチケット <span class="text-red-500">*</span></label>
-            <div class="relative">
-              <select id="ticket-select" required
-                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-white">
-                <option value="">生徒番号を検索し、振替受講日を選択してください</option>
-              </select>
-              <i id="ticket-spinner" class="fa-solid fa-spinner fa-spin hidden absolute right-3 top-3 text-gray-400 text-xs"></i>
-            </div>
-            <p id="ticket-error" class="hidden mt-1 text-xs text-red-500"></p>
+            <input type="date" id="furikae-date" required disabled
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 disabled:bg-gray-100 disabled:text-gray-400" />
+            <p id="furikae-date-hint" class="mt-1 text-xs text-gray-400"></p>
           </div>
 
           <!-- 時刻 -->
@@ -191,21 +192,23 @@
       return `${parseInt(m)}月${parseInt(d)}日`;
     }
 
-    // ── チケット取得 ──────────────────────────────────────────────────────────
+    // 選択中チケットの期日（振替受講日のmin/max制御に使用）
+    let currentTickets = [];
+
+    // ── チケット取得（生徒番号のみで絞り込み。日付には依存しない）────────────────
     async function loadTickets() {
       const myId = ++ticketReqId;
-      const date = document.getElementById('furikae-date').value;
       const ticketSelect = document.getElementById('ticket-select');
       const ticketSpinner = document.getElementById('ticket-spinner');
       const ticketError = document.getElementById('ticket-error');
 
       ticketSelect.innerHTML = '<option value="">選択してください</option>';
+      ticketSelect.disabled = true;
       ticketError.classList.add('hidden');
       ticketError.textContent = '';
-      document.getElementById('submit-btn').disabled = true;
-      document.getElementById('submit-hint').classList.remove('hidden');
+      currentTickets = [];
 
-      if (!studentData || !date) return;
+      if (!studentData) return;
 
       // サブ番号（A0001-2）でも入力できるよう、ベース番号でまとめて検索
       const studentNumber = baseStudentNumber(document.getElementById('student-number').value.trim());
@@ -213,7 +216,7 @@
 
       try {
         const res = await fetch(
-          `${API_BASE}/api/furikae-tickets?studentNumber=${encodeURIComponent(studentNumber)}&date=${encodeURIComponent(date)}`
+          `${API_BASE}/api/furikae-tickets?studentNumber=${encodeURIComponent(studentNumber)}`
         );
         const data = await res.json();
         if (myId !== ticketReqId) return; // 古いリクエストは破棄
@@ -222,9 +225,10 @@
 
         if (data.tickets.length === 0) {
           ticketSelect.innerHTML = '<option value="">利用可能なチケットがありません</option>';
-          ticketError.textContent = 'この日付に使用できる振替チケットが見つかりませんでした。';
+          ticketError.textContent = '使用できる振替チケットが見つかりませんでした。';
           ticketError.classList.remove('hidden');
         } else {
+          currentTickets = data.tickets;
           data.tickets.forEach(t => {
             const opt = document.createElement('option');
             opt.value = t.id;
@@ -234,8 +238,7 @@
             opt.textContent = `欠席日：${fmtDate(t['欠席日'])}${period}`;
             ticketSelect.appendChild(opt);
           });
-          document.getElementById('submit-btn').disabled = false;
-          document.getElementById('submit-hint').classList.add('hidden');
+          ticketSelect.disabled = false;
         }
       } catch (err) {
         if (myId !== ticketReqId) return;
@@ -246,35 +249,74 @@
       }
     }
 
-    document.getElementById('furikae-date').addEventListener('change', loadTickets);
+    // チケット選択 → 教室・振替受講日を有効化し、選んだチケットの振替期日で日付範囲を制限
+    document.getElementById('ticket-select').addEventListener('change', function () {
+      const classroomSelect = document.getElementById('furikae-classroom');
+      const dateInput = document.getElementById('furikae-date');
+      const dateHint = document.getElementById('furikae-date-hint');
+      const submitBtn = document.getElementById('submit-btn');
+      const submitHint = document.getElementById('submit-hint');
+
+      const ticket = currentTickets.find(t => t.id === this.value);
+      if (!ticket) {
+        classroomSelect.disabled = true;
+        classroomSelect.value = '';
+        dateInput.disabled = true;
+        dateInput.value = '';
+        dateHint.textContent = '';
+        submitBtn.disabled = true;
+        submitHint.classList.remove('hidden');
+        return;
+      }
+
+      classroomSelect.disabled = false;
+      dateInput.disabled = false;
+      dateInput.min = ticket['振替期日_始_'] || '';
+      dateInput.max = ticket['振替期日_終_'] || '';
+      dateInput.value = '';
+      dateHint.textContent = (ticket['振替期日_始_'] && ticket['振替期日_終_'])
+        ? `${fmtDate(ticket['振替期日_始_'])}〜${fmtDate(ticket['振替期日_終_'])}の間で選択してください`
+        : '';
+      submitBtn.disabled = true;
+      submitHint.classList.remove('hidden');
+    });
 
     document.getElementById('furikae-classroom').addEventListener('change', function () {
       loadTimeSlotsInto('furikae-time', this.value);
+    });
+
+    document.getElementById('furikae-date').addEventListener('change', function () {
+      const submitBtn = document.getElementById('submit-btn');
+      const submitHint = document.getElementById('submit-hint');
+      const ready = !!document.getElementById('ticket-select').value && !!this.value;
+      submitBtn.disabled = !ready;
+      submitHint.classList.toggle('hidden', ready);
     });
 
     // 生徒番号検索（共通処理 /js/form-common.js。submitはチケット選択後に有効化されるため自動有効化しない）
     setupStudentLookup({
       enableSubmitOnSuccess: false,
       onReset: () => {
-        // チケット・教室・時刻をリセット
-        document.getElementById('ticket-select').innerHTML = '<option value="">生徒番号を検索し、振替受講日を選択してください</option>';
+        // チケット・教室・振替受講日・時刻をリセット
+        document.getElementById('ticket-select').innerHTML = '<option value="">生徒番号を検索してください</option>';
+        document.getElementById('ticket-select').disabled = true;
         document.getElementById('ticket-error').classList.add('hidden');
+        currentTickets = [];
         const classroomSelect = document.getElementById('furikae-classroom');
         classroomSelect.value = '';
         classroomSelect.disabled = true;
+        const dateInput = document.getElementById('furikae-date');
+        dateInput.value = '';
+        dateInput.disabled = true;
+        document.getElementById('furikae-date-hint').textContent = '';
         document.getElementById('furikae-time').innerHTML = '<option value="">選択してください</option>';
       },
       onSuccess: async (s) => {
-        // 教室セレクタを有効化してメインレコードの教室をプリセット
+        // チケット一覧を取得（教室は生徒のホーム教室をプリセットしておく）
         const classroomSelect = document.getElementById('furikae-classroom');
-        classroomSelect.disabled = false;
         if (s.records[0]?.classroom) classroomSelect.value = s.records[0].classroom;
         await loadTimeSlotsInto('furikae-time', classroomSelect.value);
-
-        // 振替受講日がすでに入力済みならチケットを再取得
-        if (document.getElementById('furikae-date').value) {
-          await loadTickets();
-        }
+        await loadTickets();
       },
     });
 

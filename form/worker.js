@@ -684,24 +684,21 @@ async function handleAbsenceCount(params, env) {
 }
 
 /**
- * GET /api/furikae-tickets?studentNumber=A0000&date=2026-04-17
- * Returns available 振替tickets from App 14 that cover the given date.
+ * GET /api/furikae-tickets?studentNumber=A0000
+ * Returns unused 振替tickets from App 14 for the student (振替受講日が未確定のもの)。
+ * 振替受講日を選ぶ前にチケットを選択できるよう、日付での絞り込みは行わない。
  */
 async function handleFurikaeTickets(params, env) {
   const studentNumber = params.get("studentNumber");
-  const date = params.get("date");
-  if (!studentNumber || !date) {
-    return { success: false, error: "studentNumber と date は必須です", status: 400 };
+  if (!studentNumber) {
+    return { success: false, error: "studentNumber は必須です", status: 400 };
   }
 
   // メイン番号（A0001）＋サブ番号（A0001-2 など）の両チケットを取得
   const sn = escapeQueryValue(studentNumber);
-  const dt = escapeQueryValue(date);
   const conditions = [
     `(生徒番号 = "${sn}" or 生徒番号 like "${sn}-%")`,
     `振替受講日 = ""`,
-    `振替期日_始_ <= "${dt}"`,
-    `振替期日_終_ >= "${dt}"`,
   ].join(" and ");
   const query = `${conditions} order by 欠席日 asc limit 50`;
 
