@@ -303,6 +303,7 @@
     let seitoView = 'grid'; // 'grid' or 'list'
     let cachedSeitoRecords = null;
     let cachedKessekiRecords = null;
+    let cachedFurikaeRecords = null;
 
     const GRID_COLS = [
       { school: '早宮校',  day: '火' },
@@ -338,8 +339,9 @@
       document.getElementById('schoolFilter').classList.toggle('hidden', isStats || isSeito);
       document.getElementById('countBar').classList.toggle('hidden', isStats);
       document.getElementById('seitoViewToggle').classList.toggle('hidden', !isSeito);
-      // 欠席・振替タブ共用キャッシュをクリア
+      // 欠席・振替タブのキャッシュをクリア
       cachedKessekiRecords = null;
+      cachedFurikaeRecords = null;
       loadData();
     }
 
@@ -361,6 +363,7 @@
     function switchSchool(school) {
       currentSchool = school;
       cachedKessekiRecords = null;
+      cachedFurikaeRecords = null;
       document.querySelectorAll('.school-btn').forEach(btn => {
         const active = btn.dataset.school === school;
         btn.classList.toggle('school-active', active);
@@ -394,11 +397,17 @@
       const endpoint = currentTab === 'taiken' ? '/api/staff/taiken'
                      : currentTab === 'seito'  ? '/api/staff/seito'
                      : '/api/staff/kesseki';
-      const url = `${API}${endpoint}?school=${encodeURIComponent(currentSchool)}`;
+      const url = (currentTab === 'kesseki' || currentTab === 'furikae')
+        ? `${API}${endpoint}?school=${encodeURIComponent(currentSchool)}&tab=${currentTab}`
+        : `${API}${endpoint}?school=${encodeURIComponent(currentSchool)}`;
 
-      // 欠席・振替タブはキャッシュを共用（同じAPIエンドポイントのため）
-      if ((currentTab === 'kesseki' || currentTab === 'furikae') && cachedKessekiRecords) {
+      // 欠席タブ・振替タブはホーム教室／振替先教室で絞り込みが異なるためキャッシュは別々に保持
+      if (currentTab === 'kesseki' && cachedKessekiRecords) {
         renderTable(cachedKessekiRecords);
+        return;
+      }
+      if (currentTab === 'furikae' && cachedFurikaeRecords) {
+        renderTable(cachedFurikaeRecords);
         return;
       }
 
@@ -417,7 +426,8 @@
         if (!data.success) throw new Error(data.error);
 
         if (currentTab === 'seito') cachedSeitoRecords = data.records;
-        if (currentTab === 'kesseki' || currentTab === 'furikae') cachedKessekiRecords = data.records;
+        if (currentTab === 'kesseki') cachedKessekiRecords = data.records;
+        if (currentTab === 'furikae') cachedFurikaeRecords = data.records;
         renderTable(data.records);
       } catch (err) {
         document.getElementById('errorText').textContent =

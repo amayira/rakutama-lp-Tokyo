@@ -1179,14 +1179,19 @@ async function handleStaffSeito(params, env) {
 }
 
 /**
- * GET /api/staff/kesseki?school=all|早宮校|氷川台校|中村校
+ * GET /api/staff/kesseki?school=all|早宮校|氷川台校|中村校&tab=kesseki|furikae
  * Returns 振替管理 (App 14) records where 欠席日 >= TODAY() or 振替受講日 >= TODAY().
+ * 欠席タブ(tab=kesseki)は教室名（ホーム教室）で絞り込み、
+ * 振替タブ(tab=furikae)は振替教室名（振替先教室）で絞り込む
+ * （出席する側の先生が知りたいのは振替先教室のため）。
  * Fields: 生徒番号, 氏, 名, 教室名, 欠席日, 振替受講日, 振替教室名, 振替期日_終_, 時刻
  */
 async function handleStaffKesseki(params, env) {
   const school = params.get("school") ?? "all";
+  const tab = params.get("tab") ?? "kesseki";
+  const schoolField = tab === "furikae" ? "振替教室名" : "教室名";
   const conditions = [`(欠席日 >= TODAY() or 振替受講日 >= TODAY())`];
-  if (school !== "all") conditions.unshift(`教室名 = "${escapeQueryValue(school)}"`);
+  if (school !== "all") conditions.unshift(`${schoolField} = "${escapeQueryValue(school)}"`);
   const query = `${conditions.join(" and ")} order by 欠席日 asc limit 500`;
 
   const data = await kintoneGet(APP.FURIKAE, query, env.TOKEN_FURIKAE);
