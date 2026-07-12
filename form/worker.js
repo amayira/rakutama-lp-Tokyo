@@ -964,20 +964,28 @@ async function handleJugyo(params, env) {
 }
 
 /**
+ * 授業マスタ(App6)に「開講中」クラスが1件以上ある教室名の Set を返す。
+ * 教室マスタに登録済みでも授業が全て休講なら、この Set に含まれない
+ * ＝フォームの教室選択から除外できる。
+ */
+async function fetchActiveClassroomNames(env) {
+  const query = `開講状況 in ("開講中") order by 教室名 asc limit 500`;
+  const data = await kintoneGet(APP.JUGYO, query, env.TOKEN_JUGYO);
+
+  return new Set(
+    (data.records ?? [])
+      .map((rec) => rec["教室名"]?.value ?? "")
+      .filter(Boolean)
+  );
+}
+
+/**
  * GET /api/active-classrooms
  * 授業マスタ(App6)に「開講中」クラスが1件以上ある教室名の一覧を返す。
  * 本部フォームのハードコード教室リストから、閉校（＝開講中クラスなし）を隠す用。
  */
 async function handleActiveClassrooms(env) {
-  const query = `開講状況 in ("開講中") order by 教室名 asc limit 500`;
-  const data = await kintoneGet(APP.JUGYO, query, env.TOKEN_JUGYO);
-
-  const classrooms = [...new Set(
-    (data.records ?? [])
-      .map((rec) => rec["教室名"]?.value ?? "")
-      .filter(Boolean)
-  )];
-
+  const classrooms = [...await fetchActiveClassroomNames(env)];
   return { success: true, classrooms };
 }
 
@@ -989,10 +997,15 @@ async function handleActiveClassrooms(env) {
  */
 async function handleAllClassrooms(env) {
   const query = `開校日 != "" order by レコード番号 asc limit 500`;
-  const data = await kintoneGet(APP.KYOSHITSU, query, env.TOKEN_KYOSHITSU);
+  const [data, activeNames] = await Promise.all([
+    kintoneGet(APP.KYOSHITSU, query, env.TOKEN_KYOSHITSU),
+    fetchActiveClassroomNames(env),
+  ]);
 
   const classrooms = (data.records ?? [])
     .filter((rec) => !String(rec["開校状況"]?.value ?? "").includes("閉"))
+    // 授業マスタに開講中クラスが無い教室（全休講の準備中校など）は出さない
+    .filter((rec) => activeNames.has(rec["教室名"]?.value ?? ""))
     .map((rec) => ({
       name: rec["教室名"]?.value ?? "",
       org: rec["組織選択"]?.value?.[0]?.code ?? "",
@@ -1019,10 +1032,15 @@ async function handleClassrooms(params, env) {
   // 教室マスタは全組織共通（関西等も含む）のため組織選択で絞る。
   // 開校日が未入力の教室（開校日未定の準備中など）はフォームに出さない。
   const query = `組織選択 in ("${escapeQueryValue(orgCode)}") and 開校日 != "" order by レコード番号 asc limit 100`;
-  const data = await kintoneGet(APP.KYOSHITSU, query, env.TOKEN_KYOSHITSU);
+  const [data, activeNames] = await Promise.all([
+    kintoneGet(APP.KYOSHITSU, query, env.TOKEN_KYOSHITSU),
+    fetchActiveClassroomNames(env),
+  ]);
 
   const classrooms = (data.records ?? [])
     .filter((rec) => !String(rec["開校状況"]?.value ?? "").includes("閉"))
+    // 授業マスタに開講中クラスが無い教室（全休講の準備中校など）は出さない
+    .filter((rec) => activeNames.has(rec["教室名"]?.value ?? ""))
     .map((rec) => ({
       name: rec["教室名"]?.value ?? "",
       openDate: rec["開校日"]?.value ?? "",
