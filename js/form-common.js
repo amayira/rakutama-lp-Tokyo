@@ -140,3 +140,42 @@ function setupStudentLookup({ onReset, onSuccess, enableSubmitOnSuccess = true }
     if (e.key === 'Enter') { e.preventDefault(); document.getElementById('lookup-btn').click(); }
   });
 }
+
+// ── 入力途中の離脱ガード（未送信の入力がある状態でページ遷移しようとしたら確認）──
+// 1つでもフォームに入力があると、リロード・タブを閉じる・別ページへの遷移時に
+// ブラウザ標準の確認ダイアログ（「このサイトを離れますか？」）を出す。
+// ※ダイアログの文言はブラウザ仕様で固定のため変更不可。
+// フォーム送信時（サンクスページへのリダイレクト・完了画面表示）はガードを解除する。
+(function setupUnloadGuard() {
+  let allowUnload = false;
+
+  // 何か1つでも初期状態から変更された入力があるか
+  function isDirty() {
+    const fields = document.querySelectorAll('input, select, textarea');
+    for (const el of fields) {
+      if (el.disabled || el.readOnly) continue;
+      const type = (el.type || '').toLowerCase();
+      if (type === 'hidden' || type === 'submit' || type === 'button' || type === 'reset') continue;
+
+      if (type === 'checkbox' || type === 'radio') {
+        if (el.checked !== el.defaultChecked) return true;
+      } else if (el.tagName === 'SELECT') {
+        // プレースホルダ（value=""）以外が選ばれていれば入力あり
+        if (el.value !== '') return true;
+      } else {
+        if (el.value !== el.defaultValue && el.value.trim() !== '') return true;
+      }
+    }
+    return false;
+  }
+
+  window.addEventListener('beforeunload', (e) => {
+    if (allowUnload) return;
+    if (!isDirty()) return;
+    e.preventDefault();
+    e.returnValue = ''; // Chrome等で確認ダイアログを出すために必要
+  });
+
+  // フォーム送信が始まったらガード解除（正規のリダイレクト・完了画面を妨げない）
+  document.addEventListener('submit', () => { allowUnload = true; }, true);
+})();
