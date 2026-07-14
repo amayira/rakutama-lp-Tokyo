@@ -15,6 +15,7 @@ const APP = {
   SEITO_NEW: 19,   // 生徒名簿（新・統合）
   SONOTA: 16,      // その他請求
   KYOSHITSU: 5,    // 教室マスタ
+  FC_LEAD: 20,     // FC説明会リード（加盟店募集サイト）
 };
 
 const ALLOWED_ORIGINS = [
@@ -22,6 +23,9 @@ const ALLOWED_ORIGINS = [
   "https://rakutama-tokyo.com",
   "https://form.rakutama-soroban.com",
   "https://amayira.github.io",
+  "https://fc.rakutama-soroban.com",        // FC加盟店募集サイト（サブドメイン候補1）
+  "https://franchise.rakutama-soroban.com", // FC加盟店募集サイト（サブドメイン候補2）
+  "http://localhost:8930",                  // FC募集サイト ローカル開発用
 ];
 
 // ドメインごとの所属組織コード（kintoneシステム管理→組織のコード）
@@ -1308,6 +1312,34 @@ async function handleStaffStats(env) {
   };
 }
 
+// ─── FC加盟店募集サイト: 説明会リード登録（App 20） ──────────────────────────
+// fc.rakutama-soroban.com のフォームから送信されるリードを App20 に追加する。
+// フィールドコードはフォームの name 属性と1:1（rakutama-fc-site/README.md 参照）。
+
+async function handleFcLead(body, env) {
+  for (const f of ["name", "email", "tel"]) {
+    if (!body[f] || !String(body[f]).trim()) {
+      return { success: false, error: `必須項目が未入力です（${f}）`, status: 400 };
+    }
+  }
+
+  const FIELD_CODES = [
+    "persona", "name", "email", "tel", "status", "experience",
+    "area", "referrer", "message", "page",
+    "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
+  ];
+  const fields = {};
+  for (const code of FIELD_CODES) {
+    const v = body[code];
+    if (v != null && String(v).trim() !== "") {
+      fields[code] = String(v).slice(0, 2000);
+    }
+  }
+
+  const result = await kintonePost(APP.FC_LEAD, buildRecord(fields), env.TOKEN_FC_LEAD);
+  return { success: true, id: result.id };
+}
+
 // ─── Main fetch handler ──────────────────────────────────────────────────────
 
 export default {
@@ -1418,6 +1450,9 @@ export default {
           break;
         case "/api/staff/auth":
           result = await handleStaffAuth(body, env);
+          break;
+        case "/api/fc-lead":
+          result = await handleFcLead(body, env);
           break;
         default:
           return errorResponse("Not Found", 404, origin);
