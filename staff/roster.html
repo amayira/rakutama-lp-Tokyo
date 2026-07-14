@@ -72,8 +72,13 @@
 
     <!-- 名簿種別タブ -->
     <div class="flex border-b border-gray-200 mb-5 bg-white rounded-t-xl overflow-hidden">
-      <button data-tab="taiken"
+      <button data-tab="notice"
         class="tab-btn flex-1 py-3 text-sm text-gray-500 transition tab-active"
+        onclick="switchTab('notice')">
+        お知らせ
+      </button>
+      <button data-tab="taiken"
+        class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
         onclick="switchTab('taiken')">
         体験名簿
       </button>
@@ -99,8 +104,8 @@
       </button>
     </div>
 
-    <!-- 校フィルター（実績タブでは非表示） -->
-    <div id="schoolFilter" class="flex flex-wrap gap-2 mb-5">
+    <!-- 校フィルター（実績・お知らせタブでは非表示） -->
+    <div id="schoolFilter" class="hidden flex flex-wrap gap-2 mb-5">
       <button data-school="all"
         class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary transition school-active"
         onclick="switchSchool('all')">全校</button>
@@ -128,8 +133,8 @@
       </button>
     </div>
 
-    <!-- 件数・更新ボタン（実績タブでは非表示） -->
-    <div id="countBar" class="flex items-center justify-between mb-3">
+    <!-- 件数・更新ボタン（実績・お知らせタブでは非表示） -->
+    <div id="countBar" class="hidden flex items-center justify-between mb-3">
       <p class="text-sm text-gray-500">
         <span id="countLabel">読み込み中…</span>
       </p>
@@ -292,12 +297,54 @@
 
     </div>
 
+    <!-- お知らせパネル -->
+    <div id="noticeArea" class="hidden space-y-4">
+
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-medium">実施中のキャンペーン</span>
+        </div>
+        <h2 class="font-bold text-gray-800 mb-2">お友達紹介キャンペーン</h2>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          在籍生徒からのご紹介で、紹介者・お友達の双方に「31アイスクリーム」ギフト券500円分をプレゼント。さらにお友達は入会金5,500円が無料になります。対象は体験未受講のお友達。期間は2026年7月〜、予告なく終了する場合があります。
+        </p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-medium">実施中のキャンペーン</span>
+        </div>
+        <h2 class="font-bold text-gray-800 mb-2">選べる特典</h2>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          入会金5,500円について、「入会金無料」または「2回目無料体験（55分）」のどちらかを選べます（初回体験当日のお申込みが条件）。今後、全校が対象になります。
+        </p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">大会</span>
+        </div>
+        <h2 class="font-bold text-gray-800 mb-2">らくたまカップ開催概要</h2>
+        <p class="text-sm text-gray-600 leading-relaxed mb-3">
+          年2回（8月・12月）開催のそろばん大会です。8/16（日）に問題配信、8/17（月）〜8/22（土）が本番計測期間。対象は珠算7級以上の在籍生徒（開催月の前後1か月在籍）。教室コースとオンラインコースがあります。講師は本番計測期間中に計測・採点を行い、結果を成績一覧表テンプレートに記入してください。総合成績上位3名にはトロフィー、上位10名と学年別上位3名には賞状が贈られます。
+        </p>
+        <a href="https://rakutama-soroban.com/20260714cup" target="_blank" rel="noopener"
+          class="inline-flex items-center gap-1 text-sm text-primary font-medium hover:underline">
+          詳しい開催概要を見る
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+
   </main>
 
   <script>
     const API = 'https://rakutama-kintone.k-ariyama.workers.dev';
 
-    let currentTab = 'taiken';
+    let currentTab = 'notice';
     let currentSchool = 'all';
     let staffKey = '';
     let seitoView = 'grid'; // 'grid' or 'list'
@@ -336,12 +383,17 @@
       });
       const isStats = tab === 'stats';
       const isSeito = tab === 'seito';
-      document.getElementById('schoolFilter').classList.toggle('hidden', isStats || isSeito);
-      document.getElementById('countBar').classList.toggle('hidden', isStats);
+      const isNotice = tab === 'notice';
+      document.getElementById('schoolFilter').classList.toggle('hidden', isStats || isSeito || isNotice);
+      document.getElementById('countBar').classList.toggle('hidden', isStats || isNotice);
       document.getElementById('seitoViewToggle').classList.toggle('hidden', !isSeito);
       // 欠席・振替タブのキャッシュをクリア
       cachedKessekiRecords = null;
       cachedFurikaeRecords = null;
+      if (isNotice) {
+        showState('notice');
+        return;
+      }
       loadData();
     }
 
@@ -753,6 +805,7 @@
       document.getElementById('gridArea').classList.toggle('hidden', state !== 'grid');
       document.getElementById('emptyArea').classList.toggle('hidden', state !== 'empty');
       document.getElementById('statsArea').classList.toggle('hidden', state !== 'stats');
+      document.getElementById('noticeArea').classList.toggle('hidden', state !== 'notice');
       if (state === 'loading') {
         document.getElementById('countLabel').textContent = '読み込み中…';
       }
@@ -798,7 +851,7 @@
     }
 
     // ── 初回ロード ────────────────────────────────────────────────
-    loadData();
+    showState('notice');
   </script>
 </body>
 </html>
