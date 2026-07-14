@@ -68,9 +68,9 @@
   <script>
     const API = 'https://rakutama-kintone.k-ariyama.workers.dev';
 
-    // すでにログイン済みなら名簿ページへ
+    // すでにログイン済みならお知らせページへ
     if (sessionStorage.getItem('staffKey')) {
-      location.href = 'roster.html';
+      location.href = 'notice.html';
     }
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -93,7 +93,7 @@
 
         if (data.success) {
           sessionStorage.setItem('staffKey', password);
-          location.href = 'roster.html';
+          location.href = 'notice.html';
         } else {
           errMsg.classList.remove('hidden');
           btn.disabled = false;
