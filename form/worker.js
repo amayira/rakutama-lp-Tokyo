@@ -1231,12 +1231,22 @@ async function handleStaffKesseki(params, env) {
   return { success: true, records };
 }
 
-const BREAKEVEN_TOTAL = 30; // 全社黒字化ライン（生徒数）
+/**
+ * 指定日時点で在籍中とみなせるか（作成日時が対象日以前 かつ 退会日が空または対象日以降）
+ */
+function isActiveAt(rec, dateStr) {
+  const created = (rec["作成日時"]?.value ?? "").slice(0, 10);
+  if (created && created > dateStr) return false;
+  const withdrawn = rec["退会日"]?.value ?? "";
+  if (withdrawn && withdrawn < dateStr) return false;
+  return true;
+}
 
 /**
  * GET /api/staff/stats
  * Returns KPI stats:
  *   - seito_count: { total, 早宮校, 氷川台校, 中村校 }
+ *   - prev_month_total: 前月末時点の在籍数（作成日時・退会日から都度算出。スナップショット不要）
  *   - monthly: [ { month: "2026-06", 全体: {taiken, nyukai}, 早宮校: {...}, ... } ]
  */
 async function handleStaffStats(env) {
@@ -1247,17 +1257,27 @@ async function handleStaffStats(env) {
   const taikenData = await kintoneGet(APP.TAIKEN, taikenQuery, env.TOKEN_TAIKEN);
   const taikenRecs = (taikenData.records ?? []).filter(r => !(r["出欠"]?.value ?? []).includes("欠席"));
 
-  // 在籍生徒（退会していないもの全件）
-  const seitoQuery = `所属組織 in ("アルファーブレイン") and (退会日 = "" or 退会日 >= TODAY()) order by 生徒番号 asc limit 500`;
+  // 前月末の日付（YYYY-MM-DD）。前月末時点の在籍数もここから復元するので、
+  // 前月末以降に退会したレコードまでは取得しておく
+  const todayStr = tokyoToday();
+  const [ty, tm] = todayStr.split("-").map(Number);
+  const prevMonthYear = tm === 1 ? ty - 1 : ty;
+  const prevMonth = tm === 1 ? 12 : tm - 1;
+  const prevMonthEndStr = `${prevMonthYear}-${String(prevMonth).padStart(2, "0")}-${String(lastDayOfMonth(prevMonthYear, prevMonth)).padStart(2, "0")}`;
+
+  // 在籍生徒（前月末以降に退会したものを含む＝現在と前月末の両方の在籍判定に使う）
+  const seitoQuery = `所属組織 in ("アルファーブレイン") and (退会日 = "" or 退会日 >= "${prevMonthEndStr}") order by 生徒番号 asc limit 500`;
   const seitoData = await kintoneGet(APP.SEITO_NEW, seitoQuery, env.TOKEN_SEITO_NEW);
   const seitoRecs = seitoData.records ?? [];
 
   // ── 生徒数集計（生徒番号に"-"を含むサブ番号レコードは除外）──────────────
   const countableRecs = seitoRecs.filter(r => !String(r["生徒番号"]?.value ?? "").includes("-"));
-  const seitoCount = { total: countableRecs.length };
+  const activeNow = countableRecs.filter(r => isActiveAt(r, todayStr));
+  const seitoCount = { total: activeNow.length };
   for (const school of SCHOOLS) {
-    seitoCount[school] = countableRecs.filter(r => r["教室名"]?.value === school).length;
+    seitoCount[school] = activeNow.filter(r => r["教室名"]?.value === school).length;
   }
+  const prevMonthTotal = countableRecs.filter(r => isActiveAt(r, prevMonthEndStr)).length;
 
   // ── 月別集計 ────────────────────────────────────────────────────
   // 体験: 2回目を除く（反響媒体に「2回目」を含まない）
@@ -1307,7 +1327,7 @@ async function handleStaffStats(env) {
   return {
     success: true,
     seito_count: seitoCount,
-    breakeven: BREAKEVEN_TOTAL,
+    prev_month_total: prevMonthTotal,
     monthly,
   };
 }

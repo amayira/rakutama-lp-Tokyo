@@ -210,17 +210,7 @@
             <p class="text-3xl font-bold text-gray-800" id="st-total">—</p>
             <p class="text-sm text-gray-400 mb-0.5">名</p>
           </div>
-          <div id="st-breakeven-msg" class="mt-1 text-xs font-medium"></div>
-          <!-- 黒字化進捗バー -->
-          <div class="mt-3">
-            <div class="flex justify-between text-xs text-gray-400 mb-1">
-              <span>黒字化まで</span>
-              <span id="st-breakeven-label">— / —名</span>
-            </div>
-            <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-              <div id="st-progress-bar" class="h-2 rounded-full transition-all duration-700 bg-green-500" style="width:0%"></div>
-            </div>
-          </div>
+          <div id="st-trend" class="mt-1 text-xs font-medium"></div>
         </div>
         <div class="bg-white rounded-2xl shadow-sm p-4">
           <p class="text-xs mb-1" style="color:#3b82f6">早宮校</p>
@@ -780,8 +770,8 @@
           </tr>`).join('');
 
       } else {
-        // 振替タブ：振替受講日が確定しているものだけ表示
-        const furikaeRecords = records.filter(r => r.振替受講日);
+        // 振替タブ：振替受講日が確定していて、かつ今日以降のものだけ表示
+        const furikaeRecords = records.filter(r => r.振替受講日 && r.振替受講日 >= todayISO());
         if (furikaeRecords.length === 0) {
           document.getElementById('countLabel').textContent = '0件';
           showState('empty');
@@ -824,28 +814,25 @@
 
     // ── 実績描画 ──────────────────────────────────────────────────
     function renderStats(data) {
-      const { seito_count, breakeven, monthly } = data;
+      const { seito_count, prev_month_total, monthly } = data;
 
       document.getElementById('st-total').textContent = seito_count.total;
       document.getElementById('st-hayamiya').textContent = seito_count['早宮校'] ?? 0;
       document.getElementById('st-hikawadai').textContent = seito_count['氷川台校'] ?? 0;
       document.getElementById('st-nakamura').textContent = seito_count['中村校'] ?? 0;
 
-      // 黒字化進捗バー
-      const remaining = breakeven - seito_count.total;
-      const pct = Math.min(100, Math.round(seito_count.total / breakeven * 100));
-      const bar = document.getElementById('st-progress-bar');
-      bar.style.width = pct + '%';
-      bar.className = 'h-2 rounded-full transition-all duration-700 ' + (remaining <= 0 ? 'bg-green-500' : 'bg-primary');
-      document.getElementById('st-breakeven-label').textContent = `${seito_count.total} / ${breakeven}名`;
-
-      const msg = document.getElementById('st-breakeven-msg');
-      if (remaining <= 0) {
-        msg.textContent = '🎉 黒字化達成！';
-        msg.className = 'mt-1 text-xs font-medium text-green-600';
+      // 先月末比
+      const trend = document.getElementById('st-trend');
+      const diff = seito_count.total - (prev_month_total ?? seito_count.total);
+      if (diff > 0) {
+        trend.textContent = `▲ 先月末比 +${diff}名`;
+        trend.className = 'mt-1 text-xs font-medium text-green-600';
+      } else if (diff < 0) {
+        trend.textContent = `▼ 先月末比 ${diff}名`;
+        trend.className = 'mt-1 text-xs font-medium text-red-500';
       } else {
-        msg.textContent = `あと ${remaining} 名で黒字化`;
-        msg.className = 'mt-1 text-xs font-medium text-orange-500';
+        trend.textContent = '先月末比 ±0名';
+        trend.className = 'mt-1 text-xs font-medium text-gray-400';
       }
 
       // 推移グラフ
@@ -1009,6 +996,13 @@
     function formatDate(val) {
       if (!val) return '―';
       return val.replace(/-/g, '/');
+    }
+
+    function todayISO() {
+      const d = new Date();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${d.getFullYear()}-${m}-${day}`;
     }
 
     const DAY_NAMES = ['日', '月', '火', '水', '木', '金', '土'];
