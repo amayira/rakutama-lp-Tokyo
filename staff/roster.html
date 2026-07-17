@@ -172,6 +172,18 @@
       </table>
     </div>
 
+    <!-- グリッド稼働率サマリー（在籍生徒） -->
+    <div id="gridSummary" class="hidden space-y-3 mb-4">
+      <div>
+        <p class="text-xs font-bold text-gray-500 mb-1.5">時間帯別稼働率</p>
+        <div id="gridSummaryTime" class="grid grid-cols-2 gap-2"></div>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-gray-500 mb-1.5">教室別稼働率</p>
+        <div id="gridSummarySchool" class="grid grid-cols-3 gap-2"></div>
+      </div>
+    </div>
+
     <!-- グリッドビュー（在籍生徒） -->
     <div id="gridArea" class="hidden overflow-x-auto rounded-xl shadow-sm">
       <table class="grid-table" id="gridTable">
@@ -1005,16 +1017,61 @@
             return `<td><div class="grid-cell">${badge}${cards}</div></td>`;
           }).join('')}
         </tr>`).join('');
+
+      // 時間帯別・教室別の稼働率サマリー
+      const schools = [...new Set(GRID_COLS.map(c => c.school))];
+      const timeTotals = {};
+      const schoolTotals = {};
+      for (const t of GRID_TIMES) timeTotals[t] = 0;
+      for (const s of schools) schoolTotals[s] = 0;
+
+      for (const col of GRID_COLS) {
+        for (const t of GRID_TIMES) {
+          const count = grid[col.school]?.[col.day]?.[t]?.length ?? 0;
+          timeTotals[t] += count;
+          schoolTotals[col.school] += count;
+        }
+      }
+
+      const timeCapacity = GRID_COLS.length * KOMA_CAPACITY;
+      const schoolCapacity = school =>
+        GRID_COLS.filter(c => c.school === school).length * GRID_TIMES.length * KOMA_CAPACITY;
+
+      document.getElementById('gridSummaryTime').innerHTML = GRID_TIMES.map(t =>
+        occupancySummaryCard(`${t}時クラス`, timeTotals[t], timeCapacity)
+      ).join('');
+
+      document.getElementById('gridSummarySchool').innerHTML = schools.map(s =>
+        occupancySummaryCard(s, schoolTotals[s], schoolCapacity(s))
+      ).join('');
     }
 
-    // コマの稼働率バッジ（定員12名・低いと赤系、高いと緑系のカラースケール）
+    // 稼働率の色スケール（低いと赤系、高いと緑系）
+    function occupancyColor(count, capacity) {
+      const hue = Math.min(count / capacity, 1) * 120; // 0=赤 → 120=緑
+      return {
+        bg: `hsl(${hue}, 65%, 93%)`,
+        border: `hsl(${hue}, 45%, 72%)`,
+        text: `hsl(${hue}, 65%, 30%)`,
+      };
+    }
+
+    // コマの稼働率バッジ（定員12名・グリッドセル内に表示する小型版）
     function komaOccupancyBadge(count) {
       const rate = Math.round(count / KOMA_CAPACITY * 100);
-      const hue = Math.min(count / KOMA_CAPACITY, 1) * 120; // 0=赤 → 120=緑
-      const bg = `hsl(${hue}, 65%, 93%)`;
-      const border = `hsl(${hue}, 45%, 72%)`;
-      const text = `hsl(${hue}, 65%, 30%)`;
-      return `<div class="koma-occupancy" style="background:${bg};border-color:${border};color:${text};">${count}/${KOMA_CAPACITY}（${rate}%）</div>`;
+      const c = occupancyColor(count, KOMA_CAPACITY);
+      return `<div class="koma-occupancy" style="background:${c.bg};border-color:${c.border};color:${c.text};">${count}/${KOMA_CAPACITY}（${rate}%）</div>`;
+    }
+
+    // 時間帯別・教室別サマリーカード
+    function occupancySummaryCard(label, count, capacity) {
+      const rate = Math.round(count / capacity * 100);
+      const c = occupancyColor(count, capacity);
+      return `<div class="rounded-xl border px-3 py-2 text-center" style="background:${c.bg};border-color:${c.border};">
+        <p class="text-xs font-medium" style="color:${c.text}">${label}</p>
+        <p class="text-lg font-bold" style="color:${c.text}">${rate}%</p>
+        <p class="text-[0.68rem] text-gray-500">${count}/${capacity}名</p>
+      </div>`;
     }
 
     // ── UI ヘルパー ───────────────────────────────────────────────
@@ -1023,6 +1080,7 @@
       document.getElementById('errorArea').classList.toggle('hidden', state !== 'error');
       document.getElementById('tableArea').classList.toggle('hidden', state !== 'table');
       document.getElementById('gridArea').classList.toggle('hidden', state !== 'grid');
+      document.getElementById('gridSummary').classList.toggle('hidden', state !== 'grid');
       document.getElementById('emptyArea').classList.toggle('hidden', state !== 'empty');
       document.getElementById('statsArea').classList.toggle('hidden', state !== 'stats');
       document.getElementById('noticeArea').classList.toggle('hidden', state !== 'notice');
