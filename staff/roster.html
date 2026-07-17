@@ -274,6 +274,33 @@
         <div id="statsEmpty" class="hidden text-center py-10 text-gray-400 text-sm">データがありません</div>
       </div>
 
+      <!-- コマ別稼働率 -->
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+        <div class="px-4 pt-4 pb-2 flex items-center justify-between">
+          <p class="text-sm font-bold text-gray-700">コマ別稼働率</p>
+          <p class="text-xs text-gray-400">在籍数 ÷ 定員12名</p>
+        </div>
+        <table class="grid-table" id="komaStatsTable">
+          <thead>
+            <tr>
+              <th class="grid-th-time" rowspan="2"></th>
+              <th class="grid-th-school" colspan="2">早宮校</th>
+              <th class="grid-th-school" colspan="2">氷川台校</th>
+              <th class="grid-th-school" colspan="2">中村校</th>
+            </tr>
+            <tr>
+              <th class="grid-th-day">火</th>
+              <th class="grid-th-day">金</th>
+              <th class="grid-th-day">月</th>
+              <th class="grid-th-day">水</th>
+              <th class="grid-th-day">月</th>
+              <th class="grid-th-day">木</th>
+            </tr>
+          </thead>
+          <tbody id="komaStatsBody"></tbody>
+        </table>
+      </div>
+
       <!-- 更新ボタン -->
       <div class="text-right">
         <button onclick="loadData()" class="text-sm text-primary hover:text-[#3a86a0] flex items-center gap-1 transition ml-auto">
@@ -546,6 +573,7 @@
       { school: '中村校',  day: '木' },
     ];
     const GRID_TIMES = ['16', '17'];
+    const KOMA_CAPACITY = 12;
 
     // ── 認証チェック ──────────────────────────────────────────────
     staffKey = sessionStorage.getItem('staffKey');
@@ -616,13 +644,18 @@
 
       if (currentTab === 'stats') {
         try {
-          const res = await fetch(`${API}/api/staff/stats`, {
-            headers: { 'Authorization': `Bearer ${staffKey}` },
-          });
-          if (res.status === 401) { sessionStorage.removeItem('staffKey'); location.href = 'index.html'; return; }
-          const data = await res.json();
+          const [statsRes, seitoRes] = await Promise.all([
+            fetch(`${API}/api/staff/stats`, { headers: { 'Authorization': `Bearer ${staffKey}` } }),
+            fetch(`${API}/api/staff/seito?school=all`, { headers: { 'Authorization': `Bearer ${staffKey}` } }),
+          ]);
+          if (statsRes.status === 401 || seitoRes.status === 401) {
+            sessionStorage.removeItem('staffKey'); location.href = 'index.html'; return;
+          }
+          const data = await statsRes.json();
           if (!data.success) throw new Error(data.error);
-          renderStats(data);
+          const seitoData = await seitoRes.json();
+          if (!seitoData.success) throw new Error(seitoData.error);
+          renderStats(data, seitoData.records);
         } catch (err) {
           document.getElementById('errorText').textContent =
             'データの取得に失敗しました: ' + (err.message || '不明なエラー');
@@ -817,7 +850,7 @@
     }
 
     // ── 実績描画 ──────────────────────────────────────────────────
-    function renderStats(data) {
+    function renderStats(data, seitoRecords) {
       const { seito_count, prev_month_total, monthly } = data;
 
       document.getElementById('st-total').textContent = seito_count.total;
@@ -891,6 +924,44 @@
 
         tbody.innerHTML = cumulativeRow + monthlyRows;
       }
+
+      // コマ別稼働率（定員12名 / コマ）
+      const komaCount = {};
+      for (const col of GRID_COLS) {
+        if (!komaCount[col.school]) komaCount[col.school] = {};
+        komaCount[col.school][col.day] = {};
+        for (const t of GRID_TIMES) komaCount[col.school][col.day][t] = 0;
+      }
+      // サブ番号レコード（同一生徒の重複）は在籍生徒タブと同様に除外
+      const komaRecords = (seitoRecords || []).filter(r => !String(r.生徒番号 || '').includes('-'));
+      for (const r of komaRecords) {
+        const school = r.教室名;
+        if (!komaCount[school]) continue;
+        const komas = [r.コマ1, r.コマ2, r.コマ3, r.コマ4, r.コマ5].filter(Boolean);
+        for (const koma of komas) {
+          const day = koma.charAt(0);
+          const time = koma.slice(1);
+          if (komaCount[school][day] && komaCount[school][day][time] !== undefined) {
+            komaCount[school][day][time]++;
+          }
+        }
+      }
+
+      document.getElementById('komaStatsBody').innerHTML = GRID_TIMES.map(time => `
+        <tr>
+          <th class="grid-th-time">${time}</th>
+          ${GRID_COLS.map(col => {
+            const count = komaCount[col.school]?.[col.day]?.[time] ?? 0;
+            const rate = Math.round(count / KOMA_CAPACITY * 100);
+            const color = count >= KOMA_CAPACITY ? 'text-red-600 font-bold'
+              : count >= KOMA_CAPACITY * 0.75 ? 'text-amber-600 font-bold'
+              : 'text-gray-700';
+            return `<td class="text-center py-2">
+              <span class="${color}">${rate}%</span>
+              <span class="block text-[0.68rem] text-gray-400">${count}/${KOMA_CAPACITY}</span>
+            </td>`;
+          }).join('')}
+        </tr>`).join('');
 
       showState('stats');
     }
