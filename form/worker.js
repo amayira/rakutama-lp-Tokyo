@@ -721,6 +721,40 @@ async function handleFurikaeTickets(params, env) {
 }
 
 /**
+ * GET /api/furikae-status?studentNumber=A0000
+ * Returns not-yet-consumed 振替 records for the student:
+ *   - 振替受講日が未確定（=""）かつ振替期日_終_が本日以降のもの、または
+ *   - 振替受講日が確定していて、その受講日がまだ本日以降のもの（受講済みは除外）
+ * 保護者向け「振替取得状況」照会用。
+ */
+async function handleFurikaeStatus(params, env) {
+  const studentNumber = params.get("studentNumber");
+  if (!studentNumber) {
+    return { success: false, error: "studentNumber は必須です", status: 400 };
+  }
+
+  const sn = escapeQueryValue(studentNumber);
+  const conditions = [
+    `(生徒番号 = "${sn}" or 生徒番号 like "${sn}-%")`,
+    `((振替受講日 = "" and 振替期日_終_ >= TODAY()) or 振替受講日 >= TODAY())`,
+  ].join(" and ");
+  const query = `${conditions} order by 欠席日 asc limit 50`;
+
+  const data = await kintoneGet(APP.FURIKAE, query, env.TOKEN_FURIKAE);
+
+  const records = (data.records ?? []).map(rec => ({
+    欠席日: rec["欠席日"]?.value ?? "",
+    振替期日_始_: rec["振替期日_始_"]?.value ?? "",
+    振替期日_終_: rec["振替期日_終_"]?.value ?? "",
+    振替受講日: rec["振替受講日"]?.value ?? "",
+    振替教室名: rec["振替教室名"]?.value ?? "",
+    時刻: rec["時刻"]?.value ?? "",
+  }));
+
+  return { success: true, records };
+}
+
+/**
  * POST /api/furikae
  * Updates an existing App 14 record (ticket) with the substitute lesson date/time.
  */
@@ -1393,6 +1427,8 @@ export default {
           result = await handleGakuhi(params, env);
         } else if (path === "/api/furikae-tickets") {
           result = await handleFurikaeTickets(params, env);
+        } else if (path === "/api/furikae-status") {
+          result = await handleFurikaeStatus(params, env);
         } else if (path === "/api/absence-count") {
           result = await handleAbsenceCount(params, env);
         } else if (path === "/api/staff/taiken") {

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="https://rakutama-tokyo.com/Pictures/favicon.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href="https://rakutama-tokyo.com/form/furikae-status.html">
+  <title>振替取得状況の確認 | 楽珠そろばん教室</title>
+  <link rel="stylesheet" href="/tailwind.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body { font-family: 'Noto Sans JP', sans-serif; background-color: #F7FBFA; }
+    .font-display { font-family: 'Zen Kaku Gothic New', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#F7FBFA]">
+
+  <!-- Sticky Header -->
+  <header class="sticky top-0 z-50 bg-white shadow-sm">
+    <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="https://rakutama-tokyo.com/">
+        <img src="https://rakutama-tokyo.com/Pictures/title.png" alt="楽珠そろばん教室" class="h-10 object-contain" />
+      </a>
+      <span class="hidden md:block text-sm font-medium text-gray-600">楽珠そろばん教室 各種申込フォーム</span>
+    </div>
+  </header>
+
+  <main class="max-w-2xl mx-auto px-4 py-8">
+
+    <a href="index" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6 transition">
+      <i class="fa-solid fa-arrow-left text-xs"></i>
+      トップに戻る
+    </a>
+
+    <div id="form-card" class="bg-white rounded-2xl shadow-md p-6 md:p-8">
+      <div class="mb-6">
+        <h1 class="text-xl font-black text-gray-800 font-display mb-2">振替取得状況の確認</h1>
+        <p class="text-sm text-gray-500">生徒番号を入力すると、現在有効な振替（期限内で未消化のもの）の一覧を確認できます。</p>
+      </div>
+
+      <div id="error-box" class="hidden mb-4 bg-red-50 border border-red-300 text-red-700 rounded-xl px-4 py-3 text-sm"></div>
+
+      <!-- Student Lookup -->
+      <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+        <label class="block text-sm font-medium text-gray-700 mb-2">生徒番号</label>
+        <div class="flex gap-2">
+          <input type="text" id="student-number" placeholder="例：A0000"
+            class="min-w-0 flex-1 border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
+          <button type="button" id="lookup-btn"
+            class="flex-shrink-0 border-2 border-green-500 text-green-600 font-bold text-sm px-4 py-2 rounded-lg hover:bg-green-50 transition font-display flex items-center gap-2">
+            <span id="lookup-text">検索</span>
+            <i id="lookup-spinner" class="fa-solid fa-spinner fa-spin hidden text-xs"></i>
+          </button>
+        </div>
+        <div id="lookup-error" class="hidden mt-2 text-xs text-red-600"></div>
+        <div id="student-info" class="hidden mt-3 bg-white border border-green-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <i class="fa-solid fa-circle-check text-green-500 text-sm"></i>
+            <span class="text-xs font-bold text-green-600">生徒情報が見つかりました</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-gray-50 rounded-lg p-2">
+              <div class="text-xs text-gray-400 mb-0.5">教室名</div>
+              <div id="info-classroom" class="text-sm font-medium text-gray-800"></div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-2">
+              <div class="text-xs text-gray-400 mb-0.5">受講中クラス</div>
+              <div id="info-jugyo" class="text-sm font-medium text-gray-800"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- form-common.js の setupStudentLookup が参照する共通DOM ID（このページでは非表示） -->
+      <button type="button" id="submit-btn" class="hidden" disabled></button>
+      <p id="submit-hint" class="hidden"></p>
+
+      <!-- Status List -->
+      <div id="status-section" class="hidden">
+        <div class="mb-3">
+          <span class="text-xs font-black border-2 border-[#4A96AE] text-[#4A96AE] rounded-full px-4 py-1 font-display">振替取得状況</span>
+        </div>
+        <div id="status-loading" class="hidden text-center py-6 text-sm text-gray-400">
+          <i class="fa-solid fa-spinner fa-spin mr-2"></i>読み込み中...
+        </div>
+        <div id="status-empty" class="hidden text-center py-6 text-sm text-gray-400">
+          現在、有効な振替はありません。
+        </div>
+        <div id="status-error" class="hidden text-center py-6 text-sm text-red-500"></div>
+        <div id="status-list" class="flex flex-col gap-3"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="text-center py-8 text-xs text-gray-400">
+    <p>&copy; 2026 Alpha-Brain LLC.</p>
+  </footer>
+
+  <script src="/js/form-common.js"></script>
+  <script>
+    // 週2コース：メインの生徒番号（"-"より前）を返す
+    function baseStudentNumber(num) {
+      return String(num).split('-')[0];
+    }
+
+    function fmtDate(ymd) {
+      if (!ymd) return '';
+      const [y, m, d] = ymd.split('-');
+      return `${y}年${parseInt(m)}月${parseInt(d)}日`;
+    }
+
+    function fmtTime(hms) {
+      if (!hms) return '';
+      return hms.slice(0, 5);
+    }
+
+    let statusReqId = 0;
+
+    async function loadFurikaeStatus() {
+      const myId = ++statusReqId;
+      const section = document.getElementById('status-section');
+      const loading = document.getElementById('status-loading');
+      const empty = document.getElementById('status-empty');
+      const errorBox = document.getElementById('status-error');
+      const list = document.getElementById('status-list');
+
+      section.classList.remove('hidden');
+      loading.classList.remove('hidden');
+      empty.classList.add('hidden');
+      errorBox.classList.add('hidden');
+      list.innerHTML = '';
+
+      const studentNumber = baseStudentNumber(document.getElementById('student-number').value.trim());
+
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/furikae-status?studentNumber=${encodeURIComponent(studentNumber)}`
+        );
+        const data = await res.json();
+        if (myId !== statusReqId) return;
+
+        if (!res.ok || !data.success) throw new Error(data.error || '振替状況の取得に失敗しました');
+
+        if (data.records.length === 0) {
+          empty.classList.remove('hidden');
+        } else {
+          data.records.forEach(r => {
+            const confirmed = !!r['振替受講日'];
+            const card = document.createElement('div');
+            card.className = 'border border-gray-200 rounded-xl p-4';
+            card.innerHTML = `
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs text-gray-400">欠席日：${fmtDate(r['欠席日'])}</span>
+                <span class="text-xs font-bold px-3 py-1 rounded-full ${confirmed ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}">
+                  ${confirmed ? '受講日確定済み' : '受講日未定'}
+                </span>
+              </div>
+              ${confirmed ? `
+                <div class="text-sm text-gray-800 font-medium">${fmtDate(r['振替受講日'])} ${r['振替教室名'] || ''}${r['時刻'] ? '　' + fmtTime(r['時刻']) + '〜' : ''}</div>
+              ` : `
+                <div class="text-xs text-gray-400">振替取得期限：${fmtDate(r['振替期日_始_'])}〜${fmtDate(r['振替期日_終_'])}</div>
+              `}
+            `;
+            list.appendChild(card);
+          });
+        }
+      } catch (err) {
+        if (myId !== statusReqId) return;
+        errorBox.textContent = err.message || '振替状況の取得中にエラーが発生しました。';
+        errorBox.classList.remove('hidden');
+      } finally {
+        if (myId === statusReqId) loading.classList.add('hidden');
+      }
+    }
+
+    setupStudentLookup({
+      enableSubmitOnSuccess: false,
+      onReset: () => {
+        document.getElementById('status-section').classList.add('hidden');
+        document.getElementById('status-list').innerHTML = '';
+        statusReqId++;
+      },
+      onSuccess: async () => {
+        await loadFurikaeStatus();
+      },
+    });
+  </script>
+</body>
+</html>
