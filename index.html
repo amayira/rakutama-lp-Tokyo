@@ -302,16 +302,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 
-    <!-- Wave（ヒーロー画像から下の青セクションへ直接つなぐ） -->
+    <!-- Wave（ヒーロー画像を白い波で締める） -->
     <svg class="wave-bottom" viewBox="0 0 1440 72" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-        <path d="M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,72 L0,72 Z" fill="#4A96AE"/>
+        <path d="M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,72 L0,72 Z" fill="#ffffff"/>
     </svg>
+</section>
+
+
+<!-- ========== お知らせ ========== -->
+<section class="bg-white pt-4 pb-10">
+    <div class="max-w-4xl mx-auto px-5">
+        <div class="bg-base border-2 border-accent rounded-2xl p-5 flex flex-col sm:flex-row sm:items-start gap-4">
+            <div class="shrink-0">
+                <span class="inline-block bg-primary text-white text-xs font-black px-3 py-1 rounded-full">お知らせ</span>
+            </div>
+            <ul class="flex-1 text-sm space-y-2">
+                <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                    <span class="text-gray-400 font-number text-xs shrink-0">2026.06</span>
+                    <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded shrink-0">校舎</span>
+                    <span class="text-gray-700">早宮校・氷川台校・中村校の3校がオープンしました</span>
+                </li>
+                <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                    <span class="text-gray-400 font-number text-xs shrink-0">2026.09予定</span>
+                    <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded shrink-0">校舎</span>
+                    <span class="text-gray-700">平和台校・東武練馬校の2校がオープン予定です</span>
+                </li>
+            </ul>
+        </div>
+    </div>
 </section>
 
 
 <!-- ========== 3つの非認知能力 ========== -->
 <section style="background:#4A96AE;" class="pt-0 pb-0 relative">
-    <div class="max-w-5xl mx-auto px-5 pt-8 pb-10 relative z-10">
+    <!-- 白から青へ立ち上がる波（ヒーローと青セクションの間にくびれを作る） -->
+    <div style="background:#ffffff; line-height:0; margin-bottom:-1px;">
+        <svg viewBox="0 0 1440 40" preserveAspectRatio="none" style="width:100%; height:40px; display:block;">
+            <path d="M0,40 C360,0 1080,40 1440,8 L1440,40 L0,40 Z" fill="#4A96AE"/>
+        </svg>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-5 pt-6 pb-10 relative z-10">
         <div class="mb-8 fade-in">
             <div style="display:flex; flex-direction:column; align-items:flex-start; gap:8px;">
                 <div style="background:#fff; padding:8px 16px; box-shadow:0 4px 12px rgba(0,0,0,0.18); display:inline-block;">
@@ -390,12 +421,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 
-<!-- ========== 3教室 ========== -->
+<!-- ========== 5教室 ========== -->
 <section class="bg-[#FFF9E6] pt-8 pb-0">
     <div class="max-w-5xl mx-auto px-5 pb-16">
         <div class="text-center mb-10 fade-in">
-            <span class="sec-title yellow">3つの教室</span>
-            <h2 class="font-display text-3xl md:text-4xl font-black text-gray-800 mt-6">練馬区に<span class="text-secondary">3教室</span>展開</h2>
+            <span class="sec-title yellow">5つの教室</span>
+            <h2 class="font-display text-3xl md:text-4xl font-black text-gray-800 mt-6">練馬区に<span class="text-secondary">5教室</span>展開</h2>
             <p class="text-gray-500 text-sm mt-2">お住まいのエリアに合わせてお選びいただけます</p>
         </div>
 
@@ -477,6 +508,62 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </a>
                 <div class="px-4 pb-4">
                     <a href="https://maps.app.goo.gl/msYrURtLYijKrhFw8" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs text-primary font-bold border border-primary rounded-full px-3 py-1 hover:bg-primary hover:text-white transition-colors">
+                        <i class="fas fa-map-marked-alt"></i>Googleマップで見る
+                    </a>
+                </div>
+            </div>
+
+            <!-- 平和台（9月開校予定） -->
+            <div class="classroom-card bg-white rounded-2xl overflow-hidden border-2 border-secondary">
+                <a href="access#heiwadai" class="block">
+                <div class="relative h-44 overflow-hidden">
+                    <img loading="lazy" decoding="async" src="Pictures/heiwadai_outside.webp" alt="平和台校 外観" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
+                    <div class="absolute top-3 left-3 flex gap-1">
+                        <span class="bg-secondary text-white text-xs font-black px-2 py-0.5 rounded-full">9月開校</span>
+                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">月</span>
+                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">木</span>
+                    </div>
+                    <div class="absolute bottom-3 left-4 text-white font-display font-black text-xl drop-shadow">平和台校</div>
+                </div>
+                <div class="p-4">
+                    <p class="text-xs text-gray-500 leading-relaxed mb-1">
+                        <i class="fa-solid fa-map-pin mr-1 text-primary"></i>練馬区平和台１丁目３９−１４ 第三マルキマンション内
+                    </p>
+                    <p class="text-xs text-gray-400 mb-2"><i class="fa-solid fa-train mr-1"></i>平和台駅 徒歩17分</p>
+                    <p class="text-xs text-gray-500 leading-relaxed">住宅街の中で落ち着いて通える教室。駐輪スペースも確保しているので自転車での送り迎えも安心です。</p>
+                </div>
+                </a>
+                <div class="px-4 pb-4">
+                    <a href="https://www.google.com/maps/search/?api=1&query=%E7%B7%B4%E9%A6%AC%E5%8C%BA%E5%B9%B3%E5%92%8C%E5%8F%B0%EF%BC%91%E4%B8%81%E7%9B%AE%EF%BC%93%EF%BC%99%EF%BC%8D%EF%BC%91%EF%BC%94" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs text-primary font-bold border border-primary rounded-full px-3 py-1 hover:bg-primary hover:text-white transition-colors">
+                        <i class="fas fa-map-marked-alt"></i>Googleマップで見る
+                    </a>
+                </div>
+            </div>
+
+            <!-- 東武練馬（9月開校予定） -->
+            <div class="classroom-card bg-white rounded-2xl overflow-hidden border-2 border-secondary">
+                <a href="access#tobunerima" class="block">
+                <div class="relative h-44 overflow-hidden">
+                    <img loading="lazy" decoding="async" src="Pictures/tobunerima_outside.webp" alt="東武練馬校 外観" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
+                    <div class="absolute top-3 left-3 flex gap-1">
+                        <span class="bg-secondary text-white text-xs font-black px-2 py-0.5 rounded-full">9月開校</span>
+                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">水</span>
+                        <span class="bg-primary text-white text-xs font-black px-2 py-0.5 rounded-full">金</span>
+                    </div>
+                    <div class="absolute bottom-3 left-4 text-white font-display font-black text-xl drop-shadow">東武練馬校</div>
+                </div>
+                <div class="p-4">
+                    <p class="text-xs text-gray-500 leading-relaxed mb-1">
+                        <i class="fa-solid fa-map-pin mr-1 text-primary"></i>練馬区北町２丁目３７−９ サンポービル2階
+                    </p>
+                    <p class="text-xs text-gray-400 mb-2"><i class="fa-solid fa-train mr-1"></i>東武練馬駅 徒歩2分</p>
+                    <p class="text-xs text-gray-500 leading-relaxed">東武練馬駅からすぐの好立地。お仕事帰りのお迎えにも便利な駅チカ教室です。</p>
+                </div>
+                </a>
+                <div class="px-4 pb-4">
+                    <a href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E7%B7%B4%E9%A6%AC%E5%8C%BA%E5%8C%97%E7%94%BA%EF%BC%92%E4%B8%81%E7%9B%AE%EF%BC%93%EF%BC%97%EF%BC%8D%EF%BC%99" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs text-primary font-bold border border-primary rounded-full px-3 py-1 hover:bg-primary hover:text-white transition-colors">
                         <i class="fas fa-map-marked-alt"></i>Googleマップで見る
                     </a>
                 </div>
