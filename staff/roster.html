@@ -119,6 +119,9 @@
       <button data-school="中村校"
         class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary text-primary transition"
         onclick="switchSchool('中村校')">中村校</button>
+      <button data-school="平和台校"
+        class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary text-primary transition"
+        onclick="switchSchool('平和台校')">平和台校</button>
     </div>
 
     <!-- 在籍生徒ビュー切り替え -->
@@ -193,12 +196,15 @@
             <th class="grid-th-school" colspan="2">早宮校</th>
             <th class="grid-th-school" colspan="2">氷川台校</th>
             <th class="grid-th-school" colspan="2">中村校</th>
+            <th class="grid-th-school" colspan="2">平和台校</th>
           </tr>
           <tr>
             <th class="grid-th-day">火</th>
             <th class="grid-th-day">金</th>
             <th class="grid-th-day">月</th>
             <th class="grid-th-day">水</th>
+            <th class="grid-th-day">月</th>
+            <th class="grid-th-day">木</th>
             <th class="grid-th-day">月</th>
             <th class="grid-th-day">木</th>
           </tr>
@@ -246,6 +252,13 @@
             <p class="text-xs text-gray-400 mb-0.5">名</p>
           </div>
         </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="text-xs mb-1" style="color:#f59e0b">平和台校</p>
+          <div class="flex items-end gap-1">
+            <p class="text-2xl font-bold text-gray-800" id="st-heiwadai">—</p>
+            <p class="text-xs text-gray-400 mb-0.5">名</p>
+          </div>
+        </div>
       </div>
 
       <!-- 体験・入会 月別推移グラフ -->
@@ -280,6 +293,7 @@
               <th class="px-4 py-2 font-medium whitespace-nowrap text-right">早宮校</th>
               <th class="px-4 py-2 font-medium whitespace-nowrap text-right">氷川台校</th>
               <th class="px-4 py-2 font-medium whitespace-nowrap text-right">中村校</th>
+              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">平和台校</th>
             </tr>
           </thead>
           <tbody id="statsTableBody"></tbody>
@@ -557,6 +571,8 @@
       { school: '氷川台校', day: '水' },
       { school: '中村校',  day: '月' },
       { school: '中村校',  day: '木' },
+      { school: '平和台校', day: '月' },
+      { school: '平和台校', day: '木' },
     ];
     const GRID_TIMES = ['16', '17'];
     const KOMA_CAPACITY = 12;
@@ -838,6 +854,7 @@
       document.getElementById('st-hayamiya').textContent = seito_count['早宮校'] ?? 0;
       document.getElementById('st-hikawadai').textContent = seito_count['氷川台校'] ?? 0;
       document.getElementById('st-nakamura').textContent = seito_count['中村校'] ?? 0;
+      document.getElementById('st-heiwadai').textContent = seito_count['平和台校'] ?? 0;
 
       // 先月末比
       const trend = document.getElementById('st-trend');
@@ -868,7 +885,7 @@
         statsTable.classList.remove('hidden');
         statsEmpty.classList.add('hidden');
 
-        const renderRateCells = row => ['全体', '早宮校', '氷川台校', '中村校'].map(label => {
+        const renderRateCells = row => ['全体', '早宮校', '氷川台校', '中村校', '平和台校'].map(label => {
           const d = row[label] ?? { taiken: 0, nyukai: 0 };
           const rate = d.taiken > 0 ? Math.round(d.nyukai / d.taiken * 100) : null;
           const rateStr = rate !== null ? `${rate}%` : '―';
@@ -881,7 +898,7 @@
 
         // 通期累積（全月合算）を最上部に表示
         const cumulative = { month: '通期累積' };
-        ['全体', '早宮校', '氷川台校', '中村校'].forEach(label => {
+        ['全体', '早宮校', '氷川台校', '中村校', '平和台校'].forEach(label => {
           cumulative[label] = monthly.reduce((acc, row) => {
             const d = row[label] ?? { taiken: 0, nyukai: 0 };
             acc.taiken += d.taiken;
@@ -1121,6 +1138,7 @@
       '早宮校':  { bg: 'bg-blue-100',  text: 'text-blue-700'  },
       '氷川台校': { bg: 'bg-teal-100',  text: 'text-teal-700'  },
       '中村校':  { bg: 'bg-purple-100', text: 'text-purple-700' },
+      '平和台校': { bg: 'bg-amber-100', text: 'text-amber-700' },
     };
 
     function schoolBadge(name) {
