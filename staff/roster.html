@@ -175,18 +175,6 @@
       </table>
     </div>
 
-    <!-- グリッド稼働率サマリー（在籍生徒） -->
-    <div id="gridSummary" class="hidden space-y-3 mb-4">
-      <div>
-        <p class="text-xs font-bold text-gray-500 mb-1.5">時間帯別稼働率</p>
-        <div id="gridSummaryTime" class="grid grid-cols-2 gap-2"></div>
-      </div>
-      <div>
-        <p class="text-xs font-bold text-gray-500 mb-1.5">教室別稼働率</p>
-        <div id="gridSummarySchool" class="grid grid-cols-3 gap-2"></div>
-      </div>
-    </div>
-
     <!-- グリッドビュー（在籍生徒） -->
     <div id="gridArea" class="hidden overflow-x-auto rounded-xl shadow-sm">
       <table class="grid-table" id="gridTable">
@@ -211,6 +199,18 @@
         </thead>
         <tbody id="gridBody"></tbody>
       </table>
+    </div>
+
+    <!-- グリッド稼働率サマリー（在籍生徒） -->
+    <div id="gridSummary" class="hidden space-y-3 mt-4">
+      <div>
+        <p class="text-xs font-bold text-gray-500 mb-1.5">時間帯別稼働率</p>
+        <div id="gridSummaryTime" class="grid grid-cols-2 gap-2"></div>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-gray-500 mb-1.5">教室別稼働率</p>
+        <div id="gridSummarySchool" class="grid grid-cols-3 gap-2"></div>
+      </div>
     </div>
 
     <!-- 空状態 -->
