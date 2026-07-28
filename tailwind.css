@@ -1906,6 +1906,10 @@ video {
   padding-bottom: 2rem;
 }
 
+.pl-1 {
+  padding-left: 0.25rem;
+}
+
 .pl-2\.5 {
   padding-left: 0.625rem;
 }
@@ -2398,6 +2402,11 @@ video {
 
 .hover\:bg-primary\/90:hover {
   background-color: rgb(74 150 174 / 0.9);
+}
+
+.hover\:bg-red-50:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 242 242 / var(--tw-bg-opacity, 1));
 }
 
 .hover\:text-\[\#3a86a0\]:hover {

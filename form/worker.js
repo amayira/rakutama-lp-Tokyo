@@ -743,6 +743,7 @@ async function handleFurikaeStatus(params, env) {
   const data = await kintoneGet(APP.FURIKAE, query, env.TOKEN_FURIKAE);
 
   const records = (data.records ?? []).map(rec => ({
+    ticketId: rec["$id"]?.value ?? "",
     欠席日: rec["欠席日"]?.value ?? "",
     振替期日_始_: rec["振替期日_始_"]?.value ?? "",
     振替期日_終_: rec["振替期日_終_"]?.value ?? "",
@@ -783,6 +784,41 @@ async function handleFurikae(body, env) {
       ["振替受講教室", body["振替受講教室"]],
       ["時刻", body["時刻"]],
       ["備考", body["備考"]],
+    ],
+    env,
+  });
+
+  return { success: true };
+}
+
+/**
+ * POST /api/furikae-cancel
+ * Clears the substitute lesson date/classroom/time on an existing App 14 record,
+ * reverting it back to an unused ticket. 振替期日_始_/振替期日_終_（取得期日）はフィールドに
+ * 含めないため更新されない＝取得期日は維持したまま再予約可能な状態に戻る。
+ */
+async function handleFurikaeCancel(body, env) {
+  const { ticketId } = body;
+  if (!ticketId) {
+    return { success: false, error: "ticketId は必須です", status: 400 };
+  }
+
+  const record = buildRecord({
+    振替受講日: "",
+    振替教室名: "",
+    時刻: "",
+  });
+
+  const furikaeToken = [env.TOKEN_FURIKAE, env.TOKEN_SEITO_NEW, env.TOKEN_KYOSHITSU].filter(Boolean).join(",");
+  await kintoneUpdate(APP.FURIKAE, ticketId, record, furikaeToken);
+
+  await sendStudentReceipt({
+    studentNumber: body["生徒番号"],
+    subject: "【振替キャンセル】楽珠そろばん教室 東京・練馬",
+    lead: "振替受講のご予約をキャンセルしました。振替の取得期限内であれば、改めて別の日程でご予約いただけます。",
+    rows: [
+      ["キャンセルした振替受講日", body["振替受講日"]],
+      ["振替取得期限", `${body["振替期日_始_"] ?? ""}〜${body["振替期日_終_"] ?? ""}`],
     ],
     env,
   });
@@ -1500,6 +1536,9 @@ export default {
           break;
         case "/api/furikae":
           result = await handleFurikae(body, env);
+          break;
+        case "/api/furikae-cancel":
+          result = await handleFurikaeCancel(body, env);
           break;
         case "/api/flash-anzan":
           result = await handleFlashAnzan(body, env);

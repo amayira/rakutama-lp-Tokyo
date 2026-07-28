@@ -161,11 +161,20 @@
                 </span>
               </div>
               ${confirmed ? `
-                <div class="text-sm text-gray-800 font-medium">${fmtDate(r['振替受講日'])} ${r['振替教室名'] || ''}${r['時刻'] ? '　' + fmtTime(r['時刻']) + '〜' : ''}</div>
+                <div class="text-sm text-gray-800 font-medium mb-3">${fmtDate(r['振替受講日'])} ${r['振替教室名'] || ''}${r['時刻'] ? '　' + fmtTime(r['時刻']) + '〜' : ''}</div>
+                <div class="cancel-error hidden mb-2 text-xs text-red-600"></div>
+                <button type="button" class="cancel-btn text-xs font-bold text-red-500 border border-red-300 rounded-lg px-3 py-1.5 hover:bg-red-50 transition flex items-center gap-2">
+                  <span class="cancel-text">この予約をキャンセルする</span>
+                  <i class="cancel-spinner fa-solid fa-spinner fa-spin hidden text-xs"></i>
+                </button>
               ` : `
                 <div class="text-xs text-gray-400">振替取得期限：${fmtDate(r['振替期日_始_'])}〜${fmtDate(r['振替期日_終_'])}</div>
               `}
             `;
+            if (confirmed) {
+              const btn = card.querySelector('.cancel-btn');
+              btn.addEventListener('click', () => cancelFurikae(r, btn, card));
+            }
             list.appendChild(card);
           });
         }
@@ -175,6 +184,46 @@
         errorBox.classList.remove('hidden');
       } finally {
         if (myId === statusReqId) loading.classList.add('hidden');
+      }
+    }
+
+    async function cancelFurikae(record, btn, card) {
+      if (!confirm(`${fmtDate(record['振替受講日'])} ${record['振替教室名'] || ''}の振替予約をキャンセルします。よろしいですか？\n（振替の取得期限は変わらないため、期限内であれば改めて予約できます）`)) {
+        return;
+      }
+
+      const errorBox = card.querySelector('.cancel-error');
+      const text = btn.querySelector('.cancel-text');
+      const spinner = btn.querySelector('.cancel-spinner');
+      errorBox.classList.add('hidden');
+      btn.disabled = true;
+      text.textContent = 'キャンセル中...';
+      spinner.classList.remove('hidden');
+
+      const studentNumber = baseStudentNumber(document.getElementById('student-number').value.trim());
+
+      try {
+        const res = await fetch(`${API_BASE}/api/furikae-cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ticketId: record.ticketId,
+            生徒番号: studentNumber,
+            振替受講日: record['振替受講日'],
+            振替期日_始_: record['振替期日_始_'],
+            振替期日_終_: record['振替期日_終_'],
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'キャンセルに失敗しました');
+
+        await loadFurikaeStatus();
+      } catch (err) {
+        errorBox.textContent = err.message || 'キャンセル中にエラーが発生しました。';
+        errorBox.classList.remove('hidden');
+        btn.disabled = false;
+        text.textContent = 'この予約をキャンセルする';
+        spinner.classList.add('hidden');
       }
     }
 
