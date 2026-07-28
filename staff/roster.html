@@ -178,25 +178,7 @@
     <!-- グリッドビュー（在籍生徒） -->
     <div id="gridArea" class="hidden overflow-x-auto rounded-xl shadow-sm">
       <table class="grid-table" id="gridTable">
-        <thead>
-          <tr>
-            <th class="grid-th-time" rowspan="2"></th>
-            <th class="grid-th-school" colspan="2">早宮校</th>
-            <th class="grid-th-school" colspan="2">氷川台校</th>
-            <th class="grid-th-school" colspan="2">中村校</th>
-            <th class="grid-th-school" colspan="2">平和台校</th>
-          </tr>
-          <tr>
-            <th class="grid-th-day">火</th>
-            <th class="grid-th-day">金</th>
-            <th class="grid-th-day">月</th>
-            <th class="grid-th-day">水</th>
-            <th class="grid-th-day">月</th>
-            <th class="grid-th-day">木</th>
-            <th class="grid-th-day">月</th>
-            <th class="grid-th-day">木</th>
-          </tr>
-        </thead>
+        <thead id="gridHead"></thead>
         <tbody id="gridBody"></tbody>
       </table>
     </div>
@@ -599,7 +581,7 @@
       const isStats = tab === 'stats';
       const isSeito = tab === 'seito';
       const isNotice = tab === 'notice';
-      document.getElementById('schoolFilter').classList.toggle('hidden', isStats || isSeito || isNotice);
+      document.getElementById('schoolFilter').classList.toggle('hidden', isStats || isNotice);
       document.getElementById('countBar').classList.toggle('hidden', isStats || isNotice);
       document.getElementById('seitoViewToggle').classList.toggle('hidden', !isSeito);
       // 欠席・振替タブのキャッシュをクリア
@@ -987,11 +969,31 @@
       container.innerHTML = svg;
     }
 
+    // ── グリッドヘッダー描画 ──────────────────────────────────────
+    function renderGridHeader(cols) {
+      const schools = [...new Set(cols.map(c => c.school))];
+      const schoolRow = schools.map(s => {
+        const span = cols.filter(c => c.school === s).length;
+        return `<th class="grid-th-school" colspan="${span}">${s}</th>`;
+      }).join('');
+      const dayRow = cols.map(c => `<th class="grid-th-day">${c.day}</th>`).join('');
+      document.getElementById('gridHead').innerHTML = `
+        <tr>
+          <th class="grid-th-time" rowspan="2"></th>
+          ${schoolRow}
+        </tr>
+        <tr>${dayRow}</tr>`;
+    }
+
     // ── グリッド描画 ──────────────────────────────────────────────
     function renderGrid(records) {
+      // 校フィルターで選択中の教室だけに絞る（全校選択時は全列）
+      const cols = GRID_COLS.filter(c => currentSchool === 'all' || c.school === currentSchool);
+      renderGridHeader(cols);
+
       // grid[school][day][time] = [student, ...]
       const grid = {};
-      for (const col of GRID_COLS) {
+      for (const col of cols) {
         if (!grid[col.school]) grid[col.school] = {};
         if (!grid[col.school][col.day]) grid[col.school][col.day] = {};
         for (const t of GRID_TIMES) grid[col.school][col.day][t] = [];
@@ -1014,7 +1016,7 @@
       tbody.innerHTML = GRID_TIMES.map(time => `
         <tr>
           <th class="grid-th-time">${time}</th>
-          ${GRID_COLS.map(col => {
+          ${cols.map(col => {
             const students = grid[col.school]?.[col.day]?.[time] ?? [];
             const badge = komaOccupancyBadge(students.length);
             if (students.length === 0) {
@@ -1036,13 +1038,13 @@
         </tr>`).join('');
 
       // 時間帯別・教室別の稼働率サマリー
-      const schools = [...new Set(GRID_COLS.map(c => c.school))];
+      const schools = [...new Set(cols.map(c => c.school))];
       const timeTotals = {};
       const schoolTotals = {};
       for (const t of GRID_TIMES) timeTotals[t] = 0;
       for (const s of schools) schoolTotals[s] = 0;
 
-      for (const col of GRID_COLS) {
+      for (const col of cols) {
         for (const t of GRID_TIMES) {
           const count = grid[col.school]?.[col.day]?.[t]?.length ?? 0;
           timeTotals[t] += count;
@@ -1050,9 +1052,9 @@
         }
       }
 
-      const timeCapacity = GRID_COLS.length * KOMA_CAPACITY;
+      const timeCapacity = cols.length * KOMA_CAPACITY;
       const schoolCapacity = school =>
-        GRID_COLS.filter(c => c.school === school).length * GRID_TIMES.length * KOMA_CAPACITY;
+        cols.filter(c => c.school === school).length * GRID_TIMES.length * KOMA_CAPACITY;
 
       document.getElementById('gridSummaryTime').innerHTML = GRID_TIMES.map(t =>
         occupancySummaryCard(`${t}時クラス`, timeTotals[t], timeCapacity)
