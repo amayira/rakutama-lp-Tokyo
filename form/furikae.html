@@ -113,6 +113,7 @@
             <input type="date" id="furikae-date" required disabled
               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 disabled:bg-gray-100 disabled:text-gray-400" />
             <p id="furikae-date-hint" class="mt-1 text-xs text-gray-400"></p>
+            <p class="mt-1 text-xs text-gray-400">当日分の振替予約は14:30までとなります。やむを得ない事情の場合は<a href="https://lin.ee/sFR6X8y" target="_blank" rel="noopener noreferrer" class="underline hover:text-gray-600">公式LINE</a>にてご連絡ください。</p>
           </div>
 
           <!-- 時刻 -->
@@ -360,6 +361,7 @@
       if (!furikaeClassroom) errors.push('振替受講教室を選択してください');
       if (!furikaeDate) errors.push('振替受講日を選択してください');
       if (!ticketId) errors.push('使用するチケットを選択してください');
+      if (isTodayPastCutoff(furikaeDate)) errors.push('本日分の振替予約は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。');
 
       if (errors.length > 0) {
         errorBox.innerHTML = errors.join('<br />');

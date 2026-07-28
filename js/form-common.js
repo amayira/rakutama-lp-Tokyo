@@ -141,6 +141,18 @@ function setupStudentLookup({ onReset, onSuccess, enableSubmitOnSuccess = true }
   });
 }
 
+// ── 当日締切チェック（欠席連絡・振替予約共通、14:30まで）──
+// dateValue が「今日」で、かつ現在時刻が締切を過ぎていれば true。過去日・未来日は対象外。
+function isTodayPastCutoff(dateValue, cutoffHour = 14, cutoffMinute = 30) {
+  if (!dateValue) return false;
+  const now = new Date();
+  const todayYMD = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  if (dateValue !== todayYMD) return false;
+  const cutoff = new Date(now);
+  cutoff.setHours(cutoffHour, cutoffMinute, 0, 0);
+  return now > cutoff;
+}
+
 // ── 入力途中の離脱ガード（未送信の入力がある状態でページ遷移しようとしたら確認）──
 // 1つでもフォームに入力があると、リロード・タブを閉じる・別ページへの遷移時に
 // ブラウザ標準の確認ダイアログ（「このサイトを離れますか？」）を出す。

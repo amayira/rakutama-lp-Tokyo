@@ -565,6 +565,15 @@ async function handleTaiken(body, env, origin) {
  */
 async function handleKesseki(body, env) {
   const absenceDate = body["欠席日"] ?? "";
+  const furikaeDate = body["振替受講日"] ?? "";
+
+  if (isTodayPastCutoff(absenceDate)) {
+    return { success: false, error: "本日分の欠席連絡は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
+  }
+  if (isTodayPastCutoff(furikaeDate)) {
+    return { success: false, error: "本日分の振替予約は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
+  }
+
   const deadline = computeSubstituteDeadline(absenceDate);
 
   const record = buildRecord({
@@ -649,6 +658,30 @@ function tokyoToday() {
 /** 指定年月（y, m: mは1-indexed）の末日を返す */
 function lastDayOfMonth(y, m) {
   return new Date(Date.UTC(y, m, 0)).getUTCDate();
+}
+
+/** 日本時間（Asia/Tokyo）での「現在時刻」を0時からの分数で返す */
+function tokyoNowMinutes() {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Tokyo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date());
+  const h = Number(parts.find((p) => p.type === "hour").value);
+  const m = Number(parts.find((p) => p.type === "minute").value);
+  return h * 60 + m;
+}
+
+/**
+ * 欠席連絡・振替予約の当日締切チェック（14:30まで）。
+ * dateValue が「今日（日本時間）」で、かつ現在時刻が締切を過ぎていれば true。
+ * 過去日・未来日はチェック対象外（当日分のみ締切がある）。
+ */
+function isTodayPastCutoff(dateValue, cutoffHour = 14, cutoffMinute = 30) {
+  if (!dateValue) return false;
+  if (dateValue !== tokyoToday()) return false;
+  return tokyoNowMinutes() > cutoffHour * 60 + cutoffMinute;
 }
 
 /** YYYY-MM-DD に月数（負数可）を加算する。月末日は繰り上げず当月末にクランプする */
@@ -793,6 +826,10 @@ async function handleFurikae(body, env) {
   const { ticketId } = body;
   if (!ticketId) {
     return { success: false, error: "ticketId は必須です", status: 400 };
+  }
+
+  if (isTodayPastCutoff(body["振替受講日"] ?? "")) {
+    return { success: false, error: "本日分の振替予約は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
   }
 
   const record = buildRecord({
