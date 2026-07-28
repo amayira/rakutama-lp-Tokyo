@@ -564,15 +564,18 @@ async function handleTaiken(body, env, origin) {
  * Creates a record in 振替管理 (App 14).
  */
 async function handleKesseki(body, env) {
+  const absenceDate = body["欠席日"] ?? "";
+  const deadline = computeSubstituteDeadline(absenceDate);
+
   const record = buildRecord({
     生徒番号: body["生徒番号"] ?? "",
     請求ID: body["請求ID"] ?? "",
     教室名: body["教室名"] ?? "",
     氏: body["氏"] ?? "",
     名: body["名"] ?? "",
-    欠席日: body["欠席日"] ?? "",
-    振替期日_始_: body["振替期日_始_"] ?? "",
-    振替期日_終_: body["振替期日_終_"] ?? "",
+    欠席日: absenceDate,
+    振替期日_始_: deadline.start,
+    振替期日_終_: deadline.end,
     振替受講日: body["振替受講日"] ?? "",
     振替教室名: body["振替教室名"] ?? "",
     時刻: toKintoneTime(body["時刻"]),
@@ -646,6 +649,33 @@ function tokyoToday() {
 /** 指定年月（y, m: mは1-indexed）の末日を返す */
 function lastDayOfMonth(y, m) {
   return new Date(Date.UTC(y, m, 0)).getUTCDate();
+}
+
+/** YYYY-MM-DD に月数（負数可）を加算する。月末日は繰り上げず当月末にクランプする */
+function addMonthsToYMD(ymd, delta) {
+  const [y, m, d] = ymd.split("-").map(Number);
+  const total = y * 12 + (m - 1) + delta;
+  const ny = Math.floor(total / 12);
+  const nm = (total % 12) + 1;
+  const nd = Math.min(d, lastDayOfMonth(ny, nm));
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${ny}-${pad(nm)}-${pad(nd)}`;
+}
+
+/**
+ * 欠席日から振替取得期限（前後1ヶ月）をサーバー側で計算する。
+ * kesseki.html はクライアントJSでも同じ計算をして送ってくるが、change イベント未発火など
+ * クライアント側の実行漏れがあると振替期日が空文字のまま送信されてしまうため、
+ * サーバー側で必ず再計算して上書きする（クライアントの値は信用しない）。
+ */
+function computeSubstituteDeadline(absenceDate) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(absenceDate ?? "")) {
+    return { start: "", end: "" };
+  }
+  return {
+    start: addMonthsToYMD(absenceDate, -1),
+    end: addMonthsToYMD(absenceDate, 1),
+  };
 }
 
 /**
@@ -1415,7 +1445,7 @@ async function handleFcLead(body, env) {
 
   const FIELD_CODES = [
     "persona", "name", "email", "tel", "status", "experience",
-    "area", "referrer", "message", "page",
+    "area", "referrer", "面談希望日時", "message", "page",
     "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
   ];
   const fields = {};
