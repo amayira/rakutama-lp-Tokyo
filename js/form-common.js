@@ -146,7 +146,10 @@ function setupStudentLookup({ onReset, onSuccess, enableSubmitOnSuccess = true }
 // ブラウザ標準の確認ダイアログ（「このサイトを離れますか？」）を出す。
 // ※ダイアログの文言はブラウザ仕様で固定のため変更不可。
 // フォーム送信時（サンクスページへのリダイレクト・完了画面表示）はガードを解除する。
+// デフォルトでは無効。有効にするページは form-common.js を読み込む前に
+// <script>window.ENABLE_UNLOAD_GUARD = true;</script> を置くこと（体験申込フォームのみ使用）。
 (function setupUnloadGuard() {
+  if (!window.ENABLE_UNLOAD_GUARD) return;
   let allowUnload = false;
 
   // 何か1つでも初期状態から変更された入力があるか
