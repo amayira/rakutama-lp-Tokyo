@@ -163,6 +163,11 @@
 
   <script src="/js/form-common.js"></script>
   <script>
+    // 振替取得状況ページの「この日程で予約する」から遷移した場合、生徒番号検索とチケット選択を自動化する
+    const urlParams = new URLSearchParams(window.location.search);
+    const prefillStudentNumber = urlParams.get('studentNumber');
+    const prefillTicketId = urlParams.get('ticketId');
+
     let ticketReqId = 0;
 
     // 週2コース：メインの生徒番号（"-"より前）を返す
@@ -317,8 +322,23 @@
         if (s.records[0]?.classroom) classroomSelect.value = s.records[0].classroom;
         await loadTimeSlotsInto('furikae-time', classroomSelect.value);
         await loadTickets();
+
+        // URLでチケットIDが指定されていれば選択状態にして日付範囲などを反映
+        if (prefillTicketId) {
+          const ticketSelect = document.getElementById('ticket-select');
+          if ([...ticketSelect.options].some(o => o.value === prefillTicketId)) {
+            ticketSelect.value = prefillTicketId;
+            ticketSelect.dispatchEvent(new Event('change'));
+          }
+        }
       },
     });
+
+    // URLで生徒番号が指定されていれば自動検索（振替取得状況ページからの遷移）
+    if (prefillStudentNumber) {
+      document.getElementById('student-number').value = prefillStudentNumber;
+      document.getElementById('lookup-btn').click();
+    }
 
     // ── Form submission ───────────────────────────────────────────────────────
     document.getElementById('furikae-form').addEventListener('submit', async (e) => {

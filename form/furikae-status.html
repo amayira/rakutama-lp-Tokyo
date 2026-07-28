@@ -168,12 +168,21 @@
                   <i class="cancel-spinner fa-solid fa-spinner fa-spin hidden text-xs"></i>
                 </button>
               ` : `
-                <div class="text-xs text-gray-400">振替取得期限：${fmtDate(r['振替期日_始_'])}〜${fmtDate(r['振替期日_終_'])}</div>
+                <div class="text-xs text-gray-400 mb-3">振替取得期限：${fmtDate(r['振替期日_始_'])}〜${fmtDate(r['振替期日_終_'])}</div>
+                <button type="button" class="reserve-btn text-xs font-bold text-white bg-green-500 hover:bg-green-600 rounded-lg px-3 py-1.5 transition">
+                  このチケットを使用する
+                </button>
               `}
             `;
             if (confirmed) {
               const btn = card.querySelector('.cancel-btn');
               btn.addEventListener('click', () => cancelFurikae(r, btn, card));
+            } else {
+              const btn = card.querySelector('.reserve-btn');
+              btn.addEventListener('click', () => {
+                const params = new URLSearchParams({ studentNumber, ticketId: r.ticketId });
+                window.location.href = `furikae.html?${params.toString()}`;
+              });
             }
             list.appendChild(card);
           });
