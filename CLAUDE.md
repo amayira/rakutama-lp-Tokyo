@@ -319,6 +319,29 @@ Cloudflare Workers（form/worker.js）の変更は別途 `wrangler deploy` が�
 
 ---
 
+## 新教室追加時のチェックリスト（HP静的ページ側）
+
+kintone教室マスタへの登録だけでは**フォーム側は自動反映されるが、静的LP側は自動反映されない**。新教室（例: 平和台校）を`access.html`に追加する際、以下を漏らしやすい（2026-07-30に平和台校追加時、フッターリンクとJSON-LDが漏れていた実績あり）：
+
+1. **access.html**
+   - 新セクション追加。**背景色は前後のセクションと交互になるよう`bg-base`の有無を必ず確認**（白→水色→白→水色…の交互パターン。抜けると縞模様が崩れる）
+   - ページ上部のタブ（アンカーリンク一覧）に追加
+   - 住所に`〒`郵便番号を必ず入れる（他校に合わせる）
+   - **JSON-LD構造化データ（`<script type="application/ld+json">`の配列）に`EducationalOrganization`エントリを追加**（抜けても表示上は気づかないがSEOに影響）
+   - フッターの「教室一覧」`<ul>`に追加
+2. **index.html**
+   - 教室紹介グリッド（`classroom-card`）に追加
+   - フッターの「教室一覧」`<ul>`に追加
+   - お知らせ欄・アナウンス文言
+3. **courses.html / faq.html / features.html / trial.html**
+   - フッターの「教室一覧」`<ul>`に追加（5ページとも同じ`<ul>`を持つので全部見る）
+4. **各ページのtitle・meta description**の教室数表記（「◯教室」）を更新
+5. **開校済みに切り替わったら**：「9月◯日開校予定」バッジや「準備中」表記、「3校がオープン」的な文言を実態に合わせて更新
+
+→ 新教室を追加した後は `grep -rn "教室一覧" -A 5 *.html` と `grep -n "EducationalOrganization" access.html` で漏れがないか機械的に確認する。
+
+---
+
 ## 注意事項
 
 - `tailwind.css` はビルド成果物。直接編集しない。
