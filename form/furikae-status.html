@@ -155,7 +155,10 @@
             card.className = 'border border-gray-200 rounded-xl p-4';
             card.innerHTML = `
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xs text-gray-400">欠席日：${fmtDate(r['欠席日'])}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-400">欠席日：${fmtDate(r['欠席日'])}</span>
+                  ${r['種別'] ? `<span class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">${r['種別']}</span>` : ''}
+                </div>
                 <span class="text-xs font-bold px-3 py-1 rounded-full ${confirmed ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}">
                   ${confirmed ? '受講日確定済み' : '受講日未定'}
                 </span>

@@ -813,6 +813,7 @@ async function handleFurikaeStatus(params, env) {
     振替受講日: rec["振替受講日"]?.value ?? "",
     振替教室名: rec["振替教室名"]?.value ?? "",
     時刻: rec["時刻"]?.value ?? "",
+    種別: rec["種別"]?.value ?? "",
   }));
 
   return { success: true, records };
