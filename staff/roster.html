@@ -28,6 +28,17 @@
     .student-grade { color: #1d4ed8; font-size: 0.7rem; font-weight: 600; margin-top: 1px; }
     .student-since { color: #9ca3af; font-size: 0.65rem; margin-top: 1px; }
     .koma-occupancy { text-align: center; font-size: 0.72rem; font-weight: 700; padding: 3px 4px; border-radius: 5px; border: 1px solid; margin-bottom: 3px; }
+    /* 体験名簿カレンダービュー */
+    .cal-table { border-collapse: collapse; width: 100%; background: #fff; }
+    .cal-table th, .cal-table td { border: 1px solid #e5e7eb; vertical-align: top; }
+    .cal-dow { background: #f3f4f6; color: #6b7280; font-weight: 600; text-align: center; padding: 6px 4px; font-size: 0.75rem; }
+    .cal-cell { min-height: 78px; padding: 3px; vertical-align: top; }
+    .cal-cell.other-month { background: #fafafa; }
+    .cal-daynum { font-size: 0.7rem; color: #9ca3af; font-weight: 600; padding: 2px 3px 1px; }
+    .cal-daynum.today { color: #fff; background: #4A96AE; border-radius: 999px; display: inline-block; width: 18px; height: 18px; text-align: center; line-height: 18px; }
+    .cal-entry { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 2px 4px; margin: 2px 1px; font-size: 0.68rem; line-height: 1.3; }
+    .cal-entry-name { font-weight: 700; color: #111827; }
+    .cal-entry-time { color: #6b7280; }
   </style>
 </head>
 <body class="min-h-screen bg-base">
@@ -137,6 +148,35 @@
       </button>
     </div>
 
+    <!-- 体験名簿ビュー切り替え -->
+    <div id="taikenViewToggle" class="hidden mb-4 flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-500">表示：</span>
+        <button onclick="setTaikenView('list')" id="btnTaikenList"
+          class="view-btn text-xs px-3 py-1.5 rounded-full border border-primary bg-primary text-white font-medium transition">
+          リスト
+        </button>
+        <button onclick="setTaikenView('calendar')" id="btnTaikenCalendar"
+          class="view-btn text-xs px-3 py-1.5 rounded-full border border-primary text-primary transition">
+          カレンダー
+        </button>
+      </div>
+      <div id="calNav" class="hidden items-center gap-3">
+        <button onclick="changeCalMonth(-1)" class="text-primary hover:text-[#3a86a0] p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <span id="calLabel" class="text-sm font-bold text-gray-700 min-w-[5.5rem] text-center"></span>
+        <button onclick="changeCalMonth(1)" class="text-primary hover:text-[#3a86a0] p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+        <button onclick="goToCurrentMonth()" class="text-xs text-primary underline ml-1">今月</button>
+      </div>
+    </div>
+
     <!-- 件数・更新ボタン（実績・お知らせ/FAQタブでは非表示） -->
     <div id="countBar" class="hidden flex items-center justify-between mb-3">
       <p class="text-sm text-gray-500">
@@ -180,6 +220,19 @@
       <table class="grid-table" id="gridTable">
         <thead id="gridHead"></thead>
         <tbody id="gridBody"></tbody>
+      </table>
+    </div>
+
+    <!-- カレンダービュー（体験名簿） -->
+    <div id="calendarArea" class="hidden overflow-x-auto rounded-xl shadow-sm">
+      <table class="cal-table" id="calTable">
+        <thead>
+          <tr>
+            <th class="cal-dow">日</th><th class="cal-dow">月</th><th class="cal-dow">火</th>
+            <th class="cal-dow">水</th><th class="cal-dow">木</th><th class="cal-dow">金</th><th class="cal-dow">土</th>
+          </tr>
+        </thead>
+        <tbody id="calBody"></tbody>
       </table>
     </div>
 
@@ -542,9 +595,14 @@
     let currentSchool = 'all';
     let staffKey = '';
     let seitoView = 'grid'; // 'grid' or 'list'
+    let taikenView = 'list'; // 'list' or 'calendar'
     let cachedSeitoRecords = null;
     let cachedKessekiRecords = null;
     let cachedFurikaeRecords = null;
+    let cachedTaikenRecords = null;
+    const now = new Date();
+    let calYear = now.getFullYear();
+    let calMonth = now.getMonth(); // 0-11
 
     const GRID_COLS = [
       { school: '早宮校',  day: '火' },
@@ -580,13 +638,18 @@
       });
       const isStats = tab === 'stats';
       const isSeito = tab === 'seito';
+      const isTaiken = tab === 'taiken';
       const isNotice = tab === 'notice';
       document.getElementById('schoolFilter').classList.toggle('hidden', isStats || isNotice);
       document.getElementById('countBar').classList.toggle('hidden', isStats || isNotice);
       document.getElementById('seitoViewToggle').classList.toggle('hidden', !isSeito);
+      document.getElementById('taikenViewToggle').classList.toggle('hidden', !isTaiken);
+      document.getElementById('calNav').classList.toggle('hidden', !(isTaiken && taikenView === 'calendar'));
+      document.getElementById('calNav').classList.toggle('flex', isTaiken && taikenView === 'calendar');
       // 欠席・振替タブのキャッシュをクリア
       cachedKessekiRecords = null;
       cachedFurikaeRecords = null;
+      cachedTaikenRecords = null;
       if (isNotice) {
         showState('notice');
         return;
@@ -606,6 +669,37 @@
       if (cachedSeitoRecords) {
         renderTable(cachedSeitoRecords);
       }
+    }
+
+    // ── 体験名簿ビュー切り替え ───────────────────────────────────
+    function setTaikenView(view) {
+      taikenView = view;
+      document.getElementById('btnTaikenList').className =
+        'view-btn text-xs px-3 py-1.5 rounded-full border border-primary transition ' +
+        (view === 'list' ? 'bg-primary text-white font-medium' : 'text-primary');
+      document.getElementById('btnTaikenCalendar').className =
+        'view-btn text-xs px-3 py-1.5 rounded-full border border-primary transition ' +
+        (view === 'calendar' ? 'bg-primary text-white font-medium' : 'text-primary');
+      const isCal = view === 'calendar';
+      document.getElementById('calNav').classList.toggle('hidden', !isCal);
+      document.getElementById('calNav').classList.toggle('flex', isCal);
+      if (cachedTaikenRecords) {
+        renderTable(cachedTaikenRecords);
+      }
+    }
+
+    // ── 体験カレンダー月送り ─────────────────────────────────────
+    function changeCalMonth(diff) {
+      calMonth += diff;
+      if (calMonth < 0) { calMonth = 11; calYear -= 1; }
+      if (calMonth > 11) { calMonth = 0; calYear += 1; }
+      if (cachedTaikenRecords) renderTaikenCalendar(cachedTaikenRecords);
+    }
+
+    function goToCurrentMonth() {
+      calYear = now.getFullYear();
+      calMonth = now.getMonth();
+      if (cachedTaikenRecords) renderTaikenCalendar(cachedTaikenRecords);
     }
 
     // ── 校フィルター ──────────────────────────────────────────────
@@ -677,6 +771,7 @@
         if (currentTab === 'seito') cachedSeitoRecords = data.records;
         if (currentTab === 'kesseki') cachedKessekiRecords = data.records;
         if (currentTab === 'furikae') cachedFurikaeRecords = data.records;
+        if (currentTab === 'taiken') cachedTaikenRecords = data.records;
         renderTable(data.records);
       } catch (err) {
         document.getElementById('errorText').textContent =
@@ -697,6 +792,11 @@
       const tbody = document.getElementById('tableBody');
 
       if (currentTab === 'taiken') {
+        if (taikenView === 'calendar') {
+          renderTaikenCalendar(records);
+          return;
+        }
+
         thead.innerHTML = `
           <tr>
             <th class="px-4 py-3 font-medium whitespace-nowrap">教室</th>
@@ -1065,6 +1165,74 @@
       ).join('');
     }
 
+    // ── 体験名簿カレンダー描画 ────────────────────────────────────
+    function renderTaikenCalendar(records) {
+      document.getElementById('calLabel').textContent = `${calYear}年${calMonth + 1}月`;
+
+      // 日付ごとにグルーピング
+      const byDate = {};
+      for (const r of records) {
+        const d = r.体験参加日;
+        if (!d) continue;
+        if (!byDate[d]) byDate[d] = [];
+        byDate[d].push(r);
+      }
+      // 同日内は時刻順
+      for (const d in byDate) {
+        byDate[d].sort((a, b) => (a.時刻 || '').localeCompare(b.時刻 || ''));
+      }
+
+      const firstDow = new Date(calYear, calMonth, 1).getDay();
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      const prevDays = new Date(calYear, calMonth, 0).getDate();
+      const todayStr = todayISO();
+
+      const cells = [];
+      // 前月の埋め
+      for (let i = firstDow - 1; i >= 0; i--) {
+        cells.push({ day: prevDays - i, other: true, dateStr: null });
+      }
+      // 当月
+      for (let d = 1; d <= daysInMonth; d++) {
+        const mm = String(calMonth + 1).padStart(2, '0');
+        const dd = String(d).padStart(2, '0');
+        cells.push({ day: d, other: false, dateStr: `${calYear}-${mm}-${dd}` });
+      }
+      // 翌月の埋め（7の倍数になるまで）
+      let nextDay = 1;
+      while (cells.length % 7 !== 0) {
+        cells.push({ day: nextDay++, other: true, dateStr: null });
+      }
+
+      let monthCount = 0;
+      const rows = [];
+      for (let w = 0; w < cells.length / 7; w++) {
+        const rowCells = cells.slice(w * 7, w * 7 + 7).map(c => {
+          if (c.other) {
+            return `<td class="cal-cell other-month"><div class="cal-daynum">${c.day}</div></td>`;
+          }
+          const entries = byDate[c.dateStr] || [];
+          monthCount += entries.length;
+          const isToday = c.dateStr === todayStr;
+          const entryHtml = entries.map(r => `
+            <div class="cal-entry">
+              <span class="cal-entry-time">${r.時刻 || ''}</span>
+              <span class="cal-entry-name">${r.氏}${r.名}</span>
+              ${schoolBadge(r.教室名)}
+            </div>`).join('');
+          return `<td class="cal-cell">
+            <div class="cal-daynum${isToday ? ' today' : ''}">${c.day}</div>
+            ${entryHtml}
+          </td>`;
+        }).join('');
+        rows.push(`<tr>${rowCells}</tr>`);
+      }
+
+      document.getElementById('calBody').innerHTML = rows.join('');
+      document.getElementById('countLabel').textContent = `${monthCount}件（${calYear}年${calMonth + 1}月）`;
+      showState('calendar');
+    }
+
     // 稼働率の色スケール（低いと赤系、高いと緑系）
     function occupancyColor(count, capacity) {
       const hue = Math.min(count / capacity, 1) * 120; // 0=赤 → 120=緑
@@ -1100,6 +1268,7 @@
       document.getElementById('tableArea').classList.toggle('hidden', state !== 'table');
       document.getElementById('gridArea').classList.toggle('hidden', state !== 'grid');
       document.getElementById('gridSummary').classList.toggle('hidden', state !== 'grid');
+      document.getElementById('calendarArea').classList.toggle('hidden', state !== 'calendar');
       document.getElementById('emptyArea').classList.toggle('hidden', state !== 'empty');
       document.getElementById('statsArea').classList.toggle('hidden', state !== 'stats');
       document.getElementById('noticeArea').classList.toggle('hidden', state !== 'notice');
