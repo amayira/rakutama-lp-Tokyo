@@ -1161,6 +1161,33 @@ async function handleAllClassrooms(env) {
 }
 
 /**
+ * GET /api/franchises
+ * FC加盟店サイト（rakutama-form）の 404.html 動的ルーティング用。
+ * 教室マスタ（App5）の「form_url」フィールド（URLスラッグ、例: "newshop"）に
+ * 値が入っているレコードから { slug, orgCode, displayName } の一覧を返す。
+ * displayName は組織選択フィールドの組織名をそのまま使う（運営会社名＝所属組織）。
+ * 新加盟店を追加するときは、その組織の最初の1教室にだけ form_url を入力すればよい
+ * （同一組織の2教室目以降は空欄でOK。先頭一致を代表として使う）。
+ */
+async function handleFranchises(env) {
+  const query = `form_url != "" order by レコード番号 asc limit 200`;
+  const data = await kintoneGet(APP.KYOSHITSU, query, env.TOKEN_KYOSHITSU);
+
+  const seen = new Set();
+  const franchises = [];
+  (data.records ?? []).forEach((rec) => {
+    const slug = rec["form_url"]?.value ?? "";
+    const orgCode = rec["組織選択"]?.value?.[0]?.code ?? "";
+    const displayName = rec["組織選択"]?.value?.[0]?.name ?? orgCode;
+    if (!slug || seen.has(slug)) return;
+    seen.add(slug);
+    franchises.push({ slug, orgCode, displayName });
+  });
+
+  return { success: true, franchises };
+}
+
+/**
  * GET /api/classrooms?orgCode=所属組織コード
  * Returns classrooms for the given org from 教室マスタ (App 7).
  * openDate（開校日）より前の日付はフォーム側で選択不可になる。
@@ -1525,6 +1552,8 @@ export default {
           result = await handleActiveClassrooms(env);
         } else if (path === "/api/all-classrooms") {
           result = await handleAllClassrooms(env);
+        } else if (path === "/api/franchises") {
+          result = await handleFranchises(env);
         } else if (path === "/api/classrooms") {
           result = await handleClassrooms(params, env);
         } else if (path === "/api/gakuhi") {
