@@ -1213,6 +1213,8 @@ async function handleClassrooms(params, env) {
     .map((rec) => ({
       name: rec["教室名"]?.value ?? "",
       openDate: rec["開校日"]?.value ?? "",
+      pref: rec["都道府県"]?.value ?? "",
+      address: rec["所在地"]?.value ?? "",
     }))
     .filter((c) => c.name);
 
