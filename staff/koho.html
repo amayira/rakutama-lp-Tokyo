@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>候補地の状況 | 楽珠そろばん教室 講師ポータル</title>
+  <link rel="icon" href="https://rakutama-tokyo.com/Pictures/favicon.png" type="image/png" />
+  <link rel="stylesheet" href="/tailwind.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    body { font-family: 'Noto Sans JP', sans-serif; }
+    .page-nav-link { padding: 10px 14px; font-size: 0.82rem; color: #6b7280; border-bottom: 3px solid transparent; transition: all .15s; }
+    .page-nav-link:hover { color: #4A96AE; }
+    .page-nav-active { color: #4A96AE; font-weight: 700; border-bottom-color: #4A96AE; }
+    .rank-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; }
+  </style>
+</head>
+<body class="min-h-screen bg-base">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div>
+        <span class="font-bold text-gray-800 text-base">楽珠そろばん教室</span>
+        <span class="ml-2 text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">講師ポータル</span>
+      </div>
+      <button id="logoutBtn" class="text-sm text-gray-500 hover:text-red-500 transition flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        ログアウト
+      </button>
+    </div>
+    <div class="border-t border-gray-100">
+      <div class="max-w-5xl mx-auto px-4 flex gap-1">
+        <a href="roster.html" class="page-nav-link">名簿</a>
+        <a href="jisseki.html" class="page-nav-link">実績</a>
+        <a href="koho.html" class="page-nav-link page-nav-active">候補地の状況</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6 space-y-8">
+
+    <div class="bg-white rounded-2xl shadow-sm p-5">
+      <p class="text-sm text-gray-600 leading-relaxed">
+        楽珠そろばん教室の開校スケジュールの現状です。新しい教室での勤務にご興味があれば、いつでも本部までお声がけください。
+      </p>
+      <p class="text-xs text-gray-400 mt-2">最終更新：2026年8月6日</p>
+    </div>
+
+    <!-- 開校済み -->
+    <section>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="rank-badge bg-green-100 text-green-700">A</span>
+        <h2 class="font-bold text-gray-800">開校済み</h2>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">早宮校</p>
+          <p class="text-sm text-gray-500 mt-1">火・金</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">氷川台校</p>
+          <p class="text-sm text-gray-500 mt-1">月・水</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">中村校</p>
+          <p class="text-sm text-gray-500 mt-1">月・木</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 開校確定 -->
+    <section>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="rank-badge bg-blue-100 text-blue-700">B</span>
+        <h2 class="font-bold text-gray-800">開校確定</h2>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">平和台校</p>
+          <p class="text-sm text-gray-500 mt-1">月・木</p>
+          <span class="inline-block mt-2 text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium">2026年9月開校予定</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 開校予定・講師募集中 -->
+    <section>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="rank-badge bg-amber-100 text-amber-700">C</span>
+        <h2 class="font-bold text-gray-800">開校予定（会場確定・講師募集中）</h2>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">江古田校</p>
+          <p class="text-sm text-gray-500 mt-1">火・金</p>
+          <span class="inline-block mt-2 text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">講師募集中</span>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">東武練馬校</p>
+          <p class="text-sm text-gray-500 mt-1">水・金</p>
+          <span class="inline-block mt-2 text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">講師募集中</span>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">上板橋校</p>
+          <p class="text-sm text-gray-500 mt-1">月・火</p>
+          <span class="inline-block mt-2 text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">会場最終調整中・講師募集開始</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 検討中 -->
+    <section>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="rank-badge bg-gray-200 text-gray-600">D</span>
+        <h2 class="font-bold text-gray-800">検討中の候補地</h2>
+      </div>
+      <p class="text-xs text-gray-400 mb-3">会場交渉中のエリアです。確定次第このページで更新します。</p>
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">常盤台エリア</p>
+          <p class="text-xs text-gray-400 mt-1">板橋区</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">向山エリア</p>
+          <p class="text-xs text-gray-400 mt-1">練馬区</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">富士見台エリア</p>
+          <p class="text-xs text-gray-400 mt-1">中野区</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">田柄エリア</p>
+          <p class="text-xs text-gray-400 mt-1">練馬区</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">桜台エリア</p>
+          <p class="text-xs text-gray-400 mt-1">練馬区</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="font-bold text-gray-800">豊玉エリア</p>
+          <p class="text-xs text-gray-400 mt-1">練馬区</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ── 認証チェック ──────────────────────────────────────────────
+    if (!sessionStorage.getItem('staffKey')) {
+      location.href = 'index.html';
+    }
+
+    // ── ログアウト ────────────────────────────────────────────────
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('staffKey');
+      location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

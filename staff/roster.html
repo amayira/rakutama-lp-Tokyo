@@ -14,6 +14,9 @@
     body { font-family: 'Noto Sans JP', sans-serif; }
     .tab-active { border-bottom: 3px solid #4A96AE; color: #4A96AE; font-weight: 700; }
     .school-active { background-color: #4A96AE; color: #fff; }
+    .page-nav-link { padding: 10px 14px; font-size: 0.82rem; color: #6b7280; border-bottom: 3px solid transparent; transition: all .15s; }
+    .page-nav-link:hover { color: #4A96AE; }
+    .page-nav-active { color: #4A96AE; font-weight: 700; border-bottom-color: #4A96AE; }
     /* グリッドビュー */
     .grid-table { border-collapse: collapse; width: 100%; background: #fff; font-size: 0.8rem; }
     .grid-table th, .grid-table td { border: 1px solid #d1d5db; vertical-align: top; }
@@ -57,6 +60,13 @@
         </svg>
         ログアウト
       </button>
+    </div>
+    <div class="border-t border-gray-100">
+      <div class="max-w-5xl mx-auto px-4 flex gap-1">
+        <a href="roster.html" class="page-nav-link page-nav-active">名簿</a>
+        <a href="jisseki.html" class="page-nav-link">実績</a>
+        <a href="koho.html" class="page-nav-link">候補地の状況</a>
+      </div>
     </div>
   </header>
 
@@ -108,11 +118,6 @@
         class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
         onclick="switchTab('furikae')">
         振替
-      </button>
-      <button data-tab="stats"
-        class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
-        onclick="switchTab('stats')">
-        実績
       </button>
     </div>
 
@@ -251,102 +256,6 @@
     <!-- 空状態 -->
     <div id="emptyArea" class="hidden text-center py-16 text-gray-400 text-sm">
       該当するデータがありません
-    </div>
-
-    <!-- 実績パネル -->
-    <div id="statsArea" class="hidden space-y-6">
-
-      <!-- 生徒数カード -->
-      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div class="bg-white rounded-2xl shadow-sm p-4 col-span-2 sm:col-span-1">
-          <p class="text-xs text-gray-400 mb-1">全校 在籍生徒</p>
-          <div class="flex items-end gap-1">
-            <p class="text-3xl font-bold text-gray-800" id="st-total">—</p>
-            <p class="text-sm text-gray-400 mb-0.5">名</p>
-          </div>
-          <div id="st-trend" class="mt-1 text-xs font-medium"></div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4">
-          <p class="text-xs mb-1" style="color:#3b82f6">早宮校</p>
-          <div class="flex items-end gap-1">
-            <p class="text-2xl font-bold text-gray-800" id="st-hayamiya">—</p>
-            <p class="text-xs text-gray-400 mb-0.5">名</p>
-          </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4">
-          <p class="text-xs mb-1" style="color:#14b8a6">氷川台校</p>
-          <div class="flex items-end gap-1">
-            <p class="text-2xl font-bold text-gray-800" id="st-hikawadai">—</p>
-            <p class="text-xs text-gray-400 mb-0.5">名</p>
-          </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4">
-          <p class="text-xs mb-1" style="color:#a855f7">中村校</p>
-          <div class="flex items-end gap-1">
-            <p class="text-2xl font-bold text-gray-800" id="st-nakamura">—</p>
-            <p class="text-xs text-gray-400 mb-0.5">名</p>
-          </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4">
-          <p class="text-xs mb-1" style="color:#f59e0b">平和台校</p>
-          <div class="flex items-end gap-1">
-            <p class="text-2xl font-bold text-gray-800" id="st-heiwadai">—</p>
-            <p class="text-xs text-gray-400 mb-0.5">名</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 体験・入会 月別推移グラフ -->
-      <div class="bg-white rounded-2xl shadow-sm p-4">
-        <div class="flex items-center justify-between mb-3">
-          <p class="text-sm font-bold text-gray-700">体験・入会 月別推移</p>
-          <div class="flex items-center gap-4 text-xs text-gray-500">
-            <span class="flex items-center gap-1.5">
-              <span class="inline-block w-3 h-3 rounded-sm bg-slate-300"></span>体験
-            </span>
-            <span class="flex items-center gap-1.5">
-              <span class="inline-block w-3 h-3 rounded-sm bg-green-500"></span>入会
-            </span>
-          </div>
-        </div>
-        <div id="chart-container" class="w-full min-h-[160px] flex items-center justify-center text-sm text-gray-400">
-          読み込み中…
-        </div>
-      </div>
-
-      <!-- 月別入会率テーブル -->
-      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
-        <div class="px-4 pt-4 pb-2 flex items-center justify-between">
-          <p class="text-sm font-bold text-gray-700">月別入会率</p>
-          <p class="text-xs text-gray-400">入会者数 ÷ 体験参加者数（2回目除く）</p>
-        </div>
-        <table class="w-full text-sm border-collapse" id="statsTable">
-          <thead>
-            <tr class="bg-primary text-white text-left">
-              <th class="px-4 py-2 font-medium whitespace-nowrap">月</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">全体</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">早宮校</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">氷川台校</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">中村校</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">平和台校</th>
-            </tr>
-          </thead>
-          <tbody id="statsTableBody"></tbody>
-        </table>
-        <div id="statsEmpty" class="hidden text-center py-10 text-gray-400 text-sm">データがありません</div>
-      </div>
-
-      <!-- 更新ボタン -->
-      <div class="text-right">
-        <button onclick="loadData()" class="text-sm text-primary hover:text-[#3a86a0] flex items-center gap-1 transition ml-auto">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
-          更新
-        </button>
-      </div>
-
     </div>
 
     <!-- お知らせパネル -->
@@ -636,12 +545,11 @@
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('tab-active', btn.dataset.tab === tab);
       });
-      const isStats = tab === 'stats';
       const isSeito = tab === 'seito';
       const isTaiken = tab === 'taiken';
       const isNotice = tab === 'notice';
-      document.getElementById('schoolFilter').classList.toggle('hidden', isStats || isNotice);
-      document.getElementById('countBar').classList.toggle('hidden', isStats || isNotice);
+      document.getElementById('schoolFilter').classList.toggle('hidden', isNotice);
+      document.getElementById('countBar').classList.toggle('hidden', isNotice);
       document.getElementById('seitoViewToggle').classList.toggle('hidden', !isSeito);
       document.getElementById('taikenViewToggle').classList.toggle('hidden', !isTaiken);
       document.getElementById('calNav').classList.toggle('hidden', !(isTaiken && taikenView === 'calendar'));
@@ -719,23 +627,6 @@
     // ── データ取得 ────────────────────────────────────────────────
     async function loadData() {
       showState('loading');
-
-      if (currentTab === 'stats') {
-        try {
-          const res = await fetch(`${API}/api/staff/stats`, {
-            headers: { 'Authorization': `Bearer ${staffKey}` },
-          });
-          if (res.status === 401) { sessionStorage.removeItem('staffKey'); location.href = 'index.html'; return; }
-          const data = await res.json();
-          if (!data.success) throw new Error(data.error);
-          renderStats(data);
-        } catch (err) {
-          document.getElementById('errorText').textContent =
-            'データの取得に失敗しました: ' + (err.message || '不明なエラー');
-          showState('error');
-        }
-        return;
-      }
 
       const endpoint = currentTab === 'taiken' ? '/api/staff/taiken'
                      : currentTab === 'seito'  ? '/api/staff/seito'
@@ -926,147 +817,6 @@
         : records.length;
       document.getElementById('countLabel').textContent = `${countBase}件`;
       showState('table');
-    }
-
-    // ── 実績描画 ──────────────────────────────────────────────────
-    function renderStats(data) {
-      const { seito_count, prev_month_total, monthly } = data;
-
-      document.getElementById('st-total').textContent = seito_count.total;
-      document.getElementById('st-hayamiya').textContent = seito_count['早宮校'] ?? 0;
-      document.getElementById('st-hikawadai').textContent = seito_count['氷川台校'] ?? 0;
-      document.getElementById('st-nakamura').textContent = seito_count['中村校'] ?? 0;
-      document.getElementById('st-heiwadai').textContent = seito_count['平和台校'] ?? 0;
-
-      // 先月末比
-      const trend = document.getElementById('st-trend');
-      const diff = seito_count.total - (prev_month_total ?? seito_count.total);
-      if (diff > 0) {
-        trend.textContent = `▲ 先月末比 +${diff}名`;
-        trend.className = 'mt-1 text-xs font-medium text-green-600';
-      } else if (diff < 0) {
-        trend.textContent = `▼ 先月末比 ${diff}名`;
-        trend.className = 'mt-1 text-xs font-medium text-red-500';
-      } else {
-        trend.textContent = '先月末比 ±0名';
-        trend.className = 'mt-1 text-xs font-medium text-gray-400';
-      }
-
-      // 推移グラフ
-      renderChart(monthly);
-
-      // 月別入会率テーブル
-      const tbody = document.getElementById('statsTableBody');
-      const statsEmpty = document.getElementById('statsEmpty');
-      const statsTable = document.getElementById('statsTable');
-
-      if (!monthly || monthly.length === 0) {
-        statsTable.classList.add('hidden');
-        statsEmpty.classList.remove('hidden');
-      } else {
-        statsTable.classList.remove('hidden');
-        statsEmpty.classList.add('hidden');
-
-        const renderRateCells = row => ['全体', '早宮校', '氷川台校', '中村校', '平和台校'].map(label => {
-          const d = row[label] ?? { taiken: 0, nyukai: 0 };
-          const rate = d.taiken > 0 ? Math.round(d.nyukai / d.taiken * 100) : null;
-          const rateStr = rate !== null ? `${rate}%` : '―';
-          const color = rate === null ? 'text-gray-400' : rate >= 50 ? 'text-green-600 font-bold' : rate >= 30 ? 'text-amber-600' : 'text-gray-700';
-          return `<td class="px-4 py-2 text-right whitespace-nowrap">
-            <span class="${color}">${rateStr}</span>
-            <span class="text-xs text-gray-400 ml-1">${d.nyukai}/${d.taiken}</span>
-          </td>`;
-        }).join('');
-
-        // 通期累積（全月合算）を最上部に表示
-        const cumulative = { month: '通期累積' };
-        ['全体', '早宮校', '氷川台校', '中村校', '平和台校'].forEach(label => {
-          cumulative[label] = monthly.reduce((acc, row) => {
-            const d = row[label] ?? { taiken: 0, nyukai: 0 };
-            acc.taiken += d.taiken;
-            acc.nyukai += d.nyukai;
-            return acc;
-          }, { taiken: 0, nyukai: 0 });
-        });
-
-        const cumulativeRow = `<tr class="bg-blue-50 font-bold border-b-2 border-primary">
-          <td class="px-4 py-2 whitespace-nowrap text-gray-800">${cumulative.month}</td>
-          ${renderRateCells(cumulative)}
-        </tr>`;
-
-        const monthlyRows = monthly.map((row, i) => {
-          const bg = i % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-          return `<tr class="${bg} hover:bg-blue-50 transition">
-            <td class="px-4 py-2 whitespace-nowrap text-gray-700">${row.month.replace('-', '/')}</td>
-            ${renderRateCells(row)}
-          </tr>`;
-        }).join('');
-
-        tbody.innerHTML = cumulativeRow + monthlyRows;
-      }
-
-      showState('stats');
-    }
-
-    // ── 推移グラフ（SVG） ─────────────────────────────────────────
-    function renderChart(monthly) {
-      const container = document.getElementById('chart-container');
-      if (!monthly || monthly.length === 0) {
-        container.innerHTML = '<p class="text-gray-400 text-sm">データがありません</p>';
-        return;
-      }
-
-      const W = 560, H = 180, padL = 28, padB = 36, padT = 16, padR = 12;
-      const chartW = W - padL - padR;
-      const chartH = H - padB - padT;
-      const maxVal = Math.max(...monthly.map(r => (r['全体']?.taiken || 0)), 1);
-      const yStep = Math.ceil(maxVal / 4);
-      const yMax = yStep * 4;
-
-      const groupW = chartW / monthly.length;
-      const barW = Math.max(4, Math.min(18, groupW * 0.32));
-      const gap = barW * 0.4;
-
-      let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="w-full">`;
-
-      // グリッド線・Y軸ラベル
-      for (let i = 0; i <= 4; i++) {
-        const val = yStep * i;
-        const y = padT + chartH * (1 - val / yMax);
-        svg += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="#f0f0f0" stroke-width="1"/>`;
-        svg += `<text x="${padL - 5}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="9" fill="#d1d5db">${val}</text>`;
-      }
-
-      // X軸
-      svg += `<line x1="${padL}" y1="${padT + chartH}" x2="${W - padR}" y2="${padT + chartH}" stroke="#e5e7eb" stroke-width="1"/>`;
-
-      // バー＋ラベル
-      monthly.forEach((row, i) => {
-        const taiken = row['全体']?.taiken || 0;
-        const nyukai = row['全体']?.nyukai || 0;
-        const cx = padL + groupW * i + groupW / 2;
-
-        // 体験バー（グレー）
-        const tH = (taiken / yMax) * chartH;
-        const tx = cx - gap / 2 - barW;
-        const ty = padT + chartH - tH;
-        svg += `<rect x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" width="${barW}" height="${Math.max(tH, 0).toFixed(1)}" fill="#cbd5e1" rx="2"/>`;
-        if (taiken > 0) svg += `<text x="${(tx + barW / 2).toFixed(1)}" y="${(ty - 3).toFixed(1)}" text-anchor="middle" font-size="9" fill="#94a3b8">${taiken}</text>`;
-
-        // 入会バー（緑）
-        const nH = (nyukai / yMax) * chartH;
-        const nx = cx + gap / 2;
-        const ny = padT + chartH - nH;
-        svg += `<rect x="${nx.toFixed(1)}" y="${ny.toFixed(1)}" width="${barW}" height="${Math.max(nH, 0).toFixed(1)}" fill="#22c55e" rx="2"/>`;
-        if (nyukai > 0) svg += `<text x="${(nx + barW / 2).toFixed(1)}" y="${(ny - 3).toFixed(1)}" text-anchor="middle" font-size="9" fill="#16a34a">${nyukai}</text>`;
-
-        // X軸ラベル（月だけ表示）
-        const label = row.month.slice(5).replace(/^0/, '') + '月';
-        svg += `<text x="${cx.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#9ca3af">${label}</text>`;
-      });
-
-      svg += '</svg>';
-      container.innerHTML = svg;
     }
 
     // ── グリッドヘッダー描画 ──────────────────────────────────────
@@ -1270,7 +1020,6 @@
       document.getElementById('gridSummary').classList.toggle('hidden', state !== 'grid');
       document.getElementById('calendarArea').classList.toggle('hidden', state !== 'calendar');
       document.getElementById('emptyArea').classList.toggle('hidden', state !== 'empty');
-      document.getElementById('statsArea').classList.toggle('hidden', state !== 'stats');
       document.getElementById('noticeArea').classList.toggle('hidden', state !== 'notice');
       if (state === 'loading') {
         document.getElementById('countLabel').textContent = '読み込み中…';
