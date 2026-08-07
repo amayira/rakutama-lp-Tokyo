@@ -283,6 +283,17 @@ async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboD
   const kyoshitsuLine = kyoshitsu ? `\n■ ご希望の教室：${kyoshitsu}` : "";
   const kiboLine = kiboDaiji ? `\n■ ご希望日時：${kiboDaiji}` : "";
 
+  // FC加盟店は申込者に送らず、本部へバックアップだけ送る
+  if (profile.mode === "backup") {
+    await sendFranchiseBackup({
+      profile, apiKey, org, to,
+      name: `${familyName} ${givenName}`.trim(),
+      subject: "【体験申込受付】",
+      rows: [["ご希望の教室", kyoshitsu], ["ご希望日時", kiboDaiji]].filter(([, v]) => v),
+    });
+    return;
+  }
+
   // 問い合わせ先は組織で異なる（公式LINEは東京直営のみ）
   const contactLead = profile.line
     ? "※ お急ぎの場合は、公式LINEまたはメールにてお問い合わせください。"
@@ -349,11 +360,15 @@ ${profile.footer}
 // 管理者宛（有山さん）の控え・障害通知は自社ドメインから送る
 const MAIL_FROM = "楽珠そろばん教室 <info@rakutama-tokyo.com>";
 
-// 組織ごとの差出人・問い合わせ先・署名（2026-08-07）。
-// 加盟店・本部は運営会社も連絡先も自社と異なるため、本部ドメイン(rakutama-soroban.com)から
-// 本部用のResendキーで送る。キーが未設定の組織には送信しない（別ドメイン名義の誤送信を防ぐ）。
+// 組織ごとのメール方針（2026-08-07）。
+//   mode:"direct" … 申込者（保護者）本人へ受付メールを送る
+//   mode:"backup" … 申込者へは送らず、本部へ申込内容のバックアップだけ送る
+// 加盟店は運営会社・問い合わせ窓口が各社で異なり、楽珠名義で保護者に自動返信すると
+// 実態と食い違うため backup 運用にする（有山さん判断 2026-08-07）。
+// キーが未設定の組織には送信しない（別ドメイン名義の誤送信を防ぐ）。
 const MAIL_PROFILES = {
   "アルファーブレイン": {
+    mode: "direct",
     keyVar: "RESEND_API_KEY",
     from: "楽珠そろばん教室 <info@rakutama-tokyo.com>",
     addr: "info@rakutama-tokyo.com",
@@ -362,20 +377,61 @@ const MAIL_PROFILES = {
     footer: "楽珠そろばん教室（東京・練馬）｜運営：アルファーブレイン合同会社",
   },
   "本部": {
+    mode: "direct",
     keyVar: "RESEND_API_KEY_HONBU",
     from: "楽珠そろばん教室 <info@rakutama-soroban.com>",
     addr: "info@rakutama-soroban.com",
-    // 公式LINEは東京直営専用のため本部・加盟店には案内しない
+    // 公式LINEは東京直営専用のため本部には案内しない
     line: "",
     subjectSuffix: "楽珠そろばん教室",
-    // 加盟店ごとに運営会社が異なるため、署名に運営会社名は入れない
+    // 運営会社名は入れない
     footer: "楽珠そろばん教室",
   },
 };
 
-/** 所属組織コード → メールプロファイル（未知・空は東京直営扱い） */
+// FC加盟店（上記以外の組織コード）用。申込者には送らず本部へバックアップのみ。
+const FC_BACKUP_PROFILE = {
+  mode: "backup",
+  keyVar: "RESEND_API_KEY_HONBU",
+  from: "楽珠そろばん教室 <info@rakutama-soroban.com>",
+  backupTo: "info@rakutama-soroban.com",
+};
+
+/**
+ * 所属組織コード → メールプロファイル。
+ * 空欄は東京直営扱い（旧レコードで所属組織が未設定のものが自社のため）。
+ * 未知の組織コード＝FC加盟店とみなし、バックアップ運用にする。
+ */
 function getMailProfile(org) {
-  return MAIL_PROFILES[org] ?? MAIL_PROFILES["アルファーブレイン"];
+  if (!org) return MAIL_PROFILES["アルファーブレイン"];
+  return MAIL_PROFILES[org] ?? FC_BACKUP_PROFILE;
+}
+
+/** FC加盟店ぶんの申込内容を本部へバックアップ送信する（申込者には送らない） */
+async function sendFranchiseBackup({ profile, apiKey, org, to, name, subject, rows }) {
+  const plainSubject = String(subject).replace(/[【】]/g, "");
+  const lines = [
+    "FC加盟店フォームからの申込です。加盟店の運営会社・問い合わせ窓口が異なるため、",
+    "申込者への自動返信は送信していません（本部へのバックアップのみ）。",
+    "",
+    `■ 所属組織：${org}`,
+    `■ 申込者：${name || "-"}`,
+    `■ 申込者メール：${to}`,
+    ...rows.map(([k, v]) => `■ ${k}：${v}`),
+  ];
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: profile.from,
+      to: [profile.backupTo],
+      subject: `【加盟店控え】${plainSubject}：${name || to}（${org}）`,
+      text: lines.join("\n") + "\n",
+    }),
+  });
 }
 
 // 体験・入会の控え／障害通知の宛先（本部・全組織分をここに集約）
@@ -421,6 +477,13 @@ async function sendReceiptEmail({ to, name, subject, lead, rows, org, env }) {
 
   const namePart = name ? `${name} さん` : "ご保護者様";
   const filled = (rows || []).filter(([, v]) => v != null && String(v).trim() !== "");
+
+  // FC加盟店は申込者に送らず、本部へバックアップだけ送る
+  if (profile.mode === "backup") {
+    await sendFranchiseBackup({ profile, apiKey, org, to, name, subject, rows: filled });
+    return;
+  }
+
   const fullSubject = `${subject}${profile.subjectSuffix}`;
 
   // 問い合わせ先は組織で異なる（公式LINEは東京直営のみ）
@@ -585,7 +648,9 @@ async function handleTaiken(body, env, origin) {
   });
 
   // kintone登録成功後に確認メール送信（失敗しても申込自体はエラーにしない）
-  // 組織ごとの差出人・問い合わせ先で送る（本部・加盟店は本部ドメインから）。
+  // 組織ごとに送り分ける（東京直営・本部＝申込者へ／FC加盟店＝本部へバックアップ）。
+  // 加盟店フォームは form.rakutama-soroban.com 配下のパス違いで Origin では区別できないため、
+  // フォームが送ってくる body.所属組織 を優先する（入会フォームと同じ扱い）。
   try {
     await sendConfirmationEmail(
       body["メールアドレス"],
@@ -593,7 +658,7 @@ async function handleTaiken(body, env, origin) {
       body["名"] ?? "",
       body["教室名"] ?? "",
       body["希望日時"] ?? "",
-      getOrgCode(origin),
+      body["所属組織"] || getOrgCode(origin),
       env,
     );
   } catch (e) {
