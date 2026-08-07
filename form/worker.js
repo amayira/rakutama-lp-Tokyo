@@ -276,6 +276,8 @@ async function handleLookup(body, env) {
 
 async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboDaiji, org, env) {
   const profile = getMailProfile(org);
+  // mode:"none"（FC加盟店）は申込者へ自動返信しない。内容は本部への控えメールで届く。
+  if (profile.mode !== "direct") return;
   const apiKey = env[profile.keyVar];
   if (!apiKey || !to) return;
 
@@ -283,16 +285,6 @@ async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboD
   const kyoshitsuLine = kyoshitsu ? `\n■ ご希望の教室：${kyoshitsu}` : "";
   const kiboLine = kiboDaiji ? `\n■ ご希望日時：${kiboDaiji}` : "";
 
-  // FC加盟店は申込者に送らず、本部へバックアップだけ送る
-  if (profile.mode === "backup") {
-    await sendFranchiseBackup({
-      profile, apiKey, org, to,
-      name: `${familyName} ${givenName}`.trim(),
-      subject: "【体験申込受付】",
-      rows: [["ご希望の教室", kyoshitsu], ["ご希望日時", kiboDaiji]].filter(([, v]) => v),
-    });
-    return;
-  }
 
   // 問い合わせ先は組織で異なる（公式LINEは東京直営のみ）
   const contactLead = profile.line
@@ -389,53 +381,23 @@ const MAIL_PROFILES = {
   },
 };
 
-// FC加盟店（上記以外の組織コード）用。申込者には送らず本部へバックアップのみ。
-const FC_BACKUP_PROFILE = {
-  mode: "backup",
-  keyVar: "RESEND_API_KEY_HONBU",
-  from: "楽珠そろばん教室 <info@rakutama-soroban.com>",
-  backupTo: "info@rakutama-soroban.com",
-};
+// FC加盟店（上記以外の組織コード）用。申込者には自動返信しない。
+// 申込内容そのものは全組織まとめてバックアップメール（下記 ADMIN_EMAILS）で本部に届く。
+const FC_NO_REPLY_PROFILE = { mode: "none" };
 
 /**
  * 所属組織コード → メールプロファイル。
  * 空欄は東京直営扱い（旧レコードで所属組織が未設定のものが自社のため）。
- * 未知の組織コード＝FC加盟店とみなし、バックアップ運用にする。
+ * 未知の組織コード＝FC加盟店とみなし、申込者への自動返信を止める。
  */
 function getMailProfile(org) {
   if (!org) return MAIL_PROFILES["アルファーブレイン"];
-  return MAIL_PROFILES[org] ?? FC_BACKUP_PROFILE;
+  return MAIL_PROFILES[org] ?? FC_NO_REPLY_PROFILE;
 }
 
-/** FC加盟店ぶんの申込内容を本部へバックアップ送信する（申込者には送らない） */
-async function sendFranchiseBackup({ profile, apiKey, org, to, name, subject, rows }) {
-  const plainSubject = String(subject).replace(/[【】]/g, "");
-  const lines = [
-    "FC加盟店フォームからの申込です。加盟店の運営会社・問い合わせ窓口が異なるため、",
-    "申込者への自動返信は送信していません（本部へのバックアップのみ）。",
-    "",
-    `■ 所属組織：${org}`,
-    `■ 申込者：${name || "-"}`,
-    `■ 申込者メール：${to}`,
-    ...rows.map(([k, v]) => `■ ${k}：${v}`),
-  ];
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: profile.from,
-      to: [profile.backupTo],
-      subject: `【加盟店控え】${plainSubject}：${name || to}（${org}）`,
-      text: lines.join("\n") + "\n",
-    }),
-  });
-}
-
-// 体験・入会の控え／障害通知の宛先（本部・全組織分をここに集約）
-const ADMIN_EMAIL = "k-ariyama@alpha-brain.jp";
+// 申込控え／障害通知の宛先。全フォーム・全組織の申込がここに集約される
+// （2026-08-07 有山さん指示で本部アドレスを追加。加盟店ぶんも含め全送信のバックアップ）。
+const ADMIN_EMAILS = ["k-ariyama@alpha-brain.jp", "info@rakutama-soroban.com"];
 
 /**
  * 管理者宛の控え・障害通知メール（テキストのみ）。
@@ -457,7 +419,7 @@ async function sendAdminEmail({ subject, intro, fields, env }) {
         "Authorization": `Bearer ${env.RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from: MAIL_FROM, to: [ADMIN_EMAIL], subject, text }),
+      body: JSON.stringify({ from: MAIL_FROM, to: ADMIN_EMAILS, subject, text }),
     });
   } catch (e) {
     console.error("管理者メール送信エラー:", e);
@@ -472,17 +434,13 @@ async function sendAdminEmail({ subject, intro, fields, env }) {
  */
 async function sendReceiptEmail({ to, name, subject, lead, rows, org, env }) {
   const profile = getMailProfile(org);
+  // mode:"none"（FC加盟店）は申込者へ自動返信しない。内容は本部への控えメールで届く。
+  if (profile.mode !== "direct") return;
   const apiKey = env[profile.keyVar];
   if (!apiKey || !to) return;
 
   const namePart = name ? `${name} さん` : "ご保護者様";
   const filled = (rows || []).filter(([, v]) => v != null && String(v).trim() !== "");
-
-  // FC加盟店は申込者に送らず、本部へバックアップだけ送る
-  if (profile.mode === "backup") {
-    await sendFranchiseBackup({ profile, apiKey, org, to, name, subject, rows: filled });
-    return;
-  }
 
   const fullSubject = `${subject}${profile.subjectSuffix}`;
 
@@ -562,17 +520,43 @@ async function getStudentContact(studentNumber, env) {
 }
 
 /**
- * 在学生フォームの受付完了メールを送る。
+ * 在学生フォーム（欠席・振替・振替キャンセル・検定・フラッシュ暗算・クラス変更）の
+ * 受付完了メールと控えメールを送る。ここが在学生系フォームの唯一の出口。
+ *
+ * ① 控え：全組織・全フォームぶんを必ず ADMIN_EMAILS へ送る（申込者に送れたかに関係なく）
+ * ② 受付完了：東京直営・本部のみ申込者本人へ。FC加盟店は送らない
+ *
  * body に氏名が無い場合は生徒名簿から補完。メール送信の失敗は申込自体を止めない。
  */
 async function sendStudentReceipt({ studentNumber, familyName, givenName, subject, lead, rows, env }) {
+  let contact = null;
   try {
-    const contact = await getStudentContact(studentNumber, env);
-    if (!contact || !contact.email) return;
-    // 組織ごとの差出人・問い合わせ先で送る（空は東京直営扱い）。
-    // 該当組織のResendキーが未設定なら sendReceiptEmail 側で何もしない。
-    const name = `${familyName || contact.familyName || ""} ${givenName || contact.givenName || ""}`.trim();
-    await sendReceiptEmail({ to: contact.email, name, subject, lead, rows, org: contact.org, env });
+    contact = await getStudentContact(studentNumber, env);
+  } catch (e) {
+    console.error("生徒連絡先の取得エラー:", e);
+  }
+
+  const name = `${familyName || contact?.familyName || ""} ${givenName || contact?.givenName || ""}`.trim();
+  const org = contact?.org ?? "";
+
+  // ① 控え（sendAdminEmail は throw しない）
+  await sendAdminEmail({
+    subject: `【控え】${String(subject).replace(/[【】]/g, "")}：${name || studentNumber}`,
+    intro: `${String(subject).replace(/[【】]/g, "")}を受け付けました。`,
+    fields: {
+      生徒番号: studentNumber,
+      お名前: name,
+      所属組織: org || "アルファーブレイン",
+      申込者メール: contact?.email ?? "（生徒名簿にメール登録なし）",
+      ...Object.fromEntries((rows || []).map(([k, v]) => [k, v])),
+    },
+    env,
+  });
+
+  // ② 申込者本人への受付完了メール
+  try {
+    if (!contact?.email) return;
+    await sendReceiptEmail({ to: contact.email, name, subject, lead, rows, org, env });
   } catch (e) {
     console.error("受付メール送信エラー:", e);
   }
@@ -1398,14 +1382,7 @@ async function handleClassChange(body, env) {
     throw err;
   }
 
-  // 成功時の控えメール（全組織分を本部へ。失敗しても申込自体はエラーにしない）
-  await sendAdminEmail({
-    subject: `【控え】クラス・コース変更申請：${mailFields["氏名"]}（${mailFields["教室名"]}）`,
-    intro: "クラス・コース変更申請を受け付け、kintone（App18）に登録しました。",
-    fields: mailFields,
-    env,
-  });
-
+  // 成功時の控えメールは sendStudentReceipt が全フォーム共通で送るのでここでは送らない
   await sendStudentReceipt({
     studentNumber: body["生徒番号"],
     familyName: body["氏"],
