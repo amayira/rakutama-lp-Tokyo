@@ -274,12 +274,23 @@ async function handleLookup(body, env) {
 
 // ─── Resend メール送信 ────────────────────────────────────────────────────────
 
-async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboDaiji, env) {
-  if (!env.RESEND_API_KEY || !to) return;
+async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboDaiji, org, env) {
+  const profile = getMailProfile(org);
+  const apiKey = env[profile.keyVar];
+  if (!apiKey || !to) return;
 
   const namePart = familyName || givenName ? `${familyName} ${givenName}`.trim() + " さん" : "ご保護者様";
   const kyoshitsuLine = kyoshitsu ? `\n■ ご希望の教室：${kyoshitsu}` : "";
   const kiboLine = kiboDaiji ? `\n■ ご希望日時：${kiboDaiji}` : "";
+
+  // 問い合わせ先は組織で異なる（公式LINEは東京直営のみ）
+  const contactLead = profile.line
+    ? "※ お急ぎの場合は、公式LINEまたはメールにてお問い合わせください。"
+    : "※ お急ぎの場合は、メールにてお問い合わせください。";
+  const contactTextLines = [
+    profile.line ? `　公式LINE：${profile.line}` : "",
+    `　メール：${profile.addr}`,
+  ].filter(Boolean).join("\n");
 
   const textBody = `${namePart}
 
@@ -290,13 +301,11 @@ async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboD
 担当者より **1営業日以内** に体験日時の確定メールをお送りします。
 今しばらくお待ちください。
 
-※ お急ぎの場合は、公式LINEまたはメールにてお問い合わせください。
-　公式LINE：https://lin.ee/oW7wspr
-　メール：info@rakutama-tokyo.com
+${contactLead}
+${contactTextLines}
 
 ━━━━━━━━━━━━━━━━━━━━━━
-楽珠そろばん教室（東京・練馬）
-運営：アルファーブレイン合同会社
+${profile.footer}
 ━━━━━━━━━━━━━━━━━━━━━━`;
 
   const htmlBody = `<p>${namePart}</p>
@@ -309,22 +318,22 @@ async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboD
 <p>担当者より <strong>1営業日以内</strong> に体験日時の確定メールをお送りします。<br>今しばらくお待ちください。</p>
 <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
 <p style="font-size:13px;color:#555;">
-  お急ぎの場合は、公式LINEまたはメールにてお問い合わせください。<br>
-  公式LINE：<a href="https://lin.ee/oW7wspr">https://lin.ee/oW7wspr</a><br>
-  メール：<a href="mailto:info@rakutama-tokyo.com">info@rakutama-tokyo.com</a>
+  ${contactLead.replace(/^※ /, "")}<br>
+  ${profile.line ? `公式LINE：<a href="${profile.line}">${profile.line}</a><br>` : ""}
+  メール：<a href="mailto:${profile.addr}">${profile.addr}</a>
 </p>
-<p style="font-size:12px;color:#aaa;">楽珠そろばん教室（東京・練馬）｜運営：アルファーブレイン合同会社</p>`;
+<p style="font-size:12px;color:#aaa;">${profile.footer}</p>`;
 
   await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+      "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "楽珠そろばん教室 <info@rakutama-tokyo.com>",
+      from: profile.from,
       to: [to],
-      subject: "【体験申込受付】楽珠そろばん教室 東京・練馬",
+      subject: `【体験申込受付】${profile.subjectSuffix}`,
       text: textBody,
       html: htmlBody,
     }),
@@ -337,9 +346,37 @@ async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboD
 // 受付時に自動返信を送る（2026-07-06）。在学生フォームはメール欄を持たないため、
 // worker 側で生徒番号 → 生徒名簿(App19) の保護者メールを引いて送信する。
 
+// 管理者宛（有山さん）の控え・障害通知は自社ドメインから送る
 const MAIL_FROM = "楽珠そろばん教室 <info@rakutama-tokyo.com>";
-const MAIL_LINE = "https://lin.ee/oW7wspr";
-const MAIL_ADDR = "info@rakutama-tokyo.com";
+
+// 組織ごとの差出人・問い合わせ先・署名（2026-08-07）。
+// 加盟店・本部は運営会社も連絡先も自社と異なるため、本部ドメイン(rakutama-soroban.com)から
+// 本部用のResendキーで送る。キーが未設定の組織には送信しない（別ドメイン名義の誤送信を防ぐ）。
+const MAIL_PROFILES = {
+  "アルファーブレイン": {
+    keyVar: "RESEND_API_KEY",
+    from: "楽珠そろばん教室 <info@rakutama-tokyo.com>",
+    addr: "info@rakutama-tokyo.com",
+    line: "https://lin.ee/oW7wspr",
+    subjectSuffix: "楽珠そろばん教室 東京・練馬",
+    footer: "楽珠そろばん教室（東京・練馬）｜運営：アルファーブレイン合同会社",
+  },
+  "本部": {
+    keyVar: "RESEND_API_KEY_HONBU",
+    from: "楽珠そろばん教室 <info@rakutama-soroban.com>",
+    addr: "info@rakutama-soroban.com",
+    // 公式LINEは東京直営専用のため本部・加盟店には案内しない
+    line: "",
+    subjectSuffix: "楽珠そろばん教室",
+    // 加盟店ごとに運営会社が異なるため、署名に運営会社名は入れない
+    footer: "楽珠そろばん教室",
+  },
+};
+
+/** 所属組織コード → メールプロファイル（未知・空は東京直営扱い） */
+function getMailProfile(org) {
+  return MAIL_PROFILES[org] ?? MAIL_PROFILES["アルファーブレイン"];
+}
 
 // 体験・入会の控え／障害通知の宛先（本部・全組織分をここに集約）
 const ADMIN_EMAIL = "k-ariyama@alpha-brain.jp";
@@ -371,19 +408,29 @@ async function sendAdminEmail({ subject, intro, fields, env }) {
   }
 }
 
-// 受付完了メールは自社（東京直営）のみ送信する。FC加盟店・本部には送らない。
-const MAIL_ORG = "アルファーブレイン";
-
 /**
  * 受付完了メールの汎用送信関数。
  * rows = [[ラベル, 値], ...]（値が空・null の行は自動で省略）。
- * RESEND_API_KEY 未設定 or 宛先無しなら何もしない。
+ * subject は「【欠席受付】」までを渡す。組織ごとの教室名は自動で後置される。
+ * 組織のResendキー未設定 or 宛先無しなら何もしない。
  */
-async function sendReceiptEmail({ to, name, subject, lead, rows, env }) {
-  if (!env.RESEND_API_KEY || !to) return;
+async function sendReceiptEmail({ to, name, subject, lead, rows, org, env }) {
+  const profile = getMailProfile(org);
+  const apiKey = env[profile.keyVar];
+  if (!apiKey || !to) return;
 
   const namePart = name ? `${name} さん` : "ご保護者様";
   const filled = (rows || []).filter(([, v]) => v != null && String(v).trim() !== "");
+  const fullSubject = `${subject}${profile.subjectSuffix}`;
+
+  // 問い合わせ先は組織で異なる（公式LINEは東京直営のみ）
+  const contactLead = profile.line
+    ? "ご不明な点は、公式LINEまたはメールにてお問い合わせください。"
+    : "ご不明な点は、メールにてお問い合わせください。";
+  const contactTextLines = [
+    profile.line ? `　公式LINE：${profile.line}` : "",
+    `　メール：${profile.addr}`,
+  ].filter(Boolean).join("\n");
 
   const textRows = filled.map(([k, v]) => `■ ${k}：${v}`).join("\n");
   const textBody = `${namePart}
@@ -396,13 +443,11 @@ ${textRows}
 内容を確認のうえ、必要に応じて担当者よりご連絡いたします。
 ※ このメールは送信専用の自動返信です。ご返信いただいてもお応えできません。
 
-ご不明な点は、公式LINEまたはメールにてお問い合わせください。
-　公式LINE：${MAIL_LINE}
-　メール：${MAIL_ADDR}
+${contactLead}
+${contactTextLines}
 
 ━━━━━━━━━━━━━━━━━━━━━━
-楽珠そろばん教室（東京・練馬）
-運営：アルファーブレイン合同会社
+${profile.footer}
 ━━━━━━━━━━━━━━━━━━━━━━`;
 
   const htmlRows = filled
@@ -418,19 +463,19 @@ ${textRows}
 <span style="color:#888;font-size:13px;">※ このメールは送信専用の自動返信です。ご返信いただいてもお応えできません。</span></p>
 <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
 <p style="font-size:13px;color:#555;">
-  ご不明な点は、公式LINEまたはメールにてお問い合わせください。<br>
-  公式LINE：<a href="${MAIL_LINE}">${MAIL_LINE}</a><br>
-  メール：<a href="mailto:${MAIL_ADDR}">${MAIL_ADDR}</a>
+  ${contactLead}<br>
+  ${profile.line ? `公式LINE：<a href="${profile.line}">${profile.line}</a><br>` : ""}
+  メール：<a href="mailto:${profile.addr}">${profile.addr}</a>
 </p>
-<p style="font-size:12px;color:#aaa;">楽珠そろばん教室（東京・練馬）｜運営：アルファーブレイン合同会社</p>`;
+<p style="font-size:12px;color:#aaa;">${profile.footer}</p>`;
 
   await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+      "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ from: MAIL_FROM, to: [to], subject, text: textBody, html: htmlBody }),
+    body: JSON.stringify({ from: profile.from, to: [to], subject: fullSubject, text: textBody, html: htmlBody }),
   });
 }
 
@@ -461,10 +506,10 @@ async function sendStudentReceipt({ studentNumber, familyName, givenName, subjec
   try {
     const contact = await getStudentContact(studentNumber, env);
     if (!contact || !contact.email) return;
-    // 自社（東京直営）のみ送信。所属組織が別組織なら送らない（空は東京扱い）。
-    if (contact.org && contact.org !== MAIL_ORG) return;
+    // 組織ごとの差出人・問い合わせ先で送る（空は東京直営扱い）。
+    // 該当組織のResendキーが未設定なら sendReceiptEmail 側で何もしない。
     const name = `${familyName || contact.familyName || ""} ${givenName || contact.givenName || ""}`.trim();
-    await sendReceiptEmail({ to: contact.email, name, subject, lead, rows, env });
+    await sendReceiptEmail({ to: contact.email, name, subject, lead, rows, org: contact.org, env });
   } catch (e) {
     console.error("受付メール送信エラー:", e);
   }
@@ -540,18 +585,17 @@ async function handleTaiken(body, env, origin) {
   });
 
   // kintone登録成功後に確認メール送信（失敗しても申込自体はエラーにしない）
-  // 自社（東京直営）のみ送信。加盟店・本部（form.rakutama-soroban.com）には送らない。
+  // 組織ごとの差出人・問い合わせ先で送る（本部・加盟店は本部ドメインから）。
   try {
-    if (getOrgCode(origin) === MAIL_ORG) {
-      await sendConfirmationEmail(
-        body["メールアドレス"],
-        body["氏"] ?? "",
-        body["名"] ?? "",
-        body["教室名"] ?? "",
-        body["希望日時"] ?? "",
-        env,
-      );
-    }
+    await sendConfirmationEmail(
+      body["メールアドレス"],
+      body["氏"] ?? "",
+      body["名"] ?? "",
+      body["教室名"] ?? "",
+      body["希望日時"] ?? "",
+      getOrgCode(origin),
+      env,
+    );
   } catch (e) {
     console.error("確認メール送信エラー:", e);
   }
@@ -598,7 +642,7 @@ async function handleKesseki(body, env) {
     studentNumber: body["生徒番号"],
     familyName: body["氏"],
     givenName: body["名"],
-    subject: "【欠席受付】楽珠そろばん教室 東京・練馬",
+    subject: "【欠席受付】",
     lead: "欠席のご連絡を受け付けました。",
     rows: [
       ["欠席日", body["欠席日"]],
@@ -631,7 +675,7 @@ async function handleFlashAnzan(body, env) {
 
   await sendStudentReceipt({
     studentNumber: body["生徒番号"],
-    subject: "【フラッシュ暗算申込受付】楽珠そろばん教室 東京・練馬",
+    subject: "【フラッシュ暗算申込受付】",
     lead: "フラッシュ暗算のお申し込みを受け付けました。",
     rows: [
       ["項目", body["項目名"]],
@@ -845,7 +889,7 @@ async function handleFurikae(body, env) {
 
   await sendStudentReceipt({
     studentNumber: body["生徒番号"],
-    subject: "【振替受付】楽珠そろばん教室 東京・練馬",
+    subject: "【振替受付】",
     lead: "振替受講のお申し込みを受け付けました。",
     rows: [
       ["振替受講日", body["振替受講日"]],
@@ -882,7 +926,7 @@ async function handleFurikaeCancel(body, env) {
 
   await sendStudentReceipt({
     studentNumber: body["生徒番号"],
-    subject: "【振替キャンセル】楽珠そろばん教室 東京・練馬",
+    subject: "【振替キャンセル】",
     lead: "振替受講のご予約をキャンセルしました。振替の取得期限内であれば、改めて別の日程でご予約いただけます。",
     rows: [
       ["キャンセルした振替受講日", body["振替受講日"]],
@@ -923,7 +967,7 @@ async function handleKentei(body, env) {
     studentNumber: body["生徒番号"],
     familyName: body["氏"],
     givenName: body["名"],
-    subject: "【検定申込受付】楽珠そろばん教室 東京・練馬",
+    subject: "【検定申込受付】",
     lead: "検定のお申し込みを受け付けました。",
     rows: [
       ["受験日", body["受験日"]],
@@ -1061,19 +1105,20 @@ async function handleNyukai(body, env, origin) {
     env,
   });
 
-  // 入会受付メール（東京直営のみ。加盟店は運営会社・連絡先が異なるため送らない）
+  // 入会受付メール（組織ごとの差出人・問い合わせ先で送る）
   try {
-    if (orgCode === MAIL_ORG && g["メールアドレス"]) {
+    if (g["メールアドレス"]) {
       await sendReceiptEmail({
         to: g["メールアドレス"],
         name: `${student["氏"] ?? ""} ${student["名"] ?? ""}`.trim(),
-        subject: "【入会申込受付】楽珠そろばん教室 東京・練馬",
+        subject: "【入会申込受付】",
         lead: "ご入会のお申し込みを受け付けました。担当者が内容を確認し、追ってご連絡いたします。",
         rows: [
           ["教室", student["教室名"]],
           ["初回授業日", student["初回授業日"]],
           ["コース", student["gakuhiName"]],
         ],
+        org: orgCode,
         env,
       });
     }
@@ -1264,13 +1309,43 @@ async function handleClassChange(body, env) {
     備考: body["備考"] ?? "",
   });
 
-  await kintonePost(APP.CLASS_CHANGE, record, token);
+  // 申込内容の原文を管理者側に必ず残す（体験・入会と同じセーフティネット）。
+  // kintone側のフィールド不足でデータが落ちても、メールから復元できるようにする。
+  const mailFields = {
+    生徒番号: body["生徒番号"] ?? "",
+    教室名: body["教室名"] ?? "",
+    氏名: `${body["氏"] ?? ""} ${body["名"] ?? ""}`.trim(),
+    変更種別: body["変更種別"] ?? "",
+    変更希望内容: body["変更希望内容"] ?? "",
+    希望変更時期: body["希望変更時期"] ?? body["希望時期"] ?? "",
+    備考: body["備考"] ?? "",
+  };
+
+  try {
+    await kintonePost(APP.CLASS_CHANGE, record, token);
+  } catch (err) {
+    await sendAdminEmail({
+      subject: `【要対応】クラス・コース変更申請のkintone登録失敗：${mailFields["氏名"]}（${mailFields["教室名"]}）`,
+      intro: `クラス・コース変更申請のkintone登録（App18）に失敗しました。レコードは作成されていません。\n以下の内容を元に手動で登録・対応してください。\n\nエラー内容：${err.message}`,
+      fields: mailFields,
+      env,
+    });
+    throw err;
+  }
+
+  // 成功時の控えメール（全組織分を本部へ。失敗しても申込自体はエラーにしない）
+  await sendAdminEmail({
+    subject: `【控え】クラス・コース変更申請：${mailFields["氏名"]}（${mailFields["教室名"]}）`,
+    intro: "クラス・コース変更申請を受け付け、kintone（App18）に登録しました。",
+    fields: mailFields,
+    env,
+  });
 
   await sendStudentReceipt({
     studentNumber: body["生徒番号"],
     familyName: body["氏"],
     givenName: body["名"],
-    subject: "【クラス変更申込受付】楽珠そろばん教室 東京・練馬",
+    subject: "【クラス変更申込受付】",
     lead: "クラス変更のお申し込みを受け付けました。",
     rows: [
       ["変更種別", body["変更種別"]],
