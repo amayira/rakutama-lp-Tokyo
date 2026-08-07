@@ -349,25 +349,28 @@ ${profile.footer}
 // 受付時に自動返信を送る（2026-07-06）。在学生フォームはメール欄を持たないため、
 // worker 側で生徒番号 → 生徒名簿(App19) の保護者メールを引いて送信する。
 
-// 管理者宛（有山さん）の控え・障害通知は自社ドメインから送る
-const MAIL_FROM = "楽珠そろばん教室 <info@rakutama-tokyo.com>";
-
-// 組織ごとのメール方針（2026-08-07）。
+// 組織ごとのメール方針（2026-08-07 有山さん指示）。
 //   mode:"direct" … 申込者（保護者）本人へ受付メールを送る
-//   mode:"backup" … 申込者へは送らず、本部へ申込内容のバックアップだけ送る
-// 加盟店は運営会社・問い合わせ窓口が各社で異なり、楽珠名義で保護者に自動返信すると
-// 実態と食い違うため backup 運用にする（有山さん判断 2026-08-07）。
+//   mode:"none"   … 申込者へは送らない（加盟店は運営会社・問い合わせ窓口が各社で
+//                   異なり、楽珠名義で自動返信すると実態と食い違うため）
+// 申込控え（adminTo宛）は組織を問わず全フォーム・全送信で必ず送る。
+// 差出人・宛先・使用キーはすべて組織で切り替える：
+//   東京直営 … info@rakutama-tokyo.com  → k-ariyama@alpha-brain.jp
+//   本部・加盟店 … info@rakutama-soroban.com → info@rakutama-soroban.com
 // キーが未設定の組織には送信しない（別ドメイン名義の誤送信を防ぐ）。
+const TOKYO_MAIL = {
+  mode: "direct",
+  keyVar: "RESEND_API_KEY",
+  from: "楽珠そろばん教室 <info@rakutama-tokyo.com>",
+  addr: "info@rakutama-tokyo.com",
+  line: "https://lin.ee/oW7wspr",
+  subjectSuffix: "楽珠そろばん教室 東京・練馬",
+  footer: "楽珠そろばん教室（東京・練馬）｜運営：アルファーブレイン合同会社",
+  adminTo: "k-ariyama@alpha-brain.jp",
+};
+
 const MAIL_PROFILES = {
-  "アルファーブレイン": {
-    mode: "direct",
-    keyVar: "RESEND_API_KEY",
-    from: "楽珠そろばん教室 <info@rakutama-tokyo.com>",
-    addr: "info@rakutama-tokyo.com",
-    line: "https://lin.ee/oW7wspr",
-    subjectSuffix: "楽珠そろばん教室 東京・練馬",
-    footer: "楽珠そろばん教室（東京・練馬）｜運営：アルファーブレイン合同会社",
-  },
+  "アルファーブレイン": TOKYO_MAIL,
   "本部": {
     mode: "direct",
     keyVar: "RESEND_API_KEY_HONBU",
@@ -378,12 +381,17 @@ const MAIL_PROFILES = {
     subjectSuffix: "楽珠そろばん教室",
     // 運営会社名は入れない
     footer: "楽珠そろばん教室",
+    adminTo: "info@rakutama-soroban.com",
   },
 };
 
-// FC加盟店（上記以外の組織コード）用。申込者には自動返信しない。
-// 申込内容そのものは全組織まとめてバックアップメール（下記 ADMIN_EMAILS）で本部に届く。
-const FC_NO_REPLY_PROFILE = { mode: "none" };
+// FC加盟店（上記以外の組織コード）用。申込者には自動返信せず、控えだけ本部へ送る。
+const FC_NO_REPLY_PROFILE = {
+  mode: "none",
+  keyVar: "RESEND_API_KEY_HONBU",
+  from: "楽珠そろばん教室 <info@rakutama-soroban.com>",
+  adminTo: "info@rakutama-soroban.com",
+};
 
 /**
  * 所属組織コード → メールプロファイル。
@@ -391,22 +399,21 @@ const FC_NO_REPLY_PROFILE = { mode: "none" };
  * 未知の組織コード＝FC加盟店とみなし、申込者への自動返信を止める。
  */
 function getMailProfile(org) {
-  if (!org) return MAIL_PROFILES["アルファーブレイン"];
+  if (!org) return TOKYO_MAIL;
   return MAIL_PROFILES[org] ?? FC_NO_REPLY_PROFILE;
 }
 
-// 申込控え／障害通知の宛先。全フォーム・全組織の申込がここに集約される
-// （2026-08-07 有山さん指示で本部アドレスを追加。加盟店ぶんも含め全送信のバックアップ）。
-const ADMIN_EMAILS = ["k-ariyama@alpha-brain.jp", "info@rakutama-soroban.com"];
-
 /**
- * 管理者宛の控え・障害通知メール（テキストのみ）。
+ * 申込控え・障害通知メール（テキストのみ）。組織ごとに差出人と宛先を切り替える。
  * fields = { ラベル: 値, ... }（空値の行は省略）。
+ * org 省略時は東京直営扱い＝有山さん宛（組織が特定できない障害通知はここに集約する）。
  * 申込処理を巻き込まないよう、この関数は絶対に throw しない。
  */
-async function sendAdminEmail({ subject, intro, fields, env }) {
+async function sendAdminEmail({ subject, intro, fields, org, env }) {
   try {
-    if (!env.RESEND_API_KEY) return;
+    const profile = getMailProfile(org);
+    const apiKey = env[profile.keyVar];
+    if (!apiKey) return;
     const now = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
     const rows = Object.entries(fields ?? {})
       .filter(([, v]) => v != null && String(v).trim() !== "")
@@ -416,10 +423,10 @@ async function sendAdminEmail({ subject, intro, fields, env }) {
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from: MAIL_FROM, to: ADMIN_EMAILS, subject, text }),
+      body: JSON.stringify({ from: profile.from, to: [profile.adminTo], subject, text }),
     });
   } catch (e) {
     console.error("管理者メール送信エラー:", e);
@@ -523,7 +530,7 @@ async function getStudentContact(studentNumber, env) {
  * 在学生フォーム（欠席・振替・振替キャンセル・検定・フラッシュ暗算・クラス変更）の
  * 受付完了メールと控えメールを送る。ここが在学生系フォームの唯一の出口。
  *
- * ① 控え：全組織・全フォームぶんを必ず ADMIN_EMAILS へ送る（申込者に送れたかに関係なく）
+ * ① 控え：組織ごとの控え宛先へ必ず送る（申込者に送れたかに関係なく）
  * ② 受付完了：東京直営・本部のみ申込者本人へ。FC加盟店は送らない
  *
  * body に氏名が無い場合は生徒名簿から補完。メール送信の失敗は申込自体を止めない。
@@ -550,6 +557,7 @@ async function sendStudentReceipt({ studentNumber, familyName, givenName, subjec
       申込者メール: contact?.email ?? "（生徒名簿にメール登録なし）",
       ...Object.fromEntries((rows || []).map(([k, v]) => [k, v])),
     },
+    org,
     env,
   });
 
@@ -609,6 +617,10 @@ async function handleTaiken(body, env, origin) {
   };
   const record = buildRecord(fields);
 
+  // 加盟店フォームは form.rakutama-soroban.com 配下のパス違いで Origin では区別できないため、
+  // フォームが送ってくる body.所属組織 を優先する（入会フォームと同じ扱い）。
+  const orgCode = body["所属組織"] || getOrgCode(origin);
+
   // kintone登録に失敗しても申込内容がメールに残るよう、失敗時は管理者へ全文通知してから
   // エラーを返す（リード取りこぼし防止のセーフティネット）
   try {
@@ -618,16 +630,18 @@ async function handleTaiken(body, env, origin) {
       subject: `【要対応】体験申込のkintone登録失敗：${fields["氏"]} ${fields["名"]}（${fields["教室名"]}）`,
       intro: `体験申込のkintone登録（App17）に失敗しました。レコードは作成されていません。\n以下の内容を元に手動で登録・連絡してください。\n\nエラー内容：${err.message}`,
       fields,
+      org: orgCode,
       env,
     });
     throw err;
   }
 
-  // 成功時の控えメール（全組織分を本部へ。失敗しても申込自体はエラーにしない）
+  // 成功時の控えメール（失敗しても申込自体はエラーにしない）
   await sendAdminEmail({
     subject: `【控え】体験申込：${fields["氏"]} ${fields["名"]}（${fields["教室名"]}）`,
     intro: "体験申込を受け付け、kintone（App17）に登録しました。",
-    fields,
+    fields: { 所属組織: orgCode, ...fields },
+    org: orgCode,
     env,
   });
 
@@ -642,7 +656,7 @@ async function handleTaiken(body, env, origin) {
       body["名"] ?? "",
       body["教室名"] ?? "",
       body["希望日時"] ?? "",
-      body["所属組織"] || getOrgCode(origin),
+      orgCode,
       env,
     );
   } catch (e) {
@@ -1141,16 +1155,18 @@ async function handleNyukai(body, env, origin) {
       subject: `【要対応】入会申込のkintone登録失敗：${fields["氏"]} ${fields["名"]}（${fields["教室名"]}）`,
       intro: `入会申込のkintone登録（App19）に失敗しました。レコードは作成されていません。\n以下の内容を元に手動で登録・連絡してください。\n\nエラー内容：${err.message}`,
       fields: mailFields,
+      org: orgCode,
       env,
     });
     throw err;
   }
 
-  // 成功時の控えメール（全組織分を本部へ。失敗しても申込自体はエラーにしない）
+  // 成功時の控えメール（失敗しても申込自体はエラーにしない）
   await sendAdminEmail({
     subject: `【控え】入会申込：${fields["氏"]} ${fields["名"]}（${fields["教室名"]}）`,
     intro: "入会申込を受け付け、kintone（App19）に登録しました。",
     fields: mailFields,
+    org: orgCode,
     env,
   });
 
@@ -1377,6 +1393,8 @@ async function handleClassChange(body, env) {
       subject: `【要対応】クラス・コース変更申請のkintone登録失敗：${mailFields["氏名"]}（${mailFields["教室名"]}）`,
       intro: `クラス・コース変更申請のkintone登録（App18）に失敗しました。レコードは作成されていません。\n以下の内容を元に手動で登録・対応してください。\n\nエラー内容：${err.message}`,
       fields: mailFields,
+      // この時点では所属組織が分からない（生徒名簿の引き当て前）ため、
+      // 障害通知は org 省略＝有山さん宛に寄せる
       env,
     });
     throw err;
