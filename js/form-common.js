@@ -141,9 +141,9 @@ function setupStudentLookup({ onReset, onSuccess, enableSubmitOnSuccess = true }
   });
 }
 
-// ── 当日締切チェック（欠席連絡・振替予約共通、14:30まで）──
+// ── 当日締切チェック（欠席連絡・振替予約共通、14:45まで）──
 // dateValue が「今日」で、かつ現在時刻が締切を過ぎていれば true。過去日・未来日は対象外。
-function isTodayPastCutoff(dateValue, cutoffHour = 14, cutoffMinute = 30) {
+function isTodayPastCutoff(dateValue, cutoffHour = 14, cutoffMinute = 45) {
   if (!dateValue) return false;
   const now = new Date();
   const todayYMD = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;

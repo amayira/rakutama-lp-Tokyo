@@ -96,7 +96,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">欠席日 <span class="text-red-500">*</span></label>
             <input type="date" id="absence-date" required
               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
-            <p class="mt-1 text-xs text-gray-400">当日分のご連絡は14:30までとなります。やむを得ない事情の場合は<a href="https://lin.ee/sFR6X8y" target="_blank" rel="noopener noreferrer" class="underline hover:text-gray-600">公式LINE</a>にてご連絡ください。</p>
+            <p class="mt-1 text-xs text-gray-400">当日分のご連絡は14:45までとなります。やむを得ない事情の場合は<a href="https://lin.ee/sFR6X8y" target="_blank" rel="noopener noreferrer" class="underline hover:text-gray-600">公式LINE</a>にてご連絡ください。</p>
           </div>
 
           <!-- 振替希望期限（自動） -->
@@ -131,7 +131,7 @@
               </div>
               <input type="date" id="furikae-date"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400" />
-              <p class="mt-1 text-xs text-gray-400">当日分の振替予約は14:30までとなります。やむを得ない事情の場合は<a href="https://lin.ee/sFR6X8y" target="_blank" rel="noopener noreferrer" class="underline hover:text-gray-600">公式LINE</a>にてご連絡ください。</p>
+              <p class="mt-1 text-xs text-gray-400">当日分の振替予約は14:45までとなります。やむを得ない事情の場合は<a href="https://lin.ee/sFR6X8y" target="_blank" rel="noopener noreferrer" class="underline hover:text-gray-600">公式LINE</a>にてご連絡ください。</p>
               <div class="mt-3">
                 <label class="block text-sm font-medium text-gray-700 mb-1">時刻</label>
                 <select id="furikae-time"
@@ -302,8 +302,8 @@
       const errors = [];
       if (!studentData) errors.push('生徒番号を検索してください');
       if (!absenceDate) errors.push('欠席日を選択してください');
-      if (isTodayPastCutoff(absenceDate)) errors.push('本日分の欠席連絡は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。');
-      if (isTodayPastCutoff(furikaeDate)) errors.push('本日分の振替予約は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。');
+      if (isTodayPastCutoff(absenceDate)) errors.push('本日分の欠席連絡は14:45までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。');
+      if (isTodayPastCutoff(furikaeDate)) errors.push('本日分の振替予約は14:45までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。');
 
       if (errors.length > 0) {
         errorBox.textContent = errors.join(' / ');
