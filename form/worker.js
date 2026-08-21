@@ -1002,6 +1002,17 @@ async function handleFurikaeCancel(body, env) {
 }
 
 /**
+ * 受験日から請求日（受験日と同月27日固定）をサーバー側で計算する。
+ */
+function computeKenteiBillingDate(examDate) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(examDate ?? "")) {
+    return "";
+  }
+  const [y, m] = examDate.split("-");
+  return `${y}-${m}-27`;
+}
+
+/**
  * POST /api/kentei
  * Creates a record in 検定申込 (App 12).
  * 暗算受験級 and 珠算受験級 are only set when non-empty.
@@ -1014,6 +1025,7 @@ async function handleKentei(body, env) {
     氏: body["氏"] ?? "",
     名: body["名"] ?? "",
     受験日: body["受験日"] ?? "",
+    請求日: computeKenteiBillingDate(body["受験日"]),
     受験会場: body["受験会場"] ?? "",
   };
 
