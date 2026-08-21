@@ -43,6 +43,14 @@
         <p class="text-sm text-gray-500">受験日と受験級を選択してください。級を選ぶと検定費が表示されます。</p>
       </div>
 
+      <div id="kentei-notice" class="mb-6 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-gray-600 leading-relaxed space-y-1">
+        <p class="font-bold text-amber-700 mb-1">9月検定について</p>
+        <p>・受験日：9/24(木)〜9/30(水)の <span class="font-bold">通常授業内</span> で実施します</p>
+        <p>・お申込み締切：8/31(月) 23:59</p>
+        <p>・週2コースの方は2回受験も可能です（同じ級の重複受験はできません）</p>
+        <p>・受験級についてご不明な点は担当講師にご相談ください</p>
+      </div>
+
       <!-- Error Box -->
       <div id="error-box" class="hidden mb-4 bg-red-50 border border-red-300 text-red-700 rounded-xl px-4 py-3 text-sm"></div>
 
@@ -182,6 +190,19 @@
       </a>
     </div>
 
+    <!-- Closed Screen（受付期間外） -->
+    <div id="closed-screen" class="hidden bg-white rounded-2xl shadow-md p-8 text-center">
+      <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+        <i class="fa-solid fa-clock text-gray-400 text-2xl"></i>
+      </div>
+      <h2 class="text-xl font-black text-gray-800 font-display mb-3">現在、検定の受付期間外です</h2>
+      <p class="text-sm text-gray-500 mb-6">次回の検定案内は公式LINE・教室にてお知らせします。</p>
+      <a href="index"
+        class="inline-block bg-green-500 hover:bg-green-600 text-white font-black text-sm py-2.5 px-8 rounded-full shadow-md transition font-display">
+        トップに戻る
+      </a>
+    </div>
+
   </main>
 
   <footer class="text-center py-8 text-xs text-gray-400">
@@ -190,6 +211,21 @@
 
   <script src="/js/form-common.js"></script>
   <script>
+    // 検定 申込受付期間（次の検定が決まったら1行追加。開始/終了はJSTのローカル日時として評価）
+    const KENTEI_APPLY_WINDOWS = [
+      { start: '2026-08-21T00:00:00+09:00', end: '2026-08-31T23:59:59+09:00' }, // 9月検定（9/24-9/30受験）
+    ];
+
+    function isKenteiApplyOpen() {
+      const now = new Date();
+      return KENTEI_APPLY_WINDOWS.some(w => now >= new Date(w.start) && now <= new Date(w.end));
+    }
+
+    if (!isKenteiApplyOpen()) {
+      document.getElementById('form-card').classList.add('hidden');
+      document.getElementById('closed-screen').classList.remove('hidden');
+    }
+
     // Toggle grade selects
     document.getElementById('shuzan-check').addEventListener('change', (e) => {
       document.getElementById('shuzan-grade-field').classList.toggle('hidden', !e.target.checked);
