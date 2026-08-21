@@ -1021,6 +1021,7 @@ async function handleKentei(body, env) {
   if (body["珠算受験時刻"]) fields["珠算受験時刻"] = body["珠算受験時刻"];
   if (body["暗算受験時刻"]) fields["暗算受験時刻"] = body["暗算受験時刻"];
   if (body["珠算受験級"]) fields["珠算受験級"] = body["珠算受験級"];
+  if (body["備考"]) fields["備考"] = body["備考"];
 
   const record = buildRecord(fields);
   const kenteiToken = [env.TOKEN_KENTEI, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
