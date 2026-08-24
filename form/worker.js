@@ -675,10 +675,10 @@ async function handleKesseki(body, env) {
   const furikaeDate = body["振替受講日"] ?? "";
 
   if (isTodayPastCutoff(absenceDate)) {
-    return { success: false, error: "本日分の欠席連絡は14:45までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
+    return { success: false, error: "本日分の欠席連絡は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
   }
   if (isTodayPastCutoff(furikaeDate)) {
-    return { success: false, error: "本日分の振替予約は14:45までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
+    return { success: false, error: "本日分の振替予約は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
   }
 
   const deadline = computeSubstituteDeadline(absenceDate);
@@ -781,7 +781,9 @@ function tokyoNowMinutes() {
 }
 
 /**
- * 欠席連絡・振替予約の当日締切チェック（14:45まで）。
+ * 欠席連絡・振替予約の当日締切チェック。
+ * ⚠️ ユーザー向け表示・エラー文言は「14:30まで」だが、実際の受付猶予は14:45まで（2026-08-19、有山さん指示）。
+ * 表示文言を直すときは実際の締切（cutoffMinute）まで一緒に動かさないよう注意。
  * dateValue が「今日（日本時間）」で、かつ現在時刻が締切を過ぎていれば true。
  * 過去日・未来日はチェック対象外（当日分のみ締切がある）。
  */
@@ -937,7 +939,7 @@ async function handleFurikae(body, env) {
   }
 
   if (isTodayPastCutoff(body["振替受講日"] ?? "")) {
-    return { success: false, error: "本日分の振替予約は14:45までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
+    return { success: false, error: "本日分の振替予約は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
   }
 
   const record = buildRecord({

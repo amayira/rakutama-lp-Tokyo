@@ -141,7 +141,8 @@ function setupStudentLookup({ onReset, onSuccess, enableSubmitOnSuccess = true }
   });
 }
 
-// ── 当日締切チェック（欠席連絡・振替予約共通、14:45まで）──
+// ── 当日締切チェック（欠席連絡・振替予約共通）──
+// ⚠️ ユーザー向け表示・エラー文言は「14:30まで」だが、実際の受付猶予は14:45まで（2026-08-19、有山さん指示）。
 // dateValue が「今日」で、かつ現在時刻が締切を過ぎていれば true。過去日・未来日は対象外。
 function isTodayPastCutoff(dateValue, cutoffHour = 14, cutoffMinute = 45) {
   if (!dateValue) return false;
