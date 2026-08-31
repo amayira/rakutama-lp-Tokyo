@@ -1552,6 +1552,34 @@ async function handleStaffKesseki(params, env) {
 }
 
 /**
+ * GET /api/staff/kentei?school=all|早宮校|氷川台校|中村校
+ * Returns upcoming 検定申込 (App 12) records where 受験日 >= TODAY().
+ * Fields: 生徒番号, 氏, 名, 教室名, 受験日, 受験会場, 珠算受験級, 暗算受験級, 珠算受験時刻, 暗算受験時刻
+ */
+async function handleStaffKentei(params, env) {
+  const school = params.get("school") ?? "all";
+  const conditions = [`受験日 >= TODAY()`];
+  if (school !== "all") conditions.unshift(`教室名 = "${escapeQueryValue(school)}"`);
+  const query = `${conditions.join(" and ")} order by 受験日 asc, 教室名 asc limit 500`;
+
+  const data = await kintoneGet(APP.KENTEI, query, env.TOKEN_KENTEI);
+  const records = (data.records ?? []).map(rec => ({
+    生徒番号: rec["生徒番号"]?.value ?? "",
+    氏: rec["氏"]?.value ?? "",
+    名: rec["名"]?.value ?? "",
+    教室名: rec["教室名"]?.value ?? "",
+    受験日: rec["受験日"]?.value ?? "",
+    受験会場: rec["受験会場"]?.value ?? "",
+    珠算受験級: rec["珠算受験級"]?.value ?? "",
+    暗算受験級: rec["暗算受験級"]?.value ?? "",
+    珠算受験時刻: rec["珠算受験時刻"]?.value ?? "",
+    暗算受験時刻: rec["暗算受験時刻"]?.value ?? "",
+  }));
+
+  return { success: true, records };
+}
+
+/**
  * 指定日時点で在籍中とみなせるか（作成日時が対象日以前 かつ 退会日が空または対象日以降）
  */
 function isActiveAt(rec, dateStr) {
@@ -1734,6 +1762,11 @@ export default {
             return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
           }
           result = await handleStaffKesseki(params, env);
+        } else if (path === "/api/staff/kentei") {
+          if (!isValidStaffAuth(request, env)) {
+            return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
+          }
+          result = await handleStaffKentei(params, env);
         } else if (path === "/api/staff/stats") {
           if (!isValidStaffAuth(request, env)) {
             return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);

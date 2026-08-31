@@ -30,7 +30,6 @@
     .student-kana { color: #6b7280; font-size: 0.68rem; margin-top: 1px; }
     .student-grade { color: #1d4ed8; font-size: 0.7rem; font-weight: 600; margin-top: 1px; }
     .student-since { color: #9ca3af; font-size: 0.65rem; margin-top: 1px; }
-    .koma-occupancy { text-align: center; font-size: 0.72rem; font-weight: 700; padding: 3px 4px; border-radius: 5px; border: 1px solid; margin-bottom: 3px; }
     /* 体験名簿カレンダービュー */
     .cal-table { border-collapse: collapse; width: 100%; background: #fff; }
     .cal-table th, .cal-table td { border: 1px solid #e5e7eb; vertical-align: top; }
@@ -118,6 +117,11 @@
         class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
         onclick="switchTab('furikae')">
         振替
+      </button>
+      <button data-tab="kentei"
+        class="tab-btn flex-1 py-3 text-sm text-gray-500 transition"
+        onclick="switchTab('kentei')">
+        検定
       </button>
     </div>
 
@@ -241,18 +245,6 @@
       </table>
     </div>
 
-    <!-- グリッド稼働率サマリー（在籍生徒） -->
-    <div id="gridSummary" class="hidden space-y-3 mt-4">
-      <div>
-        <p class="text-xs font-bold text-gray-500 mb-1.5">時間帯別稼働率</p>
-        <div id="gridSummaryTime" class="grid grid-cols-2 gap-2"></div>
-      </div>
-      <div>
-        <p class="text-xs font-bold text-gray-500 mb-1.5">教室別稼働率</p>
-        <div id="gridSummarySchool" class="grid grid-cols-3 gap-2"></div>
-      </div>
-    </div>
-
     <!-- 空状態 -->
     <div id="emptyArea" class="hidden text-center py-16 text-gray-400 text-sm">
       該当するデータがありません
@@ -279,23 +271,6 @@
         <p class="text-sm text-gray-600 leading-relaxed">
           入会金5,500円について、「入会金無料」または「2回目無料体験（55分）」のどちらかを選べます（初回体験当日のお申込みが条件）。今後、全校が対象になります。
         </p>
-      </div>
-
-      <div class="bg-white rounded-2xl shadow-sm p-5">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">大会</span>
-        </div>
-        <h2 class="font-bold text-gray-800 mb-2">らくたまカップ開催概要</h2>
-        <p class="text-sm text-gray-600 leading-relaxed mb-3">
-          年2回（8月・12月）開催のそろばん大会です。8/16（日）に問題配信、8/17（月）〜8/22（土）が本番計測期間。対象は珠算7級以上の在籍生徒（開催月の前後1か月在籍）。教室コースとオンラインコースがあります。講師は本番計測期間中に計測・採点を行い、結果を成績一覧表テンプレートに記入してください。総合成績上位3名にはトロフィー、上位10名と学年別上位3名には賞状が贈られます。
-        </p>
-        <a href="https://rakutama-soroban.com/20260714cup" target="_blank" rel="noopener"
-          class="inline-flex items-center gap-1 text-sm text-primary font-medium hover:underline">
-          詳しい開催概要を見る
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-          </svg>
-        </a>
       </div>
 
       <section id="faqArea" class="space-y-6 pt-2">
@@ -509,6 +484,7 @@
     let cachedKessekiRecords = null;
     let cachedFurikaeRecords = null;
     let cachedTaikenRecords = null;
+    let cachedKenteiRecords = null;
     const now = new Date();
     let calYear = now.getFullYear();
     let calMonth = now.getMonth(); // 0-11
@@ -524,7 +500,6 @@
       { school: '平和台校', day: '木' },
     ];
     const GRID_TIMES = ['16', '17'];
-    const KOMA_CAPACITY = 12;
 
     // ── 認証チェック ──────────────────────────────────────────────
     staffKey = sessionStorage.getItem('staffKey');
@@ -558,6 +533,7 @@
       cachedKessekiRecords = null;
       cachedFurikaeRecords = null;
       cachedTaikenRecords = null;
+      cachedKenteiRecords = null;
       if (isNotice) {
         showState('notice');
         return;
@@ -630,6 +606,7 @@
 
       const endpoint = currentTab === 'taiken' ? '/api/staff/taiken'
                      : currentTab === 'seito'  ? '/api/staff/seito'
+                     : currentTab === 'kentei' ? '/api/staff/kentei'
                      : '/api/staff/kesseki';
       const url = (currentTab === 'kesseki' || currentTab === 'furikae')
         ? `${API}${endpoint}?school=${encodeURIComponent(currentSchool)}&tab=${currentTab}`
@@ -642,6 +619,10 @@
       }
       if (currentTab === 'furikae' && cachedFurikaeRecords) {
         renderTable(cachedFurikaeRecords);
+        return;
+      }
+      if (currentTab === 'kentei' && cachedKenteiRecords) {
+        renderTable(cachedKenteiRecords);
         return;
       }
 
@@ -663,6 +644,7 @@
         if (currentTab === 'kesseki') cachedKessekiRecords = data.records;
         if (currentTab === 'furikae') cachedFurikaeRecords = data.records;
         if (currentTab === 'taiken') cachedTaikenRecords = data.records;
+        if (currentTab === 'kentei') cachedKenteiRecords = data.records;
         renderTable(data.records);
       } catch (err) {
         document.getElementById('errorText').textContent =
@@ -776,6 +758,28 @@
             <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${formatDate(r.振替期日_終_)}</td>
           </tr>`).join('');
 
+      } else if (currentTab === 'kentei') {
+        // 検定タブ：今後の受験予定（誰が・いつ・どの級を受けるか）
+        thead.innerHTML = `
+          <tr>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">教室</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">受験日</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">氏名</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">珠算受験級</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">暗算受験級</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">受験会場</th>
+          </tr>`;
+
+        tbody.innerHTML = records.map((r, i) => `
+          <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition">
+            <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.教室名)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${formatDateWithDay(r.受験日)}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.珠算受験級 ? `${r.珠算受験級}${r.珠算受験時刻 ? '（' + r.珠算受験時刻.slice(0, 5) + '）' : ''}` : '―'}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.暗算受験級 ? `${r.暗算受験級}${r.暗算受験時刻 ? '（' + r.暗算受験時刻.slice(0, 5) + '）' : ''}` : '―'}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${r.受験会場 || '―'}</td>
+          </tr>`).join('');
+
       } else {
         // 振替タブ：振替受講日が確定していて、かつ今日以降のものだけ表示
         const furikaeRecords = records.filter(r => r.振替受講日 && r.振替受講日 >= todayISO());
@@ -868,9 +872,8 @@
           <th class="grid-th-time">${time}</th>
           ${cols.map(col => {
             const students = grid[col.school]?.[col.day]?.[time] ?? [];
-            const badge = komaOccupancyBadge(students.length);
             if (students.length === 0) {
-              return `<td><div class="grid-cell">${badge}</div></td>`;
+              return `<td><div class="grid-cell"></div></td>`;
             }
             const today = new Date(); today.setHours(0,0,0,0);
             const cards = students.map(s => {
@@ -883,36 +886,9 @@
                 ${s.初回授業日 ? `<div class="student-since">${s.初回授業日.replace(/-/g, '/')}</div>` : ''}
               </div>`;
             }).join('');
-            return `<td><div class="grid-cell">${badge}${cards}</div></td>`;
+            return `<td><div class="grid-cell">${cards}</div></td>`;
           }).join('')}
         </tr>`).join('');
-
-      // 時間帯別・教室別の稼働率サマリー
-      const schools = [...new Set(cols.map(c => c.school))];
-      const timeTotals = {};
-      const schoolTotals = {};
-      for (const t of GRID_TIMES) timeTotals[t] = 0;
-      for (const s of schools) schoolTotals[s] = 0;
-
-      for (const col of cols) {
-        for (const t of GRID_TIMES) {
-          const count = grid[col.school]?.[col.day]?.[t]?.length ?? 0;
-          timeTotals[t] += count;
-          schoolTotals[col.school] += count;
-        }
-      }
-
-      const timeCapacity = cols.length * KOMA_CAPACITY;
-      const schoolCapacity = school =>
-        cols.filter(c => c.school === school).length * GRID_TIMES.length * KOMA_CAPACITY;
-
-      document.getElementById('gridSummaryTime').innerHTML = GRID_TIMES.map(t =>
-        occupancySummaryCard(`${t}時クラス`, timeTotals[t], timeCapacity)
-      ).join('');
-
-      document.getElementById('gridSummarySchool').innerHTML = schools.map(s =>
-        occupancySummaryCard(s, schoolTotals[s], schoolCapacity(s))
-      ).join('');
     }
 
     // ── 体験名簿カレンダー描画 ────────────────────────────────────
@@ -983,41 +959,12 @@
       showState('calendar');
     }
 
-    // 稼働率の色スケール（低いと赤系、高いと緑系）
-    function occupancyColor(count, capacity) {
-      const hue = Math.min(count / capacity, 1) * 120; // 0=赤 → 120=緑
-      return {
-        bg: `hsl(${hue}, 65%, 93%)`,
-        border: `hsl(${hue}, 45%, 72%)`,
-        text: `hsl(${hue}, 65%, 30%)`,
-      };
-    }
-
-    // コマの稼働率バッジ（定員12名・グリッドセル内に表示する小型版）
-    function komaOccupancyBadge(count) {
-      const rate = Math.round(count / KOMA_CAPACITY * 100);
-      const c = occupancyColor(count, KOMA_CAPACITY);
-      return `<div class="koma-occupancy" style="background:${c.bg};border-color:${c.border};color:${c.text};">${count}/${KOMA_CAPACITY}（${rate}%）</div>`;
-    }
-
-    // 時間帯別・教室別サマリーカード
-    function occupancySummaryCard(label, count, capacity) {
-      const rate = Math.round(count / capacity * 100);
-      const c = occupancyColor(count, capacity);
-      return `<div class="rounded-xl border px-3 py-2 text-center" style="background:${c.bg};border-color:${c.border};">
-        <p class="text-xs font-medium" style="color:${c.text}">${label}</p>
-        <p class="text-lg font-bold" style="color:${c.text}">${rate}%</p>
-        <p class="text-[0.68rem] text-gray-500">${count}/${capacity}名</p>
-      </div>`;
-    }
-
     // ── UI ヘルパー ───────────────────────────────────────────────
     function showState(state) {
       document.getElementById('loading').classList.toggle('hidden', state !== 'loading');
       document.getElementById('errorArea').classList.toggle('hidden', state !== 'error');
       document.getElementById('tableArea').classList.toggle('hidden', state !== 'table');
       document.getElementById('gridArea').classList.toggle('hidden', state !== 'grid');
-      document.getElementById('gridSummary').classList.toggle('hidden', state !== 'grid');
       document.getElementById('calendarArea').classList.toggle('hidden', state !== 'calendar');
       document.getElementById('emptyArea').classList.toggle('hidden', state !== 'empty');
       document.getElementById('noticeArea').classList.toggle('hidden', state !== 'notice');
