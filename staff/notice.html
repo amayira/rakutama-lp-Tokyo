@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>お知らせ/FAQ | 楽珠そろばん教室 講師ポータル</title>
+  <link rel="icon" href="https://rakutama-tokyo.com/Pictures/favicon.png" type="image/png" />
+  <link rel="stylesheet" href="/tailwind.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    body { font-family: 'Noto Sans JP', sans-serif; }
+    .page-nav-link { padding: 10px 14px; font-size: 0.82rem; color: #6b7280; border-bottom: 3px solid transparent; transition: all .15s; }
+    .page-nav-link:hover { color: #4A96AE; }
+    .page-nav-active { color: #4A96AE; font-weight: 700; border-bottom-color: #4A96AE; }
+  </style>
+</head>
+<body class="min-h-screen bg-base">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div>
+        <span class="font-bold text-gray-800 text-base">楽珠そろばん教室</span>
+        <span class="ml-2 text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">講師ポータル</span>
+      </div>
+      <button id="logoutBtn" class="text-sm text-gray-500 hover:text-red-500 transition flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        ログアウト
+      </button>
+    </div>
+    <div class="border-t border-gray-100">
+      <div class="max-w-5xl mx-auto px-4 flex gap-1">
+        <a href="notice.html" class="page-nav-link page-nav-active">お知らせ/FAQ</a>
+        <a href="roster.html" class="page-nav-link">名簿</a>
+        <a href="jisseki.html" class="page-nav-link">実績</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6 space-y-4">
+
+    <div class="bg-white rounded-2xl shadow-sm p-5">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-medium">実施中のキャンペーン</span>
+      </div>
+      <h2 class="font-bold text-gray-800 mb-2">お友達紹介キャンペーン</h2>
+      <p class="text-sm text-gray-600 leading-relaxed">
+        在籍生徒からのご紹介で、紹介者・お友達の双方に「31アイスクリーム」ギフト券500円分をプレゼント。さらにお友達は入会金5,500円が無料になります。対象は体験未受講のお友達。期間は2026年7月〜、予告なく終了する場合があります。
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-5">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-medium">実施中のキャンペーン</span>
+      </div>
+      <h2 class="font-bold text-gray-800 mb-2">選べる特典</h2>
+      <p class="text-sm text-gray-600 leading-relaxed">
+        入会金5,500円について、「入会金無料」または「2回目無料体験（55分）」のどちらかを選べます（初回体験当日のお申込みが条件）。今後、全校が対象になります。
+      </p>
+    </div>
+
+    <section id="faqArea" class="space-y-6 pt-2">
+      <div>
+        <p class="text-xs font-bold text-primary mb-1">FAQ</p>
+        <p class="text-xs text-gray-400">教室運営・生徒指導に関するよくある質問です。ここにない質問は本部までご連絡ください。</p>
+      </div>
+
+    <div>
+      <h2 class="text-sm font-bold text-gray-700 mb-2 px-1">入会・キャンペーン案内</h2>
+      <div class="space-y-2">
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">当日入会の特典は今どうなっている？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            新規開校の教室も含めて全校共通で、次のどちらかを選べます。<br>
+            A：体験当日の入会で入会金無料<br>
+            B：体験当日に次回（2回目）体験を予約すると2回目体験55分無料<br>
+            それ以外のキャンペーン文言は本部からアナウンスがない限り追加で案内しないでください。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">「事務教材費2ヶ月無料」を「月謝2ヶ月無料」と勘違いされた</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            無料になるのは事務教材費のみで、月謝は無料になりません。入会案内時に誤解が起きやすいので、必ず「月謝は初月から発生する」「無料なのは教材費だけ」と明確に区別して説明してください。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">そろばん経験者が入会する場合の教材費は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            初期教材費は不要です（同ランクの教材を持っているため）。ただし事務教材費は最初から発生します（月謝と同じく回数割計算）。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">月の途中でコース変更（週2→週1など）した場合の料金は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            「回数割で損しない」のは入会初月のみです。月の途中でコース変更しても回数割の再計算はされません。コース変更は前月10日までの手続きが必要です（HPフォームから受付可）。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">キャンペーンの説明で保護者と行き違いが起きたら？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            無料・キャンペーン条件は口頭だけで説明せず、書面（チラシ・案内資料）を見せながら説明してください。判断に迷ったら本部に確認してから保護者に回答してください。
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-sm font-bold text-gray-700 mb-2 px-1">体験・クロージングの進め方</h2>
+      <div class="space-y-2">
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">経験者（そろばん既習）の体験の流れは？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            ①そろばん計測7分（指遣いチェック）→②丸つけ＆フィードバック→③あんざん計測3分（頭にそろばんを思い浮かべているか確認）→④丸つけ＆フィードバック→⑤保護者へ入会案内（どのレベルから始めるか決める）。計測は暗算3分×3回・珠算7分×3回をまとめて行い、最後にまとめて丸つけしてください（都度丸つけしない）。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">兄弟で経験者・未経験者が混在する体験の進め方は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            経験者は経験者フロー、未経験者は通常のらくたまランド1からです。時間配分が厳しい場合は「弟（未経験）15分→兄（経験者）15分→まとめて入会案内」のように区切って進めてください。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">2回目体験の日時で行き違い（ダブルブッキング等）を防ぐには？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            2回目体験の予約が決まったら、保護者に公式LINEへ登録してもらい、日時をそのまま送ってもらってください。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">体験・授業中の保護者の同席は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            原則ご遠慮いただいてください。教室スペースの都合上、授業中の同席はできない旨をご案内し、「近隣で待つ」か「一旦帰宅し終了時間に再度来る」のいずれかをご案内してください。暑さ等やむを得ない事情があれば個別相談可です。
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-sm font-bold text-gray-700 mb-2 px-1">生徒指導</h2>
+      <div class="space-y-2">
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">鉛筆を持ちながらそろばんを弾かせるタイミングは？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            原則は最初から実施してください。未就学児・幼い生徒は運指・集中力の状態を見て講師判断でタイミングを調整して構いません。10級の段階からは必ず実施してください。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">左利きの生徒への指導は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            そろばんは右手、鉛筆は左手で統一してください。鉛筆は左手の中指・薬指・小指で持ち、親指・人差し指でそろばんを押さえる形です。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">生徒同士で答え合わせ（丸つけ）させてよい？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            級テキストの計測は生徒同士の答え合わせでOKです（解答集を使用）。らくたまランドは丸つけのタイミングが異なるため基本は講師が丸つけしますが、同じペースで進められる生徒同士なら任せても構いません。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">ノートの使い方は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            導入プリント①（10級に進んだら）に作り方の説明があります。問題集に直接書き込んでも、1周目はノートに書かせても、どちらでも構いません（本部で統一ルールなし）。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">進級の基準は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            渡しているテキストでの計測10回中5回合格で進級です。5回合格しない場合は新しいテキストをコピーして渡してください（「あと1回で合格」レベルなら同じテキストを使い回し、ノートに解答させても構いません）。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">検定試験の受け方・合格証は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            進級は「検定合格→進級」が基本、サブルートとして「教室での5回合格→進級」も可能です。合格証書が欲しい場合は検定試験の受験が必要です（教室での5回合格だけでは合格証は出ません）。試験問題は本部が印刷して持参し、講師が採点、点数のみを日計連へ提出します（解答用紙の提出は不要）。週2コースの生徒は2科目を別日程で受験可能です。申込はHPフォーム（rakutama-tokyo.com/form/kentei）からです。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">全珠連の検定は受けられる？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            受けられません。楽珠は日計連の検定のみに対応しています。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">生徒が態度不良（指示を聞かない・他の生徒の迷惑になる）の場合は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            対応の基本順序は、①本人との対話（一度外に連れ出して真剣に話す）→②改善なければ連絡帳を通じて保護者に伝える→③それでも改善しなければクラス分けなど保護者と相談、です。
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-sm font-bold text-gray-700 mb-2 px-1">フラッシュ暗算・検定ソフト</h2>
+      <div class="space-y-2">
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">フラッシュ暗算の検定ソフトはAndroidタブレットでも使える？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            検定ソフトはWindowsパソコン専用で、Androidのタブレット・スマートフォンには非対応です。受験の際は自宅や親戚のWindowsパソコンを借りるなどでご対応ください。日々の練習はAndroid向けの無料フラッシュ暗算アプリでも可能です。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">練習ソフトは1人1アカウント必要？検定前後だけ使いたい場合は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            練習ソフトは1人1アカウントである必要はなく、1アカウントを継続利用して構いません。365日プラン・30日プランがあるので、検定前後のみの利用も可能です（登録後の無料期間もあるので、まず登録してお試しください）。<br>
+            一方、検定は1名につき1アカウントが必須です（合格証の発行・級の管理が登録名で行われるため、兄弟でも共有できません）。検定は飛び級不可です。<br>
+            参考資料：
+            <a href="https://rakutama-soroban.com/wp-content/uploads/2021/09/フラッシュ暗算検定レベル.pdf" target="_blank" rel="noopener" class="text-primary hover:underline">級の目安表（PDF）</a>／
+            <a href="https://rakutama-soroban.com/parents/flashanzan" target="_blank" rel="noopener" class="text-primary hover:underline">レベル理解用動画</a>（ID：rakutama／PASS：owl）
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-sm font-bold text-gray-700 mb-2 px-1">教材・備品・施設</h2>
+      <div class="space-y-2">
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">らくたまランド等の在庫が減ってきたら？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            奇数月末に在庫確認・報告をお願いします。不足部数は講師の自宅に郵送し、出勤時に教室に置いてください。在庫確認は都度LINE報告で構いません。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">教材購入（赤ペン等の授業備品）を講師が立て替えた場合は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            適当なものを購入いただき、領収書を保管してください。次回本部担当者が教室訪問したタイミングで精算します。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">間借り施設のオーナーから細かい指摘（片付け・時間等）を受けたら？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            契約している利用時間内であれば問題ありません。指摘の内容が契約範囲を超えている場合は気にせず流していただいて構いません。繰り返される場合は本部が施設側に直接伝えますので、講師が矢面に立つ必要はありません。
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-sm font-bold text-gray-700 mb-2 px-1">スケジュール・振替</h2>
+      <div class="space-y-2">
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">祝日等で月3回しか受講日がない月の振替は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            休講（黒星）の回は他の曜日・他校舎でも振替可能です。無理に振替を促す必要はなく、5週ある月に振替枠が使えるのは「おまけ」程度のイメージで構いません。
+          </p>
+        </details>
+        <details class="faq-item bg-white rounded-xl shadow-sm p-4">
+          <summary class="text-sm font-medium text-gray-800 cursor-pointer">キャンセル期限を過ぎた振替依頼への対応は？</summary>
+          <p class="text-sm text-gray-600 leading-relaxed mt-2">
+            状況次第で柔軟に対応していただいて構いません（本部の事前許可がなくてもその場の判断でOKです）。
+          </p>
+        </details>
+      </div>
+    </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    // ── 認証チェック ──────────────────────────────────────────────
+    if (!sessionStorage.getItem('staffKey')) {
+      location.href = 'index.html';
+    }
+
+    // ── ログアウト ────────────────────────────────────────────────
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('staffKey');
+      location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
