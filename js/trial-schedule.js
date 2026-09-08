@@ -213,7 +213,17 @@ function initTrialSchedule({ classroomSelectId = 'classroom', minDateMode = 'tod
   trialClassroomSelectId = classroomSelectId;
   trialMinDateMode = minDateMode;
 
-  loadClassroomsInto(classroomSelectId);
+  // URLの ?school=◯◯校 で教室を事前選択（access.htmlの各校CTAボタンから遷移した場合）
+  // 教室リストの動的取得（loadClassroomsInto）完了後に実行しないと、平和台校など
+  // HTML直書きにないoptionへのセットが効かないため .then() で待つ
+  loadClassroomsInto(classroomSelectId).then(() => {
+    const presetSchool = new URLSearchParams(window.location.search).get('school');
+    if (!presetSchool) return;
+    const sel = document.getElementById(classroomSelectId);
+    if (![...sel.options].some(o => o.value === presetSchool)) return;
+    sel.value = presetSchool;
+    sel.dispatchEvent(new Event('change'));
+  });
 
   document.getElementById('pref1-date').addEventListener('change', function () {
     buildTimeSelectForChosenDate(document.getElementById('pref1-time'), lastJugyoByDay, this.value);
