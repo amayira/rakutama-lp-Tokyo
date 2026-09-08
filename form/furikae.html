@@ -170,6 +170,9 @@
     const prefillStudentNumber = urlParams.get('studentNumber');
     const prefillTicketId = urlParams.get('ticketId');
 
+    // 振替受講教室の選択肢を教室マスタから動的取得（新規開校時の直書き漏れ対策 /js/form-common.js）
+    loadClassroomOptionsWithDays('furikae-classroom');
+
     let ticketReqId = 0;
 
     // 週2コース：メインの生徒番号（"-"より前）を返す

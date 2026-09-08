@@ -39,6 +39,40 @@ async function loadClassroomsInto(selectId) {
   } catch { /* フォールバック：HTML直書きの選択肢のまま */ }
 }
 
+// ── 校舎の運営曜日（教室マスタに曜日フィールドがないためコード側で管理）──
+// 新規開校時：kintone教室マスタに教室を登録した上で、ここにも1行追記すること。
+const CLASSROOM_DAYS = {
+  '早宮校': '火・金',
+  '氷川台校': '月・水',
+  '中村校': '月・木',
+  '平和台校': '月・木',
+};
+
+// ── 教室マスタから動的取得し「教室名（曜日）」でselectへ描画する（欠席・振替フォームの教室セレクタ用）──
+// プレースホルダー（1件目のoption）はHTML側の表記をそのまま残し、以降のoptionだけ置き換える。
+// disabled状態や選択値のプリセットは呼び出し側のロジックに任せる。
+async function loadClassroomOptionsWithDays(selectId) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  const placeholder = sel.options[0];
+  const current = sel.value;
+  try {
+    const res = await fetch(`${API_BASE}/api/classrooms?orgCode=${encodeURIComponent(ORG_CODE)}`);
+    const data = await res.json();
+    if (!res.ok || !data.success || !Array.isArray(data.classrooms) || !data.classrooms.length) return;
+    sel.innerHTML = '';
+    if (placeholder) sel.appendChild(placeholder);
+    data.classrooms.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      const days = CLASSROOM_DAYS[c.name];
+      opt.textContent = days ? `${c.name}（${days}）` : c.name;
+      sel.appendChild(opt);
+    });
+    if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
+  } catch { /* フォールバック：HTML直書きの選択肢のまま */ }
+}
+
 // ── 教室 → 時刻プルダウン連動（欠席・振替フォーム）──
 // 授業マスタのクラス名から「16時」「17時」を抽出して selectId に描画する。
 async function loadTimeSlotsInto(selectId, classroom) {

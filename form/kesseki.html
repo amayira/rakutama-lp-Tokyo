@@ -183,6 +183,9 @@
 
   <script src="/js/form-common.js"></script>
   <script>
+    // 振替受講教室の選択肢を教室マスタから動的取得（新規開校時の直書き漏れ対策 /js/form-common.js）
+    loadClassroomOptionsWithDays('furikae-classroom');
+
     // 振替取得期限：欠席日の前後1ヶ月
     let substituteDeadlineStart = '';
     let substituteDeadlineEnd = '';
