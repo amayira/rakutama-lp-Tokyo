@@ -223,6 +223,7 @@
           await loadTimeSlotsInto('furikae-time', rec.classroom);
         }
       }
+      applyFurikaeMinDate('furikae-date', document.getElementById('furikae-classroom').value);
     });
     updateDeadline('');
 
@@ -254,6 +255,7 @@
 
     document.getElementById('furikae-classroom').addEventListener('change', function () {
       loadTimeSlotsInto('furikae-time', this.value);
+      applyFurikaeMinDate('furikae-date', this.value);
     });
 
     // 生徒番号検索（共通処理 /js/form-common.js + このフォーム固有のリセット・プリセット）
@@ -273,6 +275,7 @@
         const activeRec = resolveActiveRecord(document.getElementById('absence-date').value);
         if (activeRec?.classroom) classroomSelect.value = activeRec.classroom;
         await loadTimeSlotsInto('furikae-time', classroomSelect.value);
+        applyFurikaeMinDate('furikae-date', classroomSelect.value);
 
         // 今月・来月の自己都合欠席回数を取得
         const studentNumber = document.getElementById('student-number').value.trim();
@@ -310,6 +313,10 @@
       if (!isMiteijou && !furikaeDate) errors.push('振替受講日を選択してください');
       if (isTodayPastCutoff(absenceDate)) errors.push('本日分の欠席連絡は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。');
       if (isTodayPastCutoff(furikaeDate)) errors.push('本日分の振替予約は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。');
+      if (!isMiteijou) {
+        const minDateError = furikaeMinDateError(furikaeClassroom, furikaeDate);
+        if (minDateError) errors.push(minDateError);
+      }
 
       if (errors.length > 0) {
         errorBox.textContent = errors.join(' / ');

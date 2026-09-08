@@ -73,6 +73,33 @@ async function loadClassroomOptionsWithDays(selectId) {
   } catch { /* フォールバック：HTML直書きの選択肢のまま */ }
 }
 
+// ── 校舎ごとの振替受付開始日（開校直後など準備期間で個別制限が必要な場合のみ追加）──
+// ここにない校舎は制限なし。運用が落ち着いたらエントリを削除してよい。
+const CLASSROOM_FURIKAE_START_DATE = {
+  '平和台校': '2026-09-14',
+};
+
+// ── 振替受講日inputに校舎ごとの受付開始日を反映する（欠席・振替フォーム共通）──
+// baseMin（チケットの振替期日など、呼び出し側が別途持つ下限）とのうち遅い方を採用する。
+// 既に選択済みの日付が新しいminを下回っていればクリアする。
+function applyFurikaeMinDate(dateInputId, classroom, baseMin = '') {
+  const dateInput = document.getElementById(dateInputId);
+  if (!dateInput) return;
+  const restrictStart = CLASSROOM_FURIKAE_START_DATE[classroom] || '';
+  const min = restrictStart > baseMin ? restrictStart : baseMin;
+  dateInput.min = min;
+  if (min && dateInput.value && dateInput.value < min) dateInput.value = '';
+}
+
+// ── 送信直前バリデーション用：校舎の受付開始日を下回っていればエラー文言を返す（問題なければnull）──
+// input側のmin属性を直接書き換えて回避された場合の保険。
+function furikaeMinDateError(classroom, dateValue) {
+  const restrictStart = CLASSROOM_FURIKAE_START_DATE[classroom];
+  if (!restrictStart || !dateValue || dateValue >= restrictStart) return null;
+  const [y, m, d] = restrictStart.split('-');
+  return `${classroom}の振替受講は${parseInt(m)}月${parseInt(d)}日以降でお願いします`;
+}
+
 // ── 教室 → 時刻プルダウン連動（欠席・振替フォーム）──
 // 授業マスタのクラス名から「16時」「17時」を抽出して selectId に描画する。
 async function loadTimeSlotsInto(selectId, classroom) {
@@ -108,7 +135,11 @@ let studentData = null;
 
 function setupStudentLookup({ onReset, onSuccess, enableSubmitOnSuccess = true } = {}) {
   document.getElementById('lookup-btn').addEventListener('click', async () => {
-    const studentNumber = document.getElementById('student-number').value.trim();
+    // kintone側は生徒番号を大文字で管理しているため、検索時点で正規化しておく
+    // （小文字のまま検索は通っても、登録時にkintoneとの照合でエラーになるため）
+    const studentNumberInput = document.getElementById('student-number');
+    const studentNumber = studentNumberInput.value.trim().toUpperCase();
+    studentNumberInput.value = studentNumber;
     const lookupError = document.getElementById('lookup-error');
     const studentInfo = document.getElementById('student-info');
     const lookupBtn = document.getElementById('lookup-btn');

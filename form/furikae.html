@@ -281,7 +281,7 @@
 
       classroomSelect.disabled = false;
       dateInput.disabled = false;
-      dateInput.min = ticket['振替期日_始_'] || '';
+      applyFurikaeMinDate('furikae-date', classroomSelect.value, ticket['振替期日_始_'] || '');
       dateInput.max = ticket['振替期日_終_'] || '';
       dateInput.value = '';
       dateHint.textContent = (ticket['振替期日_始_'] && ticket['振替期日_終_'])
@@ -293,6 +293,8 @@
 
     document.getElementById('furikae-classroom').addEventListener('change', function () {
       loadTimeSlotsInto('furikae-time', this.value);
+      const ticket = currentTickets.find(t => t.id === document.getElementById('ticket-select').value);
+      applyFurikaeMinDate('furikae-date', this.value, ticket?.['振替期日_始_'] || '');
     });
 
     document.getElementById('furikae-date').addEventListener('change', function () {
@@ -366,6 +368,8 @@
       if (!furikaeDate) errors.push('振替受講日を選択してください');
       if (!ticketId) errors.push('使用するチケットを選択してください');
       if (isTodayPastCutoff(furikaeDate)) errors.push('本日分の振替予約は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。');
+      const minDateError = furikaeMinDateError(furikaeClassroom, furikaeDate);
+      if (minDateError) errors.push(minDateError);
 
       if (errors.length > 0) {
         errorBox.innerHTML = errors.join('<br />');
