@@ -1135,7 +1135,7 @@ async function handleNyukai(body, env, origin) {
     学校名: student["学校名"] ?? "",
     学年: student["学年"] ?? "",
     教室名: student["教室名"] ?? "",
-    初回授業日: student["初回授業日"] ?? "",
+    希望入会日: student["初回授業日"] ?? "",
     コマ1: jugyoIds[0] ? toKoma(jugyoIds[0]) : "",
     コマ2: jugyoIds[1] ? toKoma(jugyoIds[1]) : "",
     コマ3: jugyoIds[2] ? toKoma(jugyoIds[2]) : "",
