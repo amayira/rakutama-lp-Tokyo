@@ -26,10 +26,12 @@
     .grid-cell { padding: 4px; min-height: 60px; }
     .student-card { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 5px; padding: 4px 6px; margin: 2px 0; }
     .student-card.future { background: #fefce8; border-color: #fde68a; }
+    .student-card.withdrawing { background: #fef2f2; border-color: #fecaca; }
     .student-name { font-weight: 700; color: #111827; font-size: 0.82rem; }
     .student-kana { color: #6b7280; font-size: 0.68rem; margin-top: 1px; }
     .student-grade { color: #1d4ed8; font-size: 0.7rem; font-weight: 600; margin-top: 1px; }
     .student-since { color: #9ca3af; font-size: 0.65rem; margin-top: 1px; }
+    .student-withdraw { color: #dc2626; font-size: 0.65rem; font-weight: 700; margin-top: 1px; }
     /* 体験名簿カレンダービュー */
     .cal-table { border-collapse: collapse; width: 100%; background: #fff; }
     .cal-table th, .cal-table td { border: 1px solid #e5e7eb; vertical-align: top; }
@@ -646,12 +648,14 @@
             const today = new Date(); today.setHours(0,0,0,0);
             const cards = students.map(s => {
               const isFuture = s.初回授業日 && new Date(s.初回授業日) > today;
+              const isWithdrawing = !!s.退会日;
               return `
-              <div class="student-card${isFuture ? ' future' : ''}">
+              <div class="student-card${isFuture ? ' future' : ''}${isWithdrawing ? ' withdrawing' : ''}">
                 <div class="student-name">${s.氏} ${s.名}</div>
                 <div class="student-kana">${s.フリガナ || ''}</div>
                 <div class="student-grade">${s.学年 || ''}</div>
                 ${s.初回授業日 ? `<div class="student-since">${s.初回授業日.replace(/-/g, '/')}</div>` : ''}
+                ${isWithdrawing ? `<div class="student-withdraw">退会予定 ${s.退会日.replace(/-/g, '/')}</div>` : ''}
               </div>`;
             }).join('');
             return `<td><div class="grid-cell">${cards}</div></td>`;
