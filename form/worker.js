@@ -1436,11 +1436,33 @@ async function handleClassChange(body, env) {
 
 // ─── Staff portal handlers ───────────────────────────────────────────────────
 
+/**
+ * STAFF_PASSWORD は講師ごとの個別パスワードのJSONマップ（例: {"太田":"xxxx","中村":"yyyy"}）。
+ * 講師が辞める時はその1エントリだけ削除すればよく、全員のパスワードを変える必要がない。
+ * JSON.parseに失敗した場合は旧・全員共通パスワード文字列として扱う（後方互換）。
+ */
+function getStaffPasswords(env) {
+  const raw = env.STAFF_PASSWORD ?? "";
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return parsed;
+    }
+  } catch {
+    // JSONでなければ旧形式（単一の共有パスワード文字列）とみなす
+  }
+  return raw ? { _legacy: raw } : {};
+}
+
+function isStaffPasswordValid(key, env) {
+  return Boolean(key) && Object.values(getStaffPasswords(env)).includes(key);
+}
+
 /** Validate staff password from Authorization: Bearer <password> header */
 function isValidStaffAuth(request, env) {
   const auth = request.headers.get("Authorization") ?? "";
   const key = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  return key.length > 0 && key === env.STAFF_PASSWORD;
+  return isStaffPasswordValid(key, env);
 }
 
 /**
@@ -1448,7 +1470,7 @@ function isValidStaffAuth(request, env) {
  * { password } → { success: true } or 401
  */
 async function handleStaffAuth(body, env) {
-  if (body.password && body.password === env.STAFF_PASSWORD) {
+  if (body.password && isStaffPasswordValid(body.password, env)) {
     return { success: true };
   }
   return { success: false, error: "パスワードが違います", status: 401 };
@@ -1525,6 +1547,7 @@ async function handleStaffSeito(params, env) {
  * 欠席タブ(tab=kesseki)は教室名（ホーム教室）で絞り込み、
  * 振替タブ(tab=furikae)は振替教室名（振替先教室）で絞り込む
  * （出席する側の先生が知りたいのは振替先教室のため）。
+ * 欠席タブは種別＝「カレンダー都合」（休校日等）を除外する（振替タブは除外しない）。
  * Fields: 生徒番号, 氏, 名, 教室名, 欠席日, 振替受講日, 振替教室名, 振替期日_終_, 時刻
  */
 async function handleStaffKesseki(params, env) {
@@ -1533,6 +1556,7 @@ async function handleStaffKesseki(params, env) {
   const schoolField = tab === "furikae" ? "振替教室名" : "教室名";
   const conditions = [`(欠席日 >= TODAY() or 振替受講日 >= TODAY())`];
   if (school !== "all") conditions.unshift(`${schoolField} = "${escapeQueryValue(school)}"`);
+  if (tab === "kesseki") conditions.push(`種別 not in ("カレンダー都合")`);
   const query = `${conditions.join(" and ")} order by 欠席日 asc limit 500`;
 
   const data = await kintoneGet(APP.FURIKAE, query, env.TOKEN_FURIKAE);
