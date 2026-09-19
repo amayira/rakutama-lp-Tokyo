@@ -1620,6 +1620,10 @@ function isActiveAt(rec, dateStr) {
  *   - seito_count: { total, 早宮校, 氷川台校, 中村校, 平和台校 }
  *   - prev_month_total: 前月末時点の在籍数（作成日時・退会日から都度算出。スナップショット不要）
  *   - monthly: [ { month: "2026-06", 全体: {taiken, nyukai}, 早宮校: {...}, ... } ]
+ *   - schools: 集計対象の校名配列（フロントはこれを元にカード・表・絞り込みを描画する）
+ *   - seito_trend: [ { month: "2026-06", 全体: N, 早宮校: N, ... } ] 各月末時点（当月は今日時点）の在籍数
+ *   - grade_dist: { 全体: { "小1": N, ... }, 早宮校: {...} } 現在在籍の学年別人数
+ *   - media: { 全体: [ { media, taiken, nyukai } ], 早宮校: [...] } 反響媒体別の体験数・入会確定数
  */
 async function handleStaffStats(env) {
   const SCHOOLS = ["早宮校", "氷川台校", "中村校", "平和台校"];
@@ -1629,16 +1633,15 @@ async function handleStaffStats(env) {
   const taikenData = await kintoneGet(APP.TAIKEN, taikenQuery, env.TOKEN_TAIKEN);
   const taikenRecs = (taikenData.records ?? []).filter(r => !(r["出欠"]?.value ?? []).includes("欠席"));
 
-  // 前月末の日付（YYYY-MM-DD）。前月末時点の在籍数もここから復元するので、
-  // 前月末以降に退会したレコードまでは取得しておく
+  // 前月末の日付（YYYY-MM-DD）
   const todayStr = tokyoToday();
   const [ty, tm] = todayStr.split("-").map(Number);
   const prevMonthYear = tm === 1 ? ty - 1 : ty;
   const prevMonth = tm === 1 ? 12 : tm - 1;
   const prevMonthEndStr = `${prevMonthYear}-${String(prevMonth).padStart(2, "0")}-${String(lastDayOfMonth(prevMonthYear, prevMonth)).padStart(2, "0")}`;
 
-  // 在籍生徒（前月末以降に退会したものを含む＝現在と前月末の両方の在籍判定に使う）
-  const seitoQuery = `所属組織 in ("アルファーブレイン") and (退会日 = "" or 退会日 >= "${prevMonthEndStr}") order by 生徒番号 asc limit 500`;
+  // 生徒名簿（退会者を含む全件）。現在・前月末・各月末の在籍判定（在籍推移グラフ）に使う
+  const seitoQuery = `所属組織 in ("アルファーブレイン") order by 生徒番号 asc limit 500`;
   const seitoData = await kintoneGet(APP.SEITO_NEW, seitoQuery, env.TOKEN_SEITO_NEW);
   const seitoRecs = seitoData.records ?? [];
 
@@ -1696,11 +1699,75 @@ async function handleStaffStats(env) {
     return row;
   });
 
+  // ── 在籍生徒数の推移（各月末時点。当月は今日時点）────────────────────
+  const seitoTrend = [];
+  const enrollMonths = countableRecs
+    .map(r => (r["作成日時"]?.value ?? "").slice(0, 7))
+    .filter(Boolean)
+    .sort();
+  if (enrollMonths.length > 0) {
+    let [y, m] = enrollMonths[0].split("-").map(Number);
+    while (y < ty || (y === ty && m <= tm)) {
+      const monthStr = `${y}-${String(m).padStart(2, "0")}`;
+      const asOf = (y === ty && m === tm)
+        ? todayStr
+        : `${monthStr}-${String(lastDayOfMonth(y, m)).padStart(2, "0")}`;
+      const active = countableRecs.filter(r => isActiveAt(r, asOf));
+      const row = { month: monthStr, 全体: active.length };
+      for (const school of SCHOOLS) {
+        row[school] = active.filter(r => r["教室名"]?.value === school).length;
+      }
+      seitoTrend.push(row);
+      m++;
+      if (m > 12) { m = 1; y++; }
+    }
+  }
+
+  // ── 学年別の在籍人数（現在在籍のみ）────────────────────────────────
+  const gradeDist = { 全体: {} };
+  for (const school of SCHOOLS) gradeDist[school] = {};
+  for (const rec of activeNow) {
+    const grade = rec["学年"]?.value || "その他";
+    const school = rec["教室名"]?.value ?? "";
+    for (const key of ["全体", school]) {
+      if (!gradeDist[key]) continue;
+      gradeDist[key][grade] = (gradeDist[key][grade] ?? 0) + 1;
+    }
+  }
+
+  // ── 反響媒体別の体験数・入会確定数 ───────────────────────────────────
+  // 生徒名簿には反響媒体がないため、体験名簿の体験ステータス「入会確定」で入会を数える。
+  // 体験結果が未確定の「【0】体験参加前」は母数から外す（2回目・欠席の除外は月別集計と同じ）。
+  const mediaAgg = { 全体: {} };
+  for (const school of SCHOOLS) mediaAgg[school] = {};
+  for (const rec of taikenRecs) {
+    const date = rec["体験参加日"]?.value ?? "";
+    const mediaRaw = rec["反響媒体"]?.value ?? "";
+    const status = rec["体験ステータス"]?.value ?? "";
+    if (!date || mediaRaw.includes("2回目") || status.startsWith("【0】")) continue;
+    const media = mediaRaw || "不明";
+    const school = rec["教室名"]?.value ?? "";
+    for (const key of ["全体", school]) {
+      if (!mediaAgg[key]) continue;
+      const agg = mediaAgg[key][media] ?? (mediaAgg[key][media] = { media, taiken: 0, nyukai: 0 });
+      agg.taiken++;
+      if (status.includes("入会確定")) agg.nyukai++;
+    }
+  }
+  const media = {};
+  for (const [key, byMedia] of Object.entries(mediaAgg)) {
+    media[key] = Object.values(byMedia).sort((a, b) => b.taiken - a.taiken || b.nyukai - a.nyukai);
+  }
+
   return {
     success: true,
+    schools: SCHOOLS,
     seito_count: seitoCount,
     prev_month_total: prevMonthTotal,
     monthly,
+    seito_trend: seitoTrend,
+    grade_dist: gradeDist,
+    media,
   };
 }
 

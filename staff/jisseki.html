@@ -15,6 +15,33 @@
     .page-nav-link { padding: 10px 14px; font-size: 0.82rem; color: #6b7280; border-bottom: 3px solid transparent; transition: all .15s; }
     .page-nav-link:hover { color: #4A96AE; }
     .page-nav-active { color: #4A96AE; font-weight: 700; border-bottom-color: #4A96AE; }
+
+    /* グラフ共通 */
+    .jk-chart { width: 100%; max-width: 560px; margin: 0 auto; }
+    .jk-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.78rem; color: #6b7280; }
+    .jk-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+    .jk-note { font-size: 0.75rem; color: #9ca3af; margin-top: 8px; line-height: 1.5; }
+    .jk-empty { text-align: center; padding: 32px 0; font-size: 0.85rem; color: #9ca3af; }
+
+    /* 校の絞り込みチップ */
+    .jk-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .jk-chip { padding: 7px 16px; border-radius: 9999px; font-size: 0.88rem; border: 1px solid #e5e7eb; background: #fff; color: #6b7280; cursor: pointer; transition: all .15s; }
+    .jk-chip:hover { border-color: #9ca3af; }
+    .jk-chip-active { color: #fff; font-weight: 700; border-color: transparent; }
+
+    /* 横棒（学年・媒体） */
+    .jk-bar-row { display: flex; align-items: center; gap: 10px; margin: 9px 0; font-size: 0.88rem; }
+    .jk-bar-label { width: 3.2em; flex: none; color: #4b5563; }
+    .jk-bar-track { flex: 1; height: 18px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+    .jk-bar-fill { height: 100%; border-radius: 4px; }
+    .jk-bar-val { flex: none; min-width: 3.6em; text-align: right; color: #374151; font-variant-numeric: tabular-nums; }
+    .jk-media-row { margin: 14px 0; }
+    .jk-media-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.88rem; margin-bottom: 4px; }
+    .jk-media-name { color: #374151; font-weight: 500; }
+    .jk-media-num { color: #6b7280; font-size: 0.8rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .jk-media-track { height: 14px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+    .jk-media-taiken { height: 100%; background: #cbd5e1; border-radius: 4px; }
+    .jk-media-nyukai { height: 100%; background: #22c55e; border-radius: 4px; }
   </style>
 </head>
 <body class="min-h-screen bg-base">
@@ -63,7 +90,7 @@
     <!-- 実績パネル -->
     <div id="statsArea" class="hidden space-y-6">
 
-      <!-- 生徒数カード -->
+      <!-- 生徒数カード（校カードは data.schools から生成） -->
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div class="bg-white rounded-2xl shadow-sm p-4 col-span-2 sm:col-span-1">
           <p class="text-xs text-gray-400 mb-1">全校 在籍生徒</p>
@@ -73,40 +100,27 @@
           </div>
           <div id="st-trend" class="mt-1 text-xs font-medium"></div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4">
-          <p class="text-xs mb-1" style="color:#3b82f6">早宮校</p>
-          <div class="flex items-end gap-1">
-            <p class="text-2xl font-bold text-gray-800" id="st-hayamiya">—</p>
-            <p class="text-xs text-gray-400 mb-0.5">名</p>
-          </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4">
-          <p class="text-xs mb-1" style="color:#14b8a6">氷川台校</p>
-          <div class="flex items-end gap-1">
-            <p class="text-2xl font-bold text-gray-800" id="st-hikawadai">—</p>
-            <p class="text-xs text-gray-400 mb-0.5">名</p>
-          </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4">
-          <p class="text-xs mb-1" style="color:#a855f7">中村校</p>
-          <div class="flex items-end gap-1">
-            <p class="text-2xl font-bold text-gray-800" id="st-nakamura">—</p>
-            <p class="text-xs text-gray-400 mb-0.5">名</p>
-          </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4">
-          <p class="text-xs mb-1" style="color:#f59e0b">平和台校</p>
-          <div class="flex items-end gap-1">
-            <p class="text-2xl font-bold text-gray-800" id="st-heiwadai">—</p>
-            <p class="text-xs text-gray-400 mb-0.5">名</p>
-          </div>
-        </div>
+        <div id="schoolCards" style="display:contents"></div>
       </div>
 
-      <!-- 体験・入会 月別推移グラフ -->
+      <!-- ① 在籍生徒数の推移 -->
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <p class="text-sm font-bold text-gray-700">在籍生徒数の推移</p>
+        <p class="text-xs text-gray-400 mb-3">各月末時点の人数（今月は現在）</p>
+        <div id="enroll-legend" class="jk-legend mb-2"></div>
+        <div id="enroll-chart" class="jk-chart"></div>
+      </div>
+
+      <!-- 校の絞り込み -->
+      <div>
+        <p class="text-xs text-gray-400 mb-2">校を選ぶと、下の4つのグラフがその校の数字に切り替わります</p>
+        <div id="schoolChips" class="jk-chips"></div>
+      </div>
+
+      <!-- ② 体験・入会 月別推移グラフ -->
       <div class="bg-white rounded-2xl shadow-sm p-4">
         <div class="flex items-center justify-between mb-3">
-          <p class="text-sm font-bold text-gray-700">体験・入会 月別推移</p>
+          <p class="text-sm font-bold text-gray-700">体験・入会 月別推移<span class="jk-sfx"></span></p>
           <div class="flex items-center gap-4 text-xs text-gray-500">
             <span class="flex items-center gap-1.5">
               <span class="inline-block w-3 h-3 rounded-sm bg-slate-300"></span>体験
@@ -116,9 +130,38 @@
             </span>
           </div>
         </div>
-        <div id="chart-container" class="w-full min-h-[160px] flex items-center justify-center text-sm text-gray-400">
-          読み込み中…
+        <div id="chart-container" class="jk-chart"></div>
+      </div>
+
+      <!-- ③ 入会率の推移 -->
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <p class="text-sm font-bold text-gray-700">入会率の推移<span class="jk-sfx"></span></p>
+        <p class="text-xs text-gray-400 mb-3">開業からその月までの累積 入会者数 ÷ 体験参加者数</p>
+        <div id="rate-legend" class="jk-legend mb-2"></div>
+        <div id="rate-chart" class="jk-chart"></div>
+        <p class="jk-note">体験した月と入会した月がずれることがあるため、月ごとではなく累積で表示しています。体験に来た人数が少ない校は、1人の違いで率が大きく動きます。</p>
+      </div>
+
+      <!-- ④ 学年別の生徒構成 -->
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <div class="flex items-baseline justify-between mb-1">
+          <p class="text-sm font-bold text-gray-700">学年別の生徒構成<span class="jk-sfx"></span></p>
+          <p class="text-xs text-gray-400" id="grade-total"></p>
         </div>
+        <p class="text-xs text-gray-400 mb-2">現在在籍している生徒の人数</p>
+        <div id="grade-chart"></div>
+      </div>
+
+      <!-- ⑤ 反響媒体別 -->
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <p class="text-sm font-bold text-gray-700">どこから来た体験参加者が入会しているか<span class="jk-sfx"></span></p>
+        <p class="text-xs text-gray-400 mb-2">反響媒体ごとの体験参加者数と、入会確定になった人数</p>
+        <div class="jk-legend mb-1">
+          <span><span class="jk-dot" style="background:#cbd5e1"></span>体験参加</span>
+          <span><span class="jk-dot" style="background:#22c55e"></span>うち入会確定</span>
+        </div>
+        <div id="media-chart"></div>
+        <p class="jk-note">2回目の体験・欠席・結果待ちの体験は除きます。人数が少ない媒体は率が大きく動きます。</p>
       </div>
 
       <!-- 月別入会率テーブル -->
@@ -129,14 +172,7 @@
         </div>
         <table class="w-full text-sm border-collapse" id="statsTable">
           <thead>
-            <tr class="bg-primary text-white text-left">
-              <th class="px-4 py-2 font-medium whitespace-nowrap">月</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">全体</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">早宮校</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">氷川台校</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">中村校</th>
-              <th class="px-4 py-2 font-medium whitespace-nowrap text-right">平和台校</th>
-            </tr>
+            <tr class="bg-primary text-white text-left" id="statsHeadRow"></tr>
           </thead>
           <tbody id="statsTableBody"></tbody>
         </table>
@@ -174,6 +210,25 @@
       location.href = 'index.html';
     });
 
+    // ── 定数・状態 ────────────────────────────────────────────────
+    const PRIMARY = '#4A96AE';
+    const KNOWN_SCHOOL_COLORS = { '早宮校': '#3b82f6', '氷川台校': '#14b8a6', '中村校': '#a855f7', '平和台校': '#f59e0b' };
+    const FALLBACK_COLORS = ['#ef4444', '#0ea5e9', '#84cc16', '#ec4899', '#64748b'];
+    const GRADE_ORDER = ['年少', '年中', '年長', '小1', '小2', '小3', '小4', '小5', '小6', '中1', '中2', '中3', 'その他'];
+    const CHART_W = 360;
+
+    let statsData = null;
+    let schools = [];
+    let currentLabel = '全体';
+
+    function schoolColor(label) {
+      if (label === '全体') return PRIMARY;
+      if (KNOWN_SCHOOL_COLORS[label]) return KNOWN_SCHOOL_COLORS[label];
+      const i = Math.max(0, schools.indexOf(label));
+      return FALLBACK_COLORS[i % FALLBACK_COLORS.length];
+    }
+    const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
     // ── データ取得 ────────────────────────────────────────────────
     async function loadStats() {
       showState('loading');
@@ -194,13 +249,20 @@
 
     // ── 実績描画 ──────────────────────────────────────────────────
     function renderStats(data) {
+      statsData = data;
       const { seito_count, prev_month_total, monthly } = data;
+      schools = data.schools || ['早宮校', '氷川台校', '中村校', '平和台校'];
+      if (currentLabel !== '全体' && !schools.includes(currentLabel)) currentLabel = '全体';
 
       document.getElementById('st-total').textContent = seito_count.total;
-      document.getElementById('st-hayamiya').textContent = seito_count['早宮校'] ?? 0;
-      document.getElementById('st-hikawadai').textContent = seito_count['氷川台校'] ?? 0;
-      document.getElementById('st-nakamura').textContent = seito_count['中村校'] ?? 0;
-      document.getElementById('st-heiwadai').textContent = seito_count['平和台校'] ?? 0;
+      document.getElementById('schoolCards').innerHTML = schools.map(s => `
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+          <p class="text-xs mb-1" style="color:${schoolColor(s)}">${esc(s)}</p>
+          <div class="flex items-end gap-1">
+            <p class="text-2xl font-bold text-gray-800">${seito_count[s] ?? 0}</p>
+            <p class="text-xs text-gray-400 mb-0.5">名</p>
+          </div>
+        </div>`).join('');
 
       // 先月末比
       const trend = document.getElementById('st-trend');
@@ -216,10 +278,46 @@
         trend.className = 'mt-1 text-xs font-medium text-gray-400';
       }
 
-      // 推移グラフ
-      renderChart(monthly);
+      renderEnrollChart();      // ① 全校（校で絞り込まない）
+      renderChips();
+      renderFiltered();         // ②〜⑤ 選択中の校
+      renderRateTable(monthly);
 
-      // 月別入会率テーブル
+      showState('stats');
+    }
+
+    // 校の絞り込みに連動するグラフをまとめて描画
+    function renderFiltered() {
+      const sfx = currentLabel === '全体' ? '' : `（${currentLabel}）`;
+      document.querySelectorAll('.jk-sfx').forEach(el => { el.textContent = sfx; });
+      renderChart(statsData.monthly, currentLabel);
+      renderRateChart(statsData.monthly, currentLabel);
+      renderGradeChart(currentLabel);
+      renderMediaChart(currentLabel);
+    }
+
+    function renderChips() {
+      const box = document.getElementById('schoolChips');
+      box.innerHTML = ['全体', ...schools].map(label => {
+        const active = label === currentLabel;
+        const style = active ? `background:${schoolColor(label)}` : '';
+        return `<button type="button" class="jk-chip${active ? ' jk-chip-active' : ''}" style="${style}" data-label="${esc(label)}">${esc(label === '全体' ? '全校' : label)}</button>`;
+      }).join('');
+      box.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentLabel = btn.dataset.label;
+          renderChips();
+          renderFiltered();
+        });
+      });
+    }
+
+    // ── 月別入会率テーブル ────────────────────────────────────────
+    function renderRateTable(monthly) {
+      const labels = ['全体', ...schools];
+      document.getElementById('statsHeadRow').innerHTML =
+        ['月', ...labels].map((h, i) => `<th class="px-4 py-2 font-medium whitespace-nowrap${i === 0 ? '' : ' text-right'}">${esc(h)}</th>`).join('');
+
       const tbody = document.getElementById('statsTableBody');
       const statsEmpty = document.getElementById('statsEmpty');
       const statsTable = document.getElementById('statsTable');
@@ -227,110 +325,266 @@
       if (!monthly || monthly.length === 0) {
         statsTable.classList.add('hidden');
         statsEmpty.classList.remove('hidden');
-      } else {
-        statsTable.classList.remove('hidden');
-        statsEmpty.classList.add('hidden');
-
-        const renderRateCells = row => ['全体', '早宮校', '氷川台校', '中村校', '平和台校'].map(label => {
-          const d = row[label] ?? { taiken: 0, nyukai: 0 };
-          const rate = d.taiken > 0 ? Math.round(d.nyukai / d.taiken * 100) : null;
-          const rateStr = rate !== null ? `${rate}%` : '―';
-          const color = rate === null ? 'text-gray-400' : rate >= 50 ? 'text-green-600 font-bold' : rate >= 30 ? 'text-amber-600' : 'text-gray-700';
-          return `<td class="px-4 py-2 text-right whitespace-nowrap">
-            <span class="${color}">${rateStr}</span>
-            <span class="text-xs text-gray-400 ml-1">${d.nyukai}/${d.taiken}</span>
-          </td>`;
-        }).join('');
-
-        // 通期累積（全月合算）を最上部に表示
-        const cumulative = { month: '通期累積' };
-        ['全体', '早宮校', '氷川台校', '中村校', '平和台校'].forEach(label => {
-          cumulative[label] = monthly.reduce((acc, row) => {
-            const d = row[label] ?? { taiken: 0, nyukai: 0 };
-            acc.taiken += d.taiken;
-            acc.nyukai += d.nyukai;
-            return acc;
-          }, { taiken: 0, nyukai: 0 });
-        });
-
-        const cumulativeRow = `<tr class="bg-blue-50 font-bold border-b-2 border-primary">
-          <td class="px-4 py-2 whitespace-nowrap text-gray-800">${cumulative.month}</td>
-          ${renderRateCells(cumulative)}
-        </tr>`;
-
-        const monthlyRows = monthly.map((row, i) => {
-          const bg = i % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-          return `<tr class="${bg} hover:bg-blue-50 transition">
-            <td class="px-4 py-2 whitespace-nowrap text-gray-700">${row.month.replace('-', '/')}</td>
-            ${renderRateCells(row)}
-          </tr>`;
-        }).join('');
-
-        tbody.innerHTML = cumulativeRow + monthlyRows;
-      }
-
-      showState('stats');
-    }
-
-    // ── 推移グラフ（SVG） ─────────────────────────────────────────
-    function renderChart(monthly) {
-      const container = document.getElementById('chart-container');
-      if (!monthly || monthly.length === 0) {
-        container.innerHTML = '<p class="text-gray-400 text-sm">データがありません</p>';
         return;
       }
+      statsTable.classList.remove('hidden');
+      statsEmpty.classList.add('hidden');
 
-      const W = 560, H = 180, padL = 28, padB = 36, padT = 16, padR = 12;
-      const chartW = W - padL - padR;
-      const chartH = H - padB - padT;
-      const maxVal = Math.max(...monthly.map(r => (r['全体']?.taiken || 0)), 1);
-      const yStep = Math.ceil(maxVal / 4);
-      const yMax = yStep * 4;
+      const renderRateCells = row => labels.map(label => {
+        const d = row[label] ?? { taiken: 0, nyukai: 0 };
+        const rate = d.taiken > 0 ? Math.round(d.nyukai / d.taiken * 100) : null;
+        const rateStr = rate !== null ? `${rate}%` : '―';
+        const color = rate === null ? 'text-gray-400' : rate >= 50 ? 'text-green-600 font-bold' : rate >= 30 ? 'text-amber-600' : 'text-gray-700';
+        return `<td class="px-4 py-2 text-right whitespace-nowrap">
+          <span class="${color}">${rateStr}</span>
+          <span class="text-xs text-gray-400 ml-1">${d.nyukai}/${d.taiken}</span>
+        </td>`;
+      }).join('');
 
-      const groupW = chartW / monthly.length;
-      const barW = Math.max(4, Math.min(18, groupW * 0.32));
-      const gap = barW * 0.4;
-
-      let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="w-full">`;
-
-      // グリッド線・Y軸ラベル
-      for (let i = 0; i <= 4; i++) {
-        const val = yStep * i;
-        const y = padT + chartH * (1 - val / yMax);
-        svg += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="#f0f0f0" stroke-width="1"/>`;
-        svg += `<text x="${padL - 5}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="9" fill="#d1d5db">${val}</text>`;
-      }
-
-      // X軸
-      svg += `<line x1="${padL}" y1="${padT + chartH}" x2="${W - padR}" y2="${padT + chartH}" stroke="#e5e7eb" stroke-width="1"/>`;
-
-      // バー＋ラベル
-      monthly.forEach((row, i) => {
-        const taiken = row['全体']?.taiken || 0;
-        const nyukai = row['全体']?.nyukai || 0;
-        const cx = padL + groupW * i + groupW / 2;
-
-        // 体験バー（グレー）
-        const tH = (taiken / yMax) * chartH;
-        const tx = cx - gap / 2 - barW;
-        const ty = padT + chartH - tH;
-        svg += `<rect x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" width="${barW}" height="${Math.max(tH, 0).toFixed(1)}" fill="#cbd5e1" rx="2"/>`;
-        if (taiken > 0) svg += `<text x="${(tx + barW / 2).toFixed(1)}" y="${(ty - 3).toFixed(1)}" text-anchor="middle" font-size="9" fill="#94a3b8">${taiken}</text>`;
-
-        // 入会バー（緑）
-        const nH = (nyukai / yMax) * chartH;
-        const nx = cx + gap / 2;
-        const ny = padT + chartH - nH;
-        svg += `<rect x="${nx.toFixed(1)}" y="${ny.toFixed(1)}" width="${barW}" height="${Math.max(nH, 0).toFixed(1)}" fill="#22c55e" rx="2"/>`;
-        if (nyukai > 0) svg += `<text x="${(nx + barW / 2).toFixed(1)}" y="${(ny - 3).toFixed(1)}" text-anchor="middle" font-size="9" fill="#16a34a">${nyukai}</text>`;
-
-        // X軸ラベル（月だけ表示）
-        const label = row.month.slice(5).replace(/^0/, '') + '月';
-        svg += `<text x="${cx.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#9ca3af">${label}</text>`;
+      // 通期累積（全月合算）を最上部に表示
+      const cumulative = { month: '通期累積' };
+      labels.forEach(label => {
+        cumulative[label] = monthly.reduce((acc, row) => {
+          const d = row[label] ?? { taiken: 0, nyukai: 0 };
+          acc.taiken += d.taiken;
+          acc.nyukai += d.nyukai;
+          return acc;
+        }, { taiken: 0, nyukai: 0 });
       });
 
+      const cumulativeRow = `<tr class="bg-blue-50 font-bold border-b-2 border-primary">
+        <td class="px-4 py-2 whitespace-nowrap text-gray-800">${cumulative.month}</td>
+        ${renderRateCells(cumulative)}
+      </tr>`;
+
+      const monthlyRows = monthly.map((row, i) => {
+        const bg = i % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+        return `<tr class="${bg} hover:bg-blue-50 transition">
+          <td class="px-4 py-2 whitespace-nowrap text-gray-700">${row.month.replace('-', '/')}</td>
+          ${renderRateCells(row)}
+        </tr>`;
+      }).join('');
+
+      tbody.innerHTML = cumulativeRow + monthlyRows;
+    }
+
+    // ── グラフ共通ヘルパー ────────────────────────────────────────
+    function svgOpen(H, label) {
+      return `<svg viewBox="0 0 ${CHART_W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(label)}" style="width:100%;height:auto;display:block">`;
+    }
+    // 目盛り: 最大値から「5本以内に収まるキリのいい刻み」を選ぶ
+    function niceScale(max) {
+      const steps = [1, 2, 5, 10, 20, 50, 100, 200, 500];
+      const step = steps.find(s => Math.ceil(max / s) <= 5) || 1000;
+      const n = Math.max(1, Math.ceil(max / step));
+      return { step, n, yMax: step * n };
+    }
+    function gridLines(padL, padT, chartW, chartH, step, n, yMax, suffix = '') {
+      let out = '';
+      for (let i = 0; i <= n; i++) {
+        const val = step * i;
+        const y = padT + chartH * (1 - val / yMax);
+        out += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${padL + chartW}" y2="${y.toFixed(1)}" stroke="#f0f0f0" stroke-width="1"/>`;
+        out += `<text x="${padL - 5}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="#9ca3af">${val}${suffix}</text>`;
+      }
+      return out;
+    }
+    // X軸の月ラベル（年の変わり目と最初の月だけ年も出す）
+    function monthLabel(month, i, cx, H) {
+      let out = `<text x="${cx.toFixed(1)}" y="${H - 24}" text-anchor="middle" font-size="12" fill="#6b7280">${Number(month.slice(5))}月</text>`;
+      if (i === 0 || month.endsWith('-01')) {
+        out += `<text x="${cx.toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="10" fill="#9ca3af">${month.slice(0, 4)}</text>`;
+      }
+      return out;
+    }
+
+    // ── ① 在籍生徒数の推移（校別積み上げ棒） ───────────────────────
+    function renderEnrollChart() {
+      const container = document.getElementById('enroll-chart');
+      const legend = document.getElementById('enroll-legend');
+      const trend = statsData.seito_trend || [];
+      if (trend.length === 0) {
+        legend.innerHTML = '';
+        container.innerHTML = '<p class="jk-empty">データがありません</p>';
+        return;
+      }
+      legend.innerHTML = schools.map(s => `<span><span class="jk-dot" style="background:${schoolColor(s)}"></span>${esc(s)}</span>`).join('');
+
+      const H = 230, padL = 30, padR = 10, padT = 26, padB = 40;
+      const chartW = CHART_W - padL - padR, chartH = H - padT - padB;
+      const { step, n, yMax } = niceScale(Math.max(...trend.map(r => r['全体'] || 0)));
+      const groupW = chartW / trend.length;
+      const barW = Math.min(46, groupW * 0.62);
+
+      let svg = svgOpen(H, '各月末の在籍生徒数（校別の積み上げ）');
+      svg += gridLines(padL, padT, chartW, chartH, step, n, yMax);
+      trend.forEach((row, i) => {
+        const cx = padL + groupW * i + groupW / 2;
+        let acc = 0;
+        schools.forEach(s => {
+          const v = row[s] || 0;
+          if (!v) return;
+          const h = v / yMax * chartH;
+          const y = padT + chartH * (1 - (acc + v) / yMax);
+          svg += `<rect x="${(cx - barW / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${schoolColor(s)}" stroke="#fff" stroke-width="1"/>`;
+          if (h >= 15) svg += `<text x="${cx.toFixed(1)}" y="${(y + h / 2 + 4).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">${v}</text>`;
+          acc += v;
+        });
+        const total = row['全体'] || 0;
+        const ty = padT + chartH * (1 - Math.max(acc, total) / yMax);
+        svg += `<text x="${cx.toFixed(1)}" y="${(ty - 5).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">${total}</text>`;
+        svg += monthLabel(row.month, i, cx, H);
+      });
       svg += '</svg>';
       container.innerHTML = svg;
+    }
+
+    // ── ② 体験・入会 月別推移（選択した校） ────────────────────────
+    function renderChart(monthly, label) {
+      const container = document.getElementById('chart-container');
+      if (!monthly || monthly.length === 0) {
+        container.innerHTML = '<p class="jk-empty">データがありません</p>';
+        return;
+      }
+      const H = 210, padL = 30, padR = 10, padT = 22, padB = 40;
+      const chartW = CHART_W - padL - padR, chartH = H - padT - padB;
+      const get = row => row[label] ?? { taiken: 0, nyukai: 0 };
+      const { step, n, yMax } = niceScale(Math.max(...monthly.map(r => Math.max(get(r).taiken, get(r).nyukai))));
+      const groupW = chartW / monthly.length;
+      const barW = Math.max(6, Math.min(22, groupW * 0.34));
+      const gap = barW * 0.3;
+      const fs = monthly.length > 8 ? 9 : 12;
+
+      let svg = svgOpen(H, `${label === '全体' ? '全校' : label}の体験参加数と入会数の月別推移`);
+      svg += gridLines(padL, padT, chartW, chartH, step, n, yMax);
+      monthly.forEach((row, i) => {
+        const { taiken, nyukai } = get(row);
+        const cx = padL + groupW * i + groupW / 2;
+
+        const tH = taiken / yMax * chartH, tx = cx - gap / 2 - barW, ty = padT + chartH - tH;
+        svg += `<rect x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" width="${barW.toFixed(1)}" height="${tH.toFixed(1)}" fill="#cbd5e1" rx="2"/>`;
+        if (taiken > 0) svg += `<text x="${(tx + barW / 2).toFixed(1)}" y="${(ty - 4).toFixed(1)}" text-anchor="middle" font-size="${fs}" fill="#64748b">${taiken}</text>`;
+
+        const nH = nyukai / yMax * chartH, nx = cx + gap / 2, ny = padT + chartH - nH;
+        svg += `<rect x="${nx.toFixed(1)}" y="${ny.toFixed(1)}" width="${barW.toFixed(1)}" height="${nH.toFixed(1)}" fill="#22c55e" rx="2"/>`;
+        if (nyukai > 0) svg += `<text x="${(nx + barW / 2).toFixed(1)}" y="${(ny - 4).toFixed(1)}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="#16a34a">${nyukai}</text>`;
+
+        svg += monthLabel(row.month, i, cx, H);
+      });
+      svg += '</svg>';
+      container.innerHTML = svg;
+    }
+
+    // ── ③ 入会率の推移（開業からの累積で計算） ─────────────────────
+    // 月ごと・直近数ヶ月だと、体験月と入会月のズレで分子が分母を超える（例: 150%）ため累積にする
+    function cumulativeRates(monthly, label) {
+      return monthly.map((_, i) => {
+        let t = 0, n = 0;
+        for (let j = 0; j <= i; j++) {
+          const d = monthly[j][label] ?? { taiken: 0, nyukai: 0 };
+          t += d.taiken;
+          n += d.nyukai;
+        }
+        return t > 0 ? { rate: Math.round(n / t * 100), n, t } : null;
+      });
+    }
+    function renderRateChart(monthly, label) {
+      const container = document.getElementById('rate-chart');
+      const legend = document.getElementById('rate-legend');
+      if (!monthly || monthly.length === 0) {
+        legend.innerHTML = '';
+        container.innerHTML = '<p class="jk-empty">データがありません</p>';
+        return;
+      }
+      const series = [{ label, color: schoolColor(label), dashed: false, data: cumulativeRates(monthly, label) }];
+      if (label !== '全体') series.push({ label: '全校', color: '#9ca3af', dashed: true, data: cumulativeRates(monthly, '全体') });
+      legend.innerHTML = series.map(s =>
+        `<span><span class="jk-dot" style="background:${s.color}"></span>${esc(s.label === '全体' ? '全校' : s.label)}</span>`).join('');
+
+      const H = 210, padL = 38, padR = 14, padT = 22, padB = 40;
+      const chartW = CHART_W - padL - padR, chartH = H - padT - padB;
+      const maxRate = Math.max(100, ...series.flatMap(s => s.data.map(d => d ? d.rate : 0)));
+      const yMax = Math.ceil(maxRate / 25) * 25;
+      const groupW = chartW / monthly.length;
+      const xAt = i => padL + groupW * i + groupW / 2;
+      const yAt = rate => padT + chartH * (1 - rate / yMax);
+
+      let svg = svgOpen(H, `${label === '全体' ? '全校' : label}の入会率の推移`);
+      svg += gridLines(padL, padT, chartW, chartH, 25, yMax / 25, yMax, '%');
+      monthly.forEach((row, i) => { svg += monthLabel(row.month, i, xAt(i), H); });
+
+      // 全校（破線）を先に、選択中の校を上に重ねる
+      [...series].reverse().forEach(s => {
+        let path = '';
+        s.data.forEach((d, i) => {
+          if (!d) return;
+          path += `${path && s.data[i - 1] ? 'L' : 'M'}${xAt(i).toFixed(1)},${yAt(d.rate).toFixed(1)} `;
+        });
+        if (path) svg += `<path d="${path}" fill="none" stroke="${s.color}" stroke-width="${s.dashed ? 1.8 : 2.6}" ${s.dashed ? 'stroke-dasharray="5 4"' : ''} stroke-linejoin="round" stroke-linecap="round"/>`;
+        s.data.forEach((d, i) => {
+          if (!d) return;
+          svg += `<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(d.rate).toFixed(1)}" r="${s.dashed ? 3 : 4}" fill="${s.dashed ? '#fff' : s.color}" stroke="${s.color}" stroke-width="2"/>`;
+          const showLabel = monthly.length <= 8 || (monthly.length - 1 - i) % 3 === 0;
+          if (!s.dashed && showLabel) svg += `<text x="${xAt(i).toFixed(1)}" y="${(yAt(d.rate) - 9).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="${s.color}">${d.rate}%</text>`;
+        });
+      });
+      svg += '</svg>';
+      container.innerHTML = svg;
+    }
+
+    // ── ④ 学年別の生徒構成（横棒） ─────────────────────────────────
+    function renderGradeChart(label) {
+      const container = document.getElementById('grade-chart');
+      const totalEl = document.getElementById('grade-total');
+      const dist = statsData.grade_dist || {};
+      const d = dist[label] || {};
+      const all = dist['全体'] || {};
+      const total = Object.values(d).reduce((a, b) => a + b, 0);
+      totalEl.textContent = total ? `計 ${total}名` : '';
+      if (total === 0) {
+        container.innerHTML = '<p class="jk-empty">在籍生徒がいません</p>';
+        return;
+      }
+      // 校を切り替えても行が変わらないよう、全校で在籍のある学年を常に並べる
+      const known = GRADE_ORDER.filter(g => (all[g] || 0) > 0 || (d[g] || 0) > 0);
+      const unknown = Object.keys({ ...all, ...d }).filter(g => !GRADE_ORDER.includes(g));
+      const rows = [...known, ...unknown];
+      const max = Math.max(...rows.map(g => d[g] || 0), 1);
+      const color = schoolColor(label);
+      container.innerHTML = rows.map(g => {
+        const v = d[g] || 0;
+        return `<div class="jk-bar-row">
+          <span class="jk-bar-label">${esc(g)}</span>
+          <div class="jk-bar-track"><div class="jk-bar-fill" style="width:${(v / max * 100).toFixed(1)}%;background:${color}"></div></div>
+          <span class="jk-bar-val">${v}名</span>
+        </div>`;
+      }).join('');
+    }
+
+    // ── ⑤ 反響媒体別の体験数と入会確定数 ───────────────────────────
+    function renderMediaChart(label) {
+      const container = document.getElementById('media-chart');
+      const list = (statsData.media || {})[label] || [];
+      if (list.length === 0) {
+        container.innerHTML = '<p class="jk-empty">データがありません</p>';
+        return;
+      }
+      const maxTaiken = Math.max(...list.map(m => m.taiken), 1);
+      container.innerHTML = list.map(m => {
+        const rate = m.taiken > 0 ? Math.round(m.nyukai / m.taiken * 100) : null;
+        const rateCls = rate === null ? 'text-gray-400' : rate >= 50 ? 'text-green-600 font-bold' : rate >= 30 ? 'text-amber-600' : 'text-gray-700';
+        const outer = (m.taiken / maxTaiken * 100).toFixed(1);
+        const inner = m.taiken > 0 ? (m.nyukai / m.taiken * 100).toFixed(1) : 0;
+        return `<div class="jk-media-row">
+          <div class="jk-media-head">
+            <span class="jk-media-name">${esc(m.media)}</span>
+            <span class="jk-media-num">入会 ${m.nyukai} / 体験 ${m.taiken}　<span class="${rateCls}" style="font-size:0.95rem">${rate !== null ? rate + '%' : '―'}</span></span>
+          </div>
+          <div class="jk-media-track">
+            <div class="jk-media-taiken" style="width:${outer}%"><div class="jk-media-nyukai" style="width:${inner}%"></div></div>
+          </div>
+        </div>`;
+      }).join('');
     }
 
     // ── UI ヘルパー ───────────────────────────────────────────────
