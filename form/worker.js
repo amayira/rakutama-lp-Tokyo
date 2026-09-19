@@ -1645,8 +1645,11 @@ async function handleStaffStats(env) {
   const seitoData = await kintoneGet(APP.SEITO_NEW, seitoQuery, env.TOKEN_SEITO_NEW);
   const seitoRecs = seitoData.records ?? [];
 
-  // ── 生徒数集計（生徒番号に"-"を含むサブ番号レコードは除外）──────────────
-  const countableRecs = seitoRecs.filter(r => !String(r["生徒番号"]?.value ?? "").includes("-"));
+  // ── 生徒数集計（生徒番号に"-"を含むサブ番号レコードと、フォーム動作確認用のテスト生徒A0000は除外）──
+  const countableRecs = seitoRecs.filter(r => {
+    const no = String(r["生徒番号"]?.value ?? "");
+    return !no.includes("-") && no !== "A0000";
+  });
   const activeNow = countableRecs.filter(r => isActiveAt(r, todayStr));
   const seitoCount = { total: activeNow.length };
   for (const school of SCHOOLS) {
