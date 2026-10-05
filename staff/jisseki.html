@@ -212,7 +212,7 @@
 
     // ── 定数・状態 ────────────────────────────────────────────────
     const PRIMARY = '#4A96AE';
-    const KNOWN_SCHOOL_COLORS = { '早宮校': '#3b82f6', '氷川台校': '#14b8a6', '中村校': '#a855f7', '平和台校': '#f59e0b' };
+    const KNOWN_SCHOOL_COLORS = { '早宮校': '#3b82f6', '氷川台校': '#14b8a6', '中村校': '#a855f7', '平和台校': '#f59e0b', '富士見台校': '#ec4899', '東武練馬校': '#6366f1' };
     const FALLBACK_COLORS = ['#ef4444', '#0ea5e9', '#84cc16', '#ec4899', '#64748b'];
     const GRADE_ORDER = ['年少', '年中', '年長', '小1', '小2', '小3', '小4', '小5', '小6', '中1', '中2', '中3', 'その他'];
     const CHART_W = 360;
@@ -251,7 +251,7 @@
     function renderStats(data) {
       statsData = data;
       const { seito_count, prev_month_total, monthly } = data;
-      schools = data.schools || ['早宮校', '氷川台校', '中村校', '平和台校'];
+      schools = data.schools || ['早宮校', '氷川台校', '中村校', '平和台校', '富士見台校', '東武練馬校'];
       if (currentLabel !== '全体' && !schools.includes(currentLabel)) currentLabel = '全体';
 
       document.getElementById('st-total').textContent = seito_count.total;

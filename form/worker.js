@@ -1626,7 +1626,7 @@ function isActiveAt(rec, dateStr) {
  *   - media: { 全体: [ { media, taiken, nyukai } ], 早宮校: [...] } 反響媒体別の体験数・入会確定数
  */
 async function handleStaffStats(env) {
-  const SCHOOLS = ["早宮校", "氷川台校", "中村校", "平和台校"];
+  const SCHOOLS = ["早宮校", "氷川台校", "中村校", "平和台校", "富士見台校", "東武練馬校"];
 
   // 体験参加名簿（過去・当日のみ）。欠席除外はJS側で処理
   const taikenQuery = `所属組織 in ("アルファーブレイン") and 体験参加日 <= TODAY() order by 体験参加日 asc limit 500`;

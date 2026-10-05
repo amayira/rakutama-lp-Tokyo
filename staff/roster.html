@@ -139,6 +139,12 @@
       <button data-school="平和台校"
         class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary text-primary transition"
         onclick="switchSchool('平和台校')">平和台校</button>
+      <button data-school="富士見台校"
+        class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary text-primary transition"
+        onclick="switchSchool('富士見台校')">富士見台校</button>
+      <button data-school="東武練馬校"
+        class="school-btn text-sm px-4 py-1.5 rounded-full border border-primary text-primary transition"
+        onclick="switchSchool('東武練馬校')">東武練馬校</button>
     </div>
 
     <!-- 在籍生徒ビュー切り替え -->
@@ -275,6 +281,10 @@
       { school: '中村校',  day: '木' },
       { school: '平和台校', day: '月' },
       { school: '平和台校', day: '木' },
+      { school: '富士見台校', day: '火' },
+      { school: '富士見台校', day: '木' },
+      { school: '東武練馬校', day: '火' },
+      { school: '東武練馬校', day: '金' },
     ];
     const GRID_TIMES = ['16', '17'];
 
@@ -777,6 +787,8 @@
       '氷川台校': { bg: 'bg-teal-100',  text: 'text-teal-700'  },
       '中村校':  { bg: 'bg-purple-100', text: 'text-purple-700' },
       '平和台校': { bg: 'bg-amber-100', text: 'text-amber-700' },
+      '富士見台校': { bg: 'bg-pink-100', text: 'text-pink-700' },
+      '東武練馬校': { bg: 'bg-indigo-100', text: 'text-indigo-700' },
     };
 
     function schoolBadge(name) {
