@@ -101,7 +101,7 @@ function furikaeMinDateError(classroom, dateValue) {
 }
 
 // ── 教室 → 時刻プルダウン連動（欠席・振替フォーム）──
-// 授業マスタのクラス名から「16時」「17時」を抽出して selectId に描画する。
+// 授業マスタのクラス名から「16時」「16時15分」等を抽出して selectId に描画する。
 async function loadTimeSlotsInto(selectId, classroom) {
   const timeSelect = document.getElementById(selectId);
   timeSelect.innerHTML = '<option value="">選択してください</option>';
@@ -112,14 +112,15 @@ async function loadTimeSlotsInto(selectId, classroom) {
     if (jRes.ok && jData.success) {
       const seen = new Set();
       jData.classes.forEach(cls => {
-        const m = String(cls.name).match(/(\d+)時/);
+        const m = String(cls.name).match(/(\d+)時(?:(\d+)分)?/);
         if (!m) return;
-        const label = `${m[1]}時`;
-        if (seen.has(label)) return;
-        seen.add(label);
+        const min = Number(m[2] || 0);
+        const value = `${m[1].padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+        if (seen.has(value)) return;
+        seen.add(value);
         const opt = document.createElement('option');
-        opt.value = label;
-        opt.textContent = label;
+        opt.value = value;
+        opt.textContent = min ? `${Number(m[1])}時${min}分` : `${Number(m[1])}時`;
         timeSelect.appendChild(opt);
       });
     }
