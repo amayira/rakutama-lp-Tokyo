@@ -321,9 +321,11 @@ Cloudflare Workers（form/worker.js）の変更は別途 `wrangler deploy` が�
 
 ---
 
-## 新教室追加時のチェックリスト（HP静的ページ側）
+## 新教室追加時のチェックリスト（総合・2026-09-24拡充）
 
-kintone教室マスタへの登録だけでは**フォーム側は自動反映されるが、静的LP側は自動反映されない**。新教室（例: 平和台校）を`access.html`に追加する際、以下を漏らしやすい（2026-07-30に平和台校追加時、フッターリンクとJSON-LDが漏れていた実績あり）：
+kintone教室マスタへの登録だけでは**フォーム側は自動反映されるが、静的LP側・HPリポジトリ外のシステムは自動反映されない**。新教室（例: 平和台校）を追加する際は、以下**4系統すべて**を確認する。2026-07-30に平和台校追加時、①のフッターリンクとJSON-LDが漏れていた実績あり。2026-09-24には②のGASリマインドメールが丸ごと漏れていて、体験者への案内メールが2週間以上「アクセスは別途ご案内します」になっていた実績あり（①③はその時点で正しく更新済みだった＝リポジトリを跨ぐ項目が一番漏れやすい）。
+
+### ① HP静的ページ（このリポジトリ）
 
 1. **access.html**
    - 新セクション追加。**背景色は前後のセクションと交互になるよう`bg-base`の有無を必ず確認**（白→水色→白→水色…の交互パターン。抜けると縞模様が崩れる）
@@ -340,7 +342,28 @@ kintone教室マスタへの登録だけでは**フォーム側は自動反映�
 4. **各ページのtitle・meta description**の教室数表記（「◯教室」）を更新
 5. **開校済みに切り替わったら**：「9月◯日開校予定」バッジや「準備中」表記、「3校がオープン」的な文言を実態に合わせて更新
 
-→ 新教室を追加した後は `grep -rn "教室一覧" -A 5 *.html` と `grep -n "EducationalOrganization" access.html` で漏れがないか機械的に確認する。
+→ 追加後は `grep -rn "教室一覧" -A 5 *.html` と `grep -n "EducationalOrganization" access.html` で漏れがないか機械的に確認する。
+
+### ② Google Drive側のGAS「楽珠_リマインドメール」（このリポジトリの外）
+
+- ファイル：`01_そろばん教室事業/06_WEB・システム/kintone_reminder_mail.gs`（Google Drive）。本番GASプロジェクト名も同じ「楽珠_リマインドメール」
+- `sendTomorrowExperienceReminders` と `sendOneWeekExperienceReminders` **両方の関数**にある`MAP_LINKS`定数に、新教室名→GoogleマップURL（access.htmlの新セクションに貼ったものと同じURL）を追加
+- ⚠️ **ローカルのGoogle Driveファイルを直しただけでは本番に反映されない**。`gws script projects updateContent`（scriptId: `1MYzJ5wbcEytniP5l2zR7UteAMXdg1ao1KXNzNJyf8XoNYTNl-YLEBlDX`）で本番プロジェクトまで反映すること。worker.jsの`wrangler deploy`と同じ構造の罠
+- 反映後は `gws script projects getContent` で新教室のURLが本番コード内に実際に入っているか確認する
+- ついでに `01_そろばん教室事業/06_WEB・システム/システム運用メモ.md` の「教室別マップURL」一覧にも追記（ドキュメントの整合性用、実行には影響しないが放置すると次回また見落とす）
+
+### ③ 講師ポータル（このリポジトリのstaff/・form/worker.js）
+
+- `form/worker.js` の `SCHOOLS` 配列（実績タブAPI）に追加。※これは`wrangler deploy`が必要（①②と違ってHPリポジトリのpushでは反映される他ページと違い、worker.js全般と同じ扱い）
+- `staff/roster.html`：タブボタン（`data-school`属性・`onclick="switchSchool(...)"`）、スケジュール配列、カラー設定（`bg-*`/`text-*`）に追加
+- `staff/jisseki.html`：`KNOWN_SCHOOL_COLORS`とフォールバック用`schools`配列に追加
+
+### ④ kintone側（前提。ここが起点）
+
+- 教室マスタ（App5）に組織選択・開校日を登録（これをやらないと①②③のAPIも教室を認識しない）
+- 授業マスタ（App6）にクラス登録
+
+→ 新教室を追加する依頼が来たら、①〜④を1回のセッションで**上から順に全部**確認する。「HPだけ直して」と言われた場合でも、②③が古いままだと実害（誤案内メール・講師ポータルの数値欠落）が出るので、そのつど②③の状態も一言確認を挟む。
 
 ---
 
