@@ -11,6 +11,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
   <meta name="robots" content="noindex, nofollow" />
   <style>
+    /* 備考あり表示（tailwind.cssはビルド済みのため新規クラスは自前で定義） */
+    .biko-mark { display:inline-flex; align-items:center; justify-content:center; margin-left:6px; width:20px; height:20px; border-radius:9999px; background:#dc2626; color:#fff; font-size:12px; font-weight:700; vertical-align:middle; }
+    .biko-pill { display:inline-flex; align-items:center; gap:4px; font-size:12px; padding:4px 12px; border-radius:9999px; background:#f43f5e; color:#fff; font-weight:500; box-shadow:0 1px 2px rgba(0,0,0,.15); }
+    .biko-row { cursor:pointer; }
+    .biko-row:hover { background:#fff1f2; }
+    .biko-row:active { background:#ffe4e6; }
+    #bikoModal { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,0,.4); }
+    #bikoModal.hidden { display:none; }
+    .biko-box { background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.25); width:100%; max-width:448px; max-height:80vh; display:flex; flex-direction:column; }
+    #bikoModalBody { overflow-y:auto; white-space:pre-wrap; word-break:break-word; }
     body { font-family: 'Noto Sans JP', sans-serif; }
     .tab-active { border-bottom: 3px solid #4A96AE; color: #4A96AE; font-weight: 700; }
     .school-active { background-color: #4A96AE; color: #fff; }
@@ -257,7 +267,7 @@
 
   <!-- 備考ポップアップ -->
   <div id="bikoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onclick="if(event.target===this)closeBiko()">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[80vh] flex flex-col">
+    <div class="biko-box">
       <div class="flex items-center justify-between px-5 py-3 border-b">
         <h3 id="bikoModalName" class="font-bold text-gray-800 text-sm"></h3>
         <button type="button" onclick="closeBiko()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none px-1" aria-label="閉じる">&times;</button>
@@ -479,7 +489,7 @@
         tbody.innerHTML = records.map((r, i) => {
           const note = (r.備考 || '').trim();
           const rowAttrs = note
-            ? ` data-name="${escapeHtml(`${r.氏 || ''} ${r.名 || ''}`.trim())}" data-note="${escapeHtml(note)}" onclick="showBiko(this)" class="biko-row cursor-pointer ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-rose-50 active:bg-rose-100 transition"`
+            ? ` data-name="${escapeHtml(`${r.氏 || ''} ${r.名 || ''}`.trim())}" data-note="${escapeHtml(note)}" onclick="showBiko(this)" class="biko-row ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}"`
             : ` class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition"`;
           return `
           <tr${rowAttrs}>
@@ -825,12 +835,12 @@
     // 備考あり＝「備考を見る ›」ボタン風表示（行全体がタップ対象）、なし＝「―」
     function bikoCell(r) {
       if (!(r.備考 || '').trim()) return `<span class="text-gray-300">―</span>`;
-      return `<span class="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-rose-500 text-white font-medium shadow-sm">📝 備考を見る <span aria-hidden="true">›</span></span>`;
+      return `<span class="biko-pill">📝 備考を見る <span aria-hidden="true">›</span></span>`;
     }
 
     // 名前の横に付ける赤い「!」（モバイルで右の備考列が見えなくても気づけるように）
     function bikoMark() {
-      return `<span class="inline-flex items-center justify-center ml-1.5 w-5 h-5 rounded-full bg-red-600 text-white text-xs font-bold align-middle" aria-label="備考あり">!</span>`;
+      return `<span class="biko-mark" aria-label="備考あり">!</span>`;
     }
 
     function showBiko(btn) {
