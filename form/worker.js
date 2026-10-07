@@ -1479,7 +1479,7 @@ async function handleStaffAuth(body, env) {
 /**
  * GET /api/staff/taiken?school=all|早宮校|氷川台校|中村校
  * Returns 体験参加名簿 (App 17) records.
- * Fields: 体験参加日, 時刻, 氏, 名, フリガナ, 学年, そろばん経験, 教室名
+ * Fields: 体験参加日, 時刻, 氏, 名, フリガナ, 学年, そろばん経験, 教室名, 備考
  */
 async function handleStaffTaiken(params, env) {
   const school = params.get("school") ?? "all";
@@ -1499,6 +1499,7 @@ async function handleStaffTaiken(params, env) {
     学年: rec["学年"]?.value ?? "",
     そろばん経験: rec["そろばん経験"]?.value ?? "",
     教室名: rec["教室名"]?.value ?? "",
+    備考: rec["備考"]?.value ?? "",
   }));
 
   return { success: true, records };

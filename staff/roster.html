@@ -255,6 +255,20 @@
 
   </main>
 
+  <!-- 備考ポップアップ -->
+  <div id="bikoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onclick="if(event.target===this)closeBiko()">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[80vh] flex flex-col">
+      <div class="flex items-center justify-between px-5 py-3 border-b">
+        <h3 id="bikoModalName" class="font-bold text-gray-800 text-sm"></h3>
+        <button type="button" onclick="closeBiko()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none px-1" aria-label="閉じる">&times;</button>
+      </div>
+      <div id="bikoModalBody" class="px-5 py-4 text-sm text-gray-700 whitespace-pre-wrap break-words overflow-y-auto"></div>
+      <div class="px-5 py-3 border-t text-right">
+        <button type="button" onclick="closeBiko()" class="text-sm px-4 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">閉じる</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API = 'https://rakutama-kintone.k-ariyama.workers.dev';
 
@@ -459,6 +473,7 @@
             <th class="px-4 py-3 font-medium whitespace-nowrap">フリガナ</th>
             <th class="px-4 py-3 font-medium whitespace-nowrap">学年</th>
             <th class="px-4 py-3 font-medium whitespace-nowrap">そろばん経験</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">備考</th>
           </tr>`;
 
         tbody.innerHTML = records.map((r, i) => `
@@ -470,6 +485,7 @@
             <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${r.フリガナ || ''}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.学年 || '―'}</td>
             <td class="px-4 py-3 whitespace-nowrap">${experienceBadge(r.そろばん経験)}</td>
+            <td class="px-4 py-3 whitespace-nowrap">${bikoCell(r)}</td>
           </tr>`).join('');
 
       } else if (currentTab === 'seito') {
@@ -794,6 +810,29 @@
     function schoolBadge(name) {
       const c = SCHOOL_COLORS[name] ?? { bg: 'bg-gray-100', text: 'text-gray-600' };
       return `<span class="inline-block text-xs px-2 py-0.5 rounded-full font-medium ${c.bg} ${c.text}">${name || '不明'}</span>`;
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    // 備考あり＝ボタン（タップでポップアップ）、なし＝「―」
+    function bikoCell(r) {
+      const note = (r.備考 || '').trim();
+      if (!note) return `<span class="text-gray-300">―</span>`;
+      const name = `${r.氏 || ''} ${r.名 || ''}`.trim();
+      return `<button type="button" class="biko-btn inline-block text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-medium hover:bg-rose-200"
+        data-name="${escapeHtml(name)}" data-note="${escapeHtml(note)}" onclick="showBiko(this)">あり</button>`;
+    }
+
+    function showBiko(btn) {
+      document.getElementById('bikoModalName').textContent = btn.dataset.name + ' さんの備考';
+      document.getElementById('bikoModalBody').textContent = btn.dataset.note;
+      document.getElementById('bikoModal').classList.remove('hidden');
+    }
+
+    function closeBiko() {
+      document.getElementById('bikoModal').classList.add('hidden');
     }
 
     function experienceBadge(val) {
