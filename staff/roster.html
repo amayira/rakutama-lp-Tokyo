@@ -486,7 +486,7 @@
             <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.教室名)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${formatDate(r.体験参加日)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.時刻 || '―'}</td>
-            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}${note ? bikoMark() : ''}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${r.フリガナ || ''}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.学年 || '―'}</td>
             <td class="px-4 py-3 whitespace-nowrap">${experienceBadge(r.そろばん経験)}</td>
@@ -826,6 +826,11 @@
     function bikoCell(r) {
       if (!(r.備考 || '').trim()) return `<span class="text-gray-300">―</span>`;
       return `<span class="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-rose-500 text-white font-medium shadow-sm">📝 備考を見る <span aria-hidden="true">›</span></span>`;
+    }
+
+    // 名前の横に付ける赤い「!」（モバイルで右の備考列が見えなくても気づけるように）
+    function bikoMark() {
+      return `<span class="inline-flex items-center justify-center ml-1.5 w-5 h-5 rounded-full bg-red-600 text-white text-xs font-bold align-middle" aria-label="備考あり">!</span>`;
     }
 
     function showBiko(btn) {
