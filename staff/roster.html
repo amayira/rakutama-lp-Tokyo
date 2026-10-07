@@ -476,8 +476,13 @@
             <th class="px-4 py-3 font-medium whitespace-nowrap">備考</th>
           </tr>`;
 
-        tbody.innerHTML = records.map((r, i) => `
-          <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition">
+        tbody.innerHTML = records.map((r, i) => {
+          const note = (r.備考 || '').trim();
+          const rowAttrs = note
+            ? ` data-name="${escapeHtml(`${r.氏 || ''} ${r.名 || ''}`.trim())}" data-note="${escapeHtml(note)}" onclick="showBiko(this)" class="biko-row cursor-pointer ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-rose-50 active:bg-rose-100 transition"`
+            : ` class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition"`;
+          return `
+          <tr${rowAttrs}>
             <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.教室名)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${formatDate(r.体験参加日)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.時刻 || '―'}</td>
@@ -486,7 +491,8 @@
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.学年 || '―'}</td>
             <td class="px-4 py-3 whitespace-nowrap">${experienceBadge(r.そろばん経験)}</td>
             <td class="px-4 py-3 whitespace-nowrap">${bikoCell(r)}</td>
-          </tr>`).join('');
+          </tr>`;
+        }).join('');
 
       } else if (currentTab === 'seito') {
         if (seitoView === 'grid') {
@@ -816,13 +822,10 @@
       return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
-    // 備考あり＝ボタン（タップでポップアップ）、なし＝「―」
+    // 備考あり＝「備考を見る ›」ボタン風表示（行全体がタップ対象）、なし＝「―」
     function bikoCell(r) {
-      const note = (r.備考 || '').trim();
-      if (!note) return `<span class="text-gray-300">―</span>`;
-      const name = `${r.氏 || ''} ${r.名 || ''}`.trim();
-      return `<button type="button" class="biko-btn inline-block text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-medium hover:bg-rose-200"
-        data-name="${escapeHtml(name)}" data-note="${escapeHtml(note)}" onclick="showBiko(this)">あり</button>`;
+      if (!(r.備考 || '').trim()) return `<span class="text-gray-300">―</span>`;
+      return `<span class="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-rose-500 text-white font-medium shadow-sm">📝 備考を見る <span aria-hidden="true">›</span></span>`;
     }
 
     function showBiko(btn) {
