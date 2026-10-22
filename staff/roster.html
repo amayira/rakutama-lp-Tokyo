@@ -28,7 +28,7 @@
     .page-nav-link:hover { color: #4A96AE; }
     .page-nav-active { color: #4A96AE; font-weight: 700; border-bottom-color: #4A96AE; }
     /* グリッドビュー */
-    .grid-table { border-collapse: collapse; width: 100%; background: #fff; font-size: 0.8rem; }
+    .grid-table { border-collapse: collapse; width: 100%; table-layout: fixed; background: #fff; font-size: 0.8rem; }
     .grid-table th, .grid-table td { border: 1px solid #d1d5db; vertical-align: top; }
     .grid-th-school { background: #1e6fa3; color: #fff; font-weight: 700; text-align: center; padding: 6px 4px; font-size: 0.82rem; }
     .grid-th-day { background: #dbeafe; color: #1e6fa3; font-weight: 600; text-align: center; padding: 5px 4px; font-size: 0.78rem; }
@@ -241,6 +241,7 @@
     <!-- グリッドビュー（在籍生徒） -->
     <div id="gridArea" class="hidden overflow-x-auto rounded-xl shadow-sm">
       <table class="grid-table" id="gridTable">
+        <colgroup id="gridCols"></colgroup>
         <thead id="gridHead"></thead>
         <tbody id="gridBody"></tbody>
       </table>
@@ -669,7 +670,15 @@
     }
 
     // ── グリッドヘッダー描画 ──────────────────────────────────────
-    function renderGridHeader(cols) {
+    function renderGridHeader(cols, filled) {
+      // 生徒がいる列は等幅、空き列は細く固定（table-layout: fixed で残り幅を等分）
+      const EMPTY_W = 44, FILLED_MIN_W = 110, TIME_W = 36;
+      document.getElementById('gridCols').innerHTML =
+        `<col style="width:${TIME_W}px">` +
+        cols.map((c, i) => filled[i] ? '<col>' : `<col style="width:${EMPTY_W}px">`).join('');
+      const filledCount = filled.filter(Boolean).length;
+      document.getElementById('gridTable').style.minWidth =
+        `${TIME_W + filledCount * FILLED_MIN_W + (cols.length - filledCount) * EMPTY_W}px`;
       const schools = [...new Set(cols.map(c => c.school))];
       const schoolRow = schools.map(s => {
         const span = cols.filter(c => c.school === s).length;
@@ -688,7 +697,6 @@
     function renderGrid(records) {
       // 校フィルターで選択中の教室だけに絞る（全校選択時は全列）
       const cols = GRID_COLS.filter(c => currentSchool === 'all' || c.school === currentSchool);
-      renderGridHeader(cols);
 
       // grid[school][day][time] = [student, ...]
       const grid = {};
@@ -710,6 +718,9 @@
           }
         }
       }
+
+      const filled = cols.map(col => GRID_TIMES.some(t => grid[col.school][col.day][t].length > 0));
+      renderGridHeader(cols, filled);
 
       const tbody = document.getElementById('gridBody');
       tbody.innerHTML = GRID_TIMES.map(time => `
