@@ -19,6 +19,11 @@
     { "name": "STAFF_AUTH_LIMITER", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } },
     { "name": "STAFF_API_LIMITER", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } },
     { "name": "FORM_LIMITER", "namespace_id": "1003", "simple": { "limit": 20, "period": 60 } }
+  ],
+  // 講師専用ファイル置き場。講師マニュアル（キー manual.pdf）を /api/staff/manual で認証付き配信する。
+  // 差し替え: npx wrangler kv key put manual.pdf --namespace-id <id> --path <PDF> --remote（1件25MiBまで）
+  "kv_namespaces": [
+    { "binding": "STAFF_FILES", "id": "a3f36e39533e46e588ff405cfc5cf398" }
   ]
   // APIトークン等（TOKEN_* / RESEND_API_KEY* / STAFF_PASSWORD）はすべて secret。
   // `wrangler secret put` で管理し、値をこのファイルに書かない（公開リポジトリのため）。

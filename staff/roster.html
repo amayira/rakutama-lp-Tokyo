@@ -85,14 +85,15 @@
 
     <!-- 講師マニュアル・年間スケジュールリンク -->
     <div class="mb-4 flex flex-col sm:flex-row gap-2">
-      <a href="講師マニュアル.pdf" target="_blank" rel="noopener"
-        class="flex items-center gap-2 flex-1 bg-white border border-primary text-primary rounded-xl px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white transition">
+      <!-- 講師マニュアルは公開サイトに置かず、Workerから認証付きで取得する（/api/staff/manual） -->
+      <button type="button" id="manualBtn"
+        class="flex items-center gap-2 flex-1 bg-white border border-primary text-primary rounded-xl px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white transition text-left">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
         </svg>
-        講師マニュアルを開く（PDF）
-      </a>
+        <span id="manualBtnText">講師マニュアルを開く（PDF）</span>
+      </button>
       <a href="../Pictures/2026schedule.pdf" target="_blank" rel="noopener"
         class="flex items-center gap-2 flex-1 bg-white border border-primary text-primary rounded-xl px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white transition">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -322,6 +323,38 @@
     document.getElementById('logoutBtn').addEventListener('click', () => {
       sessionStorage.removeItem('staffKey');
       location.href = 'index.html';
+    });
+
+    // ── 講師マニュアル ────────────────────────────────────────────
+    // 認証ヘッダーが必要なので通常のリンクにできない。先に空タブを開き（ポップアップブロック回避）、
+    // 取得したPDFを blob URL で表示する。約23MBあるので取得中は文言を変える。
+    document.getElementById('manualBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('manualBtn');
+      const text = document.getElementById('manualBtnText');
+      const win = window.open('', '_blank');
+      btn.disabled = true;
+      text.textContent = '読み込み中…（20MB超のため少し時間がかかります）';
+      try {
+        const res = await fetch(`${API}/api/staff/manual`, {
+          headers: { 'Authorization': `Bearer ${staffKey}` },
+        });
+        if (res.status === 401) {
+          if (win) win.close();
+          sessionStorage.removeItem('staffKey');
+          location.href = 'index.html';
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const url = URL.createObjectURL(await res.blob());
+        if (win) win.location.href = url;
+        else location.href = url;
+      } catch (err) {
+        if (win) win.close();
+        alert('マニュアルを開けませんでした。時間をおいて再度お試しください。');
+      } finally {
+        btn.disabled = false;
+        text.textContent = '講師マニュアルを開く（PDF）';
+      }
     });
 
     // ── タブ切り替え ──────────────────────────────────────────────

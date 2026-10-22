@@ -1993,6 +1993,20 @@ export default {
             return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
           }
           result = await handleStaffKentei(params, env);
+        } else if (path === "/api/staff/manual") {
+          // 講師マニュアルPDF（KV）。公開サイトには置かず、講師パスワードで認証した時だけ返す
+          if (!isValidStaffAuth(request, env)) {
+            return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
+          }
+          const pdf = await env.STAFF_FILES?.get("manual.pdf", "stream");
+          if (!pdf) return errorResponse("マニュアルが見つかりません", 404, origin);
+          return new Response(pdf, {
+            headers: {
+              "Content-Type": "application/pdf",
+              "Cache-Control": "private, no-store",
+              ...corsHeaders(origin),
+            },
+          });
         } else if (path === "/api/staff/stats") {
           if (!isValidStaffAuth(request, env)) {
             return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
