@@ -249,8 +249,8 @@ async function handleLookup(body, env) {
     return { success: false, error: "生徒番号が見つかりません", status: 404 };
   }
 
-  const firstRec = data.records[0];
-
+  // 生徒番号は連番で推測できるため、返すのは画面表示に使う教室・クラスだけにする。
+  // 氏名・請求IDは返さない（登録時は worker が名簿から補完する＝fillStudentFromRoster）。
   const records = data.records.map(rec => {
     const jugyoIds = ["コマ1", "コマ2", "コマ3", "コマ4"]
       .map(f => rec[f]?.value)
@@ -258,30 +258,71 @@ async function handleLookup(body, env) {
     return {
       studentNumber: rec["生徒番号"]?.value ?? "",
       classroom: rec["教室名"]?.value ?? "",
-      billingId: rec["請求先ID"]?.value ?? rec["請求ID"]?.value ?? "",
       jugyoIds,
     };
   });
 
   return {
     success: true,
-    student: {
-      familyName: firstRec["氏"]?.value ?? "",
-      givenName: firstRec["名"]?.value ?? "",
-      records,
-    },
+    student: { records },
   };
 }
 
+/**
+ * 在学生フォームの登録前に、生徒番号から名簿(App19)の氏名・請求IDを引いて body に上書きする。
+ * 検索APIが氏名・請求IDを返さなくなったため、フォームからは送られてこない前提。
+ * 週2のサブ番号（A0001-2）は請求IDがレコードごとに違うので、その番号のレコードを引く。
+ */
+async function fillStudentFromRoster(body, env) {
+  const sn = String(body["生徒番号"] ?? "").trim();
+  if (!sn) return false;
+  const data = await kintoneGet(APP.SEITO_NEW, `生徒番号 = "${escapeQueryValue(sn)}" limit 1`, env.TOKEN_SEITO_NEW);
+  const rec = data.records?.[0];
+  if (!rec) return false;
+  body["氏"] = rec["氏"]?.value ?? "";
+  body["名"] = rec["名"]?.value ?? "";
+  body["請求ID"] = rec["請求先ID"]?.value ?? rec["請求ID"]?.value ?? "";
+  return true;
+}
+
+const STUDENT_NOT_FOUND = { success: false, error: "生徒番号が見つかりません。検索し直してください。", status: 404 };
+
 // ─── Resend メール送信 ────────────────────────────────────────────────────────
+
+/**
+ * メールHTMLに差し込む値のエスケープ。フォーム入力をそのまま入れると
+ * 楽珠名義のメールにリンクやタグを仕込まれる（フィッシングの踏み台）。
+ */
+function escapeHtml(val) {
+  return String(val ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
+ * 宛名に使う氏名の無害化。URLを除去し長さを切る
+ * （テキストメールではURLが自動リンクになるため、宛名欄にリンクを仕込ませない）。
+ */
+function cleanNameForMail(val) {
+  return String(val ?? "").replace(/https?:\/\/\S+|www\.\S+/gi, "").trim().slice(0, 30);
+}
+
+const EMAIL_PATTERN = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
 
 async function sendConfirmationEmail(to, familyName, givenName, kyoshitsu, kiboDaiji, org, env) {
   const profile = getMailProfile(org);
   // mode:"none"（FC加盟店）は申込者へ自動返信しない。内容は本部への控えメールで届く。
   if (profile.mode !== "direct") return;
   const apiKey = env[profile.keyVar];
-  if (!apiKey || !to) return;
+  if (!apiKey || !to || !EMAIL_PATTERN.test(String(to))) return;
 
+  familyName = cleanNameForMail(familyName);
+  givenName = cleanNameForMail(givenName);
+  kyoshitsu = String(kyoshitsu ?? "").slice(0, 50);
+  kiboDaiji = String(kiboDaiji ?? "").slice(0, 200);
   const namePart = familyName || givenName ? `${familyName} ${givenName}`.trim() + " さん" : "ご保護者様";
   const kyoshitsuLine = kyoshitsu ? `\n■ ご希望の教室：${kyoshitsu}` : "";
   const kiboLine = kiboDaiji ? `\n■ ご希望日時：${kiboDaiji}` : "";
@@ -312,12 +353,12 @@ ${contactTextLines}
 ${profile.footer}
 ━━━━━━━━━━━━━━━━━━━━━━`;
 
-  const htmlBody = `<p>${namePart}</p>
+  const htmlBody = `<p>${escapeHtml(namePart)}</p>
 <p>このたびは楽珠そろばん教室の体験授業にお申し込みいただき、ありがとうございます。</p>
 <p>以下の内容でお申し込みを受け付けました。</p>
 <table style="border-collapse:collapse;margin:16px 0;">
-  ${kyoshitsu ? `<tr><td style="padding:4px 12px 4px 0;color:#555;white-space:nowrap;">ご希望の教室</td><td style="padding:4px 0;">${kyoshitsu}</td></tr>` : ""}
-  ${kiboDaiji ? `<tr><td style="padding:4px 12px 4px 0;color:#555;white-space:nowrap;">ご希望日時</td><td style="padding:4px 0;">${kiboDaiji}</td></tr>` : ""}
+  ${kyoshitsu ? `<tr><td style="padding:4px 12px 4px 0;color:#555;white-space:nowrap;">ご希望の教室</td><td style="padding:4px 0;">${escapeHtml(kyoshitsu)}</td></tr>` : ""}
+  ${kiboDaiji ? `<tr><td style="padding:4px 12px 4px 0;color:#555;white-space:nowrap;">ご希望日時</td><td style="padding:4px 0;">${escapeHtml(kiboDaiji)}</td></tr>` : ""}
 </table>
 <p>担当者より <strong>1営業日以内</strong> に体験日時の確定メールをお送りします。<br>今しばらくお待ちください。</p>
 <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
@@ -445,9 +486,10 @@ async function sendReceiptEmail({ to, name, subject, lead, rows, org, env }) {
   // mode:"none"（FC加盟店）は申込者へ自動返信しない。内容は本部への控えメールで届く。
   if (profile.mode !== "direct") return;
   const apiKey = env[profile.keyVar];
-  if (!apiKey || !to) return;
+  if (!apiKey || !to || !EMAIL_PATTERN.test(String(to))) return;
 
-  const namePart = name ? `${name} さん` : "ご保護者様";
+  const cleanName = cleanNameForMail(name);
+  const namePart = cleanName ? `${cleanName} さん` : "ご保護者様";
   const filled = (rows || []).filter(([, v]) => v != null && String(v).trim() !== "");
 
   const fullSubject = `${subject}${profile.subjectSuffix}`;
@@ -480,9 +522,9 @@ ${profile.footer}
 ━━━━━━━━━━━━━━━━━━━━━━`;
 
   const htmlRows = filled
-    .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:#555;white-space:nowrap;vertical-align:top;">${k}</td><td style="padding:4px 0;">${String(v).replace(/\n/g, "<br>")}</td></tr>`)
+    .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:#555;white-space:nowrap;vertical-align:top;">${escapeHtml(k)}</td><td style="padding:4px 0;">${escapeHtml(v).replace(/\n/g, "<br>")}</td></tr>`)
     .join("");
-  const htmlBody = `<p>${namePart}</p>
+  const htmlBody = `<p>${escapeHtml(namePart)}</p>
 <p>${lead}</p>
 <p>以下の内容で受け付けました。</p>
 <table style="border-collapse:collapse;margin:16px 0;">
@@ -681,6 +723,8 @@ async function handleKesseki(body, env) {
   if (isTodayPastCutoff(furikaeDate)) {
     return { success: false, error: "本日分の振替予約は14:30までとなります。やむを得ない事情の場合は公式LINEにてご連絡ください。", status: 400 };
   }
+
+  if (!(await fillStudentFromRoster(body, env))) return STUDENT_NOT_FOUND;
 
   const deadline = computeSubstituteDeadline(absenceDate);
 
@@ -948,6 +992,24 @@ async function handleFurikaeStatus(params, env) {
 }
 
 /**
+ * 振替チケット（App14のレコード）が送信された生徒番号のものか確認する。
+ * ticketId は kintone の連番レコードIDで推測できるため、照合しないと
+ * 他の生徒の振替を書き換え・取消できてしまう。
+ * 週2コース（A0001-2）は "-" より前のメイン番号同士で比較する。
+ */
+async function verifyTicketOwner(ticketId, studentNumber, env) {
+  if (!/^\d+$/.test(String(ticketId)) || !studentNumber) return false;
+  const main = (sn) => String(sn).trim().toUpperCase().split("-")[0];
+  try {
+    const data = await kintoneGetById(APP.FURIKAE, ticketId, env.TOKEN_FURIKAE);
+    const owner = data.record?.["生徒番号"]?.value ?? "";
+    return Boolean(owner) && main(owner) === main(studentNumber);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * POST /api/furikae
  * Updates an existing App 14 record (ticket) with the substitute lesson date/time.
  */
@@ -955,6 +1017,9 @@ async function handleFurikae(body, env) {
   const { ticketId } = body;
   if (!ticketId) {
     return { success: false, error: "ticketId は必須です", status: 400 };
+  }
+  if (!(await verifyTicketOwner(ticketId, body["生徒番号"], env))) {
+    return { success: false, error: "振替チケットが見つかりません。生徒番号を検索し直してください。", status: 404 };
   }
 
   if (isTodayPastCutoff(body["振替受講日"] ?? "")) {
@@ -998,6 +1063,9 @@ async function handleFurikaeCancel(body, env) {
   if (!ticketId) {
     return { success: false, error: "ticketId は必須です", status: 400 };
   }
+  if (!(await verifyTicketOwner(ticketId, body["生徒番号"], env))) {
+    return { success: false, error: "振替チケットが見つかりません。生徒番号を検索し直してください。", status: 404 };
+  }
 
   const record = buildRecord({
     振替受講日: "",
@@ -1039,6 +1107,8 @@ function computeKenteiBillingDate(examDate) {
  * 暗算受験級 and 珠算受験級 are only set when non-empty.
  */
 async function handleKentei(body, env) {
+  if (!(await fillStudentFromRoster(body, env))) return STUDENT_NOT_FOUND;
+
   const fields = {
     生徒番号: body["生徒番号"] ?? "",
     請求ID: body["請求ID"] ?? "",
@@ -1392,7 +1462,9 @@ async function handleGakuhi(params, env) {
  * Gracefully no-ops if CLASS_CHANGE_APP_ID is not configured.
  */
 async function handleClassChange(body, env) {
-  const token = [env.TOKEN_CLASS_CHANGE, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
+  if (!(await fillStudentFromRoster(body, env))) return STUDENT_NOT_FOUND;
+
+  const token =[env.TOKEN_CLASS_CHANGE, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
 
   const record = buildRecord({
     生徒番号: body["生徒番号"] ?? "",
@@ -1822,6 +1894,36 @@ async function handleFcLead(body, env) {
   return { success: true, id: result.id };
 }
 
+// ─── Rate limiting ───────────────────────────────────────────────────────────
+// Cloudflare の Rate Limiting バインディング（wrangler.jsonc の ratelimits）で IP ごとに回数を絞る。
+//   STAFF_AUTH_LIMITER … 講師ログイン（パスワード総当たり対策）
+//   STAFF_API_LIMITER  … 講師ポータルの閲覧API（Bearer での総当たり対策。通常利用は数回/分）
+//   FORM_LIMITER       … 保護者向けの登録・照会API（大量送信・メール踏み台対策）
+// バインディング未設定（ローカル等）の場合は制限しない。
+
+// 生徒番号で個人の情報を返す GET（マスタ系の GET はページ表示のたびに呼ばれるので対象外）
+const FORM_LOOKUP_PATHS = ["/api/furikae-tickets", "/api/furikae-status", "/api/absence-count"];
+
+async function isRateLimited(limiter, request, scope) {
+  if (!limiter) return false;
+  const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+  try {
+    const { success } = await limiter.limit({ key: `${scope}:${ip}` });
+    return !success;
+  } catch (e) {
+    console.error("rate limit error:", e);
+    return false;
+  }
+}
+
+function tooManyRequests(origin) {
+  return jsonResponse(
+    { success: false, error: "短時間に送信が集中しています。1分ほど待ってから再度お試しください。" },
+    429,
+    origin
+  );
+}
+
 // ─── Main fetch handler ──────────────────────────────────────────────────────
 
 export default {
@@ -1829,6 +1931,16 @@ export default {
     const origin = request.headers.get("Origin") ?? "";
     const url = new URL(request.url);
     const path = url.pathname;
+
+    if (request.method !== "OPTIONS") {
+      if (path === "/api/staff/auth") {
+        if (await isRateLimited(env.STAFF_AUTH_LIMITER, request, "staff-auth")) return tooManyRequests(origin);
+      } else if (path.startsWith("/api/staff/")) {
+        if (await isRateLimited(env.STAFF_API_LIMITER, request, "staff-api")) return tooManyRequests(origin);
+      } else if (request.method === "POST" || FORM_LOOKUP_PATHS.includes(path)) {
+        if (await isRateLimited(env.FORM_LIMITER, request, "form")) return tooManyRequests(origin);
+      }
+    }
 
     // ── Preflight ────────────────────────────────────────────────────────────
     if (request.method === "OPTIONS") {

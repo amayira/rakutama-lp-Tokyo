@@ -12,7 +12,15 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  // IPごとの回数制限（worker.js の isRateLimited で使用）。period は 10 か 60 秒のみ指定可。
+  // namespace_id はアカウント内で一意の任意の数字。
+  "ratelimits": [
+    { "name": "STAFF_AUTH_LIMITER", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } },
+    { "name": "STAFF_API_LIMITER", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } },
+    { "name": "FORM_LIMITER", "namespace_id": "1003", "simple": { "limit": 20, "period": 60 } }
   ]
-  // APIトークン等の環境変数（TOKEN_* / RESEND_API_KEY / STAFF_PASSWORD）は
-  // Cloudflareダッシュボードまたは `wrangler secret put` で管理する。
+  // APIトークン等（TOKEN_* / RESEND_API_KEY* / STAFF_PASSWORD）はすべて secret。
+  // `wrangler secret put` で管理し、値をこのファイルに書かない（公開リポジトリのため）。
+  // STAFF_PASSWORD の元データは ~/.claude/secrets/staff_passwords.json。
 }
