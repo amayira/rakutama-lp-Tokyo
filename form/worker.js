@@ -1679,7 +1679,18 @@ async function handleStaffKentei(params, env) {
   const query = `${conditions.join(" and ")} order by 受験日 asc, 教室名 asc limit 500`;
 
   const data = await kintoneGet(APP.KENTEI, query, env.TOKEN_KENTEI);
-  const records = (data.records ?? []).map(rec => ({
+
+  // 検定申込(App12)は所属組織を持たないため、生徒名簿の所属組織で直営（アルファーブレイン）の生徒だけに絞る。
+  // FC加盟店・オンライン等の他組織の申込が講師ポータルに混ざるのを防ぐ。
+  const numbers = [...new Set((data.records ?? []).map(rec => rec["生徒番号"]?.value).filter(Boolean))];
+  const directNumbers = new Set();
+  if (numbers.length > 0) {
+    const rosterQuery = `所属組織 in ("アルファーブレイン") and 生徒番号 in (${numbers.map(n => `"${escapeQueryValue(n)}"`).join(",")}) limit 500`;
+    const roster = await kintoneGet(APP.SEITO_NEW, rosterQuery, env.TOKEN_SEITO_NEW);
+    for (const r of roster.records ?? []) directNumbers.add(r["生徒番号"]?.value);
+  }
+
+  const records = (data.records ?? []).filter(rec => directNumbers.has(rec["生徒番号"]?.value)).map(rec => ({
     生徒番号: rec["生徒番号"]?.value ?? "",
     氏: rec["氏"]?.value ?? "",
     名: rec["名"]?.value ?? "",
