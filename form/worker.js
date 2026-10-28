@@ -1634,6 +1634,19 @@ async function handleStaffSeito(params, env) {
 }
 
 /**
+ * 生徒番号を持つkintoneレコードのうち、生徒名簿(App19)の所属組織が直営（アルファーブレイン）の生徒のものだけ返す。
+ * 検定申込・振替管理は所属組織を持たないため、FC加盟店等の他組織の生徒が講師ポータルに混ざるのを防ぐ。
+ */
+async function filterDirectStudentRecords(records, env) {
+  const numbers = [...new Set(records.map(rec => rec["生徒番号"]?.value).filter(Boolean))];
+  if (numbers.length === 0) return [];
+  const rosterQuery = `所属組織 in ("アルファーブレイン") and 生徒番号 in (${numbers.map(n => `"${escapeQueryValue(n)}"`).join(",")}) limit 500`;
+  const roster = await kintoneGet(APP.SEITO_NEW, rosterQuery, env.TOKEN_SEITO_NEW);
+  const direct = new Set((roster.records ?? []).map(r => r["生徒番号"]?.value));
+  return records.filter(rec => direct.has(rec["生徒番号"]?.value));
+}
+
+/**
  * GET /api/staff/kesseki?school=all|早宮校|氷川台校|中村校&tab=kesseki|furikae
  * Returns 振替管理 (App 14) records where 欠席日 >= TODAY() or 振替受講日 >= TODAY().
  * 欠席タブ(tab=kesseki)は教室名（ホーム教室）で絞り込み、
@@ -1652,7 +1665,7 @@ async function handleStaffKesseki(params, env) {
   const query = `${conditions.join(" and ")} order by 欠席日 asc limit 500`;
 
   const data = await kintoneGet(APP.FURIKAE, query, env.TOKEN_FURIKAE);
-  const records = (data.records ?? []).map(rec => ({
+  const records = (await filterDirectStudentRecords(data.records ?? [], env)).map(rec => ({
     生徒番号: rec["生徒番号"]?.value ?? "",
     氏: rec["氏"]?.value ?? "",
     名: rec["名"]?.value ?? "",
@@ -1680,17 +1693,8 @@ async function handleStaffKentei(params, env) {
 
   const data = await kintoneGet(APP.KENTEI, query, env.TOKEN_KENTEI);
 
-  // 検定申込(App12)は所属組織を持たないため、生徒名簿の所属組織で直営（アルファーブレイン）の生徒だけに絞る。
-  // FC加盟店・オンライン等の他組織の申込が講師ポータルに混ざるのを防ぐ。
-  const numbers = [...new Set((data.records ?? []).map(rec => rec["生徒番号"]?.value).filter(Boolean))];
-  const directNumbers = new Set();
-  if (numbers.length > 0) {
-    const rosterQuery = `所属組織 in ("アルファーブレイン") and 生徒番号 in (${numbers.map(n => `"${escapeQueryValue(n)}"`).join(",")}) limit 500`;
-    const roster = await kintoneGet(APP.SEITO_NEW, rosterQuery, env.TOKEN_SEITO_NEW);
-    for (const r of roster.records ?? []) directNumbers.add(r["生徒番号"]?.value);
-  }
-
-  const records = (data.records ?? []).filter(rec => directNumbers.has(rec["生徒番号"]?.value)).map(rec => ({
+  // 検定申込(App12)は所属組織を持たないため、生徒名簿の所属組織で直営の生徒だけに絞る
+  const records = (await filterDirectStudentRecords(data.records ?? [], env)).map(rec => ({
     生徒番号: rec["生徒番号"]?.value ?? "",
     氏: rec["氏"]?.value ?? "",
     名: rec["名"]?.value ?? "",
