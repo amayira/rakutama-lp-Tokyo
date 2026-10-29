@@ -27,6 +27,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .brand .back{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px;text-decoration:none;border-bottom:1px solid var(--line)}
 .opts{display:flex;gap:6px;flex-wrap:wrap}
 .opts label{display:flex;align-items:center;gap:6px;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;user-select:none}
+.opts button{font:inherit;font-size:14px;background:var(--card);border:1px solid var(--accent);color:var(--accent-d);border-radius:999px;padding:6px 12px;cursor:pointer}
 .opts input{accent-color:var(--accent);width:16px;height:16px}
 .opts label.dis{opacity:.45;cursor:not-allowed}
 
@@ -119,8 +120,10 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
       <label><input type="checkbox" id="optSound" checked>音</label>
       <label id="optVoiceL"><input type="checkbox" id="optVoice" checked>声</label>
       <label><input type="checkbox" id="optHint" checked>運指</label>
+      <button type="button" id="btnSoundTest">音テスト</button>
     </div>
   </header>
+  <div id="soundStat" style="font-size:13px;color:var(--muted);margin:-4px 0 8px"></div>
 
   <div class="seg" role="tablist">
     <button id="tabFree" class="on" role="tab">① 自由に弾く</button>
@@ -216,26 +219,26 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
   $('optHint').onchange = function () { opt.hint = this.checked; saveOpt(); if (demo.res) showBubble(demo.res.steps[demo.i]); };
 
   /* ---------- 音 ---------- */
-  var ac = null, unlocked = false;
-  // スマホは「画面をタップした時」にだけ音を許可する。最初のタップで音の通り道を開けておく。
+  var ac = null, speechPrimed = false;
+  // スマホは「タップした時」にだけ音を許可する。許可されるまで、タップのたびにやり直す。
   function unlockAudio() {
-    if (unlocked) return;
-    unlocked = true;
     try {
       ac = ac || new (window.AudioContext || window.webkitAudioContext)();
-      if (ac.state === 'suspended') ac.resume();
+      if (ac.state !== 'running') ac.resume();
       // iPhoneのマナーモードでも鳴るように、無音の音声をループ再生しておく
-      var a = document.createElement('audio');
-      a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';
-      a.loop = true; a.setAttribute('playsinline', '');
-      var pr = a.play(); if (pr && pr.catch) pr.catch(function () {});
-      window.__silentAudio = a;
+      if (!window.__silentAudio) {
+        var a = document.createElement('audio');
+        a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';
+        a.loop = true; a.setAttribute('playsinline', '');
+        window.__silentAudio = a;
+      }
+      if (window.__silentAudio.paused) { var pr = window.__silentAudio.play(); if (pr && pr.catch) pr.catch(function () {}); }
     } catch (e) {}
-    if (speechOK) {
-      try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+    if (speechOK && !speechPrimed) {
+      try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); speechPrimed = true; } catch (e) {}
     }
   }
-  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(function (ev) {
+  ['touchend', 'click', 'keydown'].forEach(function (ev) {
     document.addEventListener(ev, unlockAudio, { passive: true });
   });
   function tick() {
@@ -250,6 +253,28 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
       o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + .08);
     } catch (e) {}
   }
+
+
+  $('btnSoundTest').onclick = function () {
+    unlockAudio();
+    var vs = [];
+    tick();
+    if (speechOK) {
+      try {
+        vs = speechSynthesis.getVoices().filter(function (v) { return /^ja/i.test(v.lang); });
+        speechSynthesis.cancel();
+        var u = new SpeechSynthesisUtterance('音のテストです');
+        u.lang = 'ja-JP'; if (vs[0]) u.voice = vs[0];
+        u.onerror = function (e) { $('soundStat').textContent += ' ／ 声のエラー：' + (e.error || ''); };
+        window.__utt = u; speechSynthesis.speak(u);
+      } catch (e) {}
+    }
+    setTimeout(function () {
+      $('soundStat').textContent = '珠の音：' + (ac ? (ac.state === 'running' ? 'OK' : '許可待ち(' + ac.state + ')') : '非対応') +
+        ' ／ 声：' + (speechOK ? '対応（日本語の声 ' + vs.length + '個）' : 'このブラウザでは使えません') +
+        ' ／ 鳴らない時は、マナーモード解除・音量アップ・「音」「声」のチェックを確認してね。LINEの中で開いている場合は、Safari／Chromeで開き直してね。';
+    }, 500);
+  };
 
   /* ---------- そろばん盤（SVG） ---------- */
   var svg = $('board');
@@ -570,8 +595,12 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
       u.rate = Math.min(1.5, 0.95 * Math.pow(demo.speed, 0.7));
       if (onend) { u.onend = onend; u.onerror = onend; }
       window.__utt = u; // 読み上げ中に破棄されて止まるのを防ぐ
-      // cancel直後のspeakはスマホで無視されることがあるので少し待つ
-      setTimeout(function () { try { speechSynthesis.speak(u); } catch (e) { if (onend) onend(); } }, 90);
+      var busy = speechSynthesis.speaking || speechSynthesis.pending;
+      if (!busy) { speechSynthesis.speak(u); }
+      else { // cancel直後のspeakはスマホで無視されることがあるので少し待つ
+        speechSynthesis.cancel();
+        setTimeout(function () { try { speechSynthesis.speak(u); } catch (e) { if (onend) onend(); } }, 90);
+      }
     } catch (e) { if (onend) onend(); }
   }
   function cancelSpeech() { if (speechOK) { try { speechSynthesis.cancel(); } catch (e) {} } }
