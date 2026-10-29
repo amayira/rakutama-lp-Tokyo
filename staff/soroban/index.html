@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>らくたまそろばん</title>
+<meta name="description" content="楽珠そろばん教室のそろばんアプリ。自由に弾く／みとり算・かけ算・わり算の実演">
+<style>
+:root{
+  --bg:#fff7e8; --ink:#3a2814; --muted:#7b6650; --card:#fffdf8; --line:#ecdcc0;
+  --accent:#e8590c; --accent-d:#c2410c; --green:#2f9e44; --wood:#a9743a; --wood-d:#5b3a1a;
+  --dur:.38s;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic UI","Yu Gothic","Meiryo",sans-serif;
+  font-size:16px; line-height:1.6; -webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.app{max-width:1000px;margin:0 auto;padding:14px 16px 40px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.brand{font-size:24px;font-weight:700;letter-spacing:.04em}
+.brand span{color:var(--accent)}
+.brand .back{font-size:13px;font-weight:400;color:var(--muted);margin-left:10px;text-decoration:none;border-bottom:1px solid var(--line)}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opts label{display:flex;align-items:center;gap:6px;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;user-select:none}
+.opts input{accent-color:var(--accent);width:16px;height:16px}
+.opts label.dis{opacity:.45;cursor:not-allowed}
+
+.seg{display:flex;gap:6px;background:#f3e6cd;border-radius:16px;padding:5px;margin-bottom:12px}
+.seg button{flex:1;min-height:48px;border:0;background:transparent;border-radius:12px;font:inherit;font-size:17px;font-weight:700;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(90,58,26,.2)}
+.seg.small button{min-height:40px;font-size:15px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:14px}
+.readout{display:flex;align-items:baseline;gap:10px;justify-content:flex-end;padding:0 6px 6px}
+#problem{margin-right:auto;display:flex;align-items:baseline;gap:10px;min-width:0}
+#probText{font-size:28px;font-weight:700;overflow-wrap:anywhere}
+.readout .lbl{font-size:14px;color:var(--muted)}
+.readout #reading{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;min-width:2ch;text-align:right}
+#boardWrap{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+#board{width:100%;height:auto;max-height:46vh;display:block;margin:0 auto}
+.bead{cursor:pointer;transition:transform var(--dur) cubic-bezier(.25,.8,.3,1)}
+.bead path{stroke-linejoin:round;stroke-width:3}
+.bead path{fill:url(#gLow);stroke:#3f230c}
+body.demo .bead{cursor:default}
+.zone{fill:transparent;transition:fill .3s}
+.zone.zq{fill:rgba(47,158,68,.17)}
+.zone.zr{fill:rgba(232,89,12,.12)}
+.fl{fill:#ffd43b;opacity:0;pointer-events:none}
+.fl.go{animation:flash 1.1s ease-out}
+@keyframes flash{0%{opacity:.7}100%{opacity:0}}
+.lab{font-size:15px;fill:var(--muted);text-anchor:middle;font-weight:700}
+.dot{fill:#fff;stroke:var(--wood-d);stroke-width:1.5;transition:fill .2s}
+.dot.unit{fill:var(--accent)}
+.dothit{fill:transparent}
+body.free .dothit{cursor:pointer}
+#fg{transition:transform .5s cubic-bezier(.25,.8,.3,1),opacity .3s}
+.legend{display:none;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);padding:2px 6px 0;justify-content:center}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px}
+.board-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}
+.board-actions .note{font-size:13px;color:var(--muted);flex:1;min-width:200px}
+
+button.btn{min-height:48px;padding:0 20px;border-radius:14px;border:2px solid var(--line);background:#fff;color:var(--ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+button.btn:active{transform:translateY(1px)}
+button.btn.primary{background:var(--accent);border-color:var(--accent-d);color:#fff}
+button.btn.big{min-height:56px;font-size:20px;padding:0 32px}
+button.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.inputrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}
+.inputrow input{min-height:48px;border:2px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;font-size:20px;background:#fff;color:var(--ink);min-width:0}
+.inputrow input:focus{outline:3px solid #ffd8a8;border-color:var(--accent)}
+.inputrow .op{font-size:26px;font-weight:700;color:var(--muted)}
+#inpM{flex:1;min-width:220px}
+#inpA,#inpX{width:150px} #inpB,#inpY{width:130px}
+.chipsT{font-size:13px;color:var(--muted);margin:10px 0 4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font:inherit;font-size:14px;color:var(--ink);cursor:pointer}
+.chips button:hover{border-color:var(--accent)}
+.err{color:#c92a2a;font-weight:700;min-height:1.6em;font-size:14px}
+
+.bubble{background:#fff;border:2px solid var(--accent);border-radius:18px;padding:14px 18px;margin:10px 0;position:relative}
+.bubble .t{font-size:22px;font-weight:700;line-height:1.55;min-height:3.1em}
+.bubble .p{font-size:14px;color:var(--ink);background:#fff3bf;border-radius:10px;padding:6px 10px;margin-top:8px}
+.bubble .h{font-size:14px;color:#1864ab;background:#e7f5ff;border-radius:10px;padding:6px 10px;margin-top:8px}
+.bubble .p:empty,.bubble .h:empty{display:none}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.controls .btn{padding:0 14px;min-width:52px}
+.controls select{min-height:48px;border-radius:12px;border:2px solid var(--line);background:#fff;font:inherit;padding:0 10px}
+.prog{display:flex;align-items:center;gap:10px;flex:1;min-width:180px}
+.prog input[type=range]{flex:1;accent-color:var(--accent);height:32px}
+.prog span{font-size:14px;color:var(--muted);min-width:56px;text-align:right;font-variant-numeric:tabular-nums}
+details{margin-top:12px}
+summary{cursor:pointer;color:var(--muted);font-size:14px}
+ol#stepList{margin:8px 0 0;padding-left:0;list-style:none;counter-reset:s;max-height:260px;overflow:auto}
+ol#stepList li{counter-increment:s}
+ol#stepList button{display:block;width:100%;text-align:left;border:0;background:transparent;font:inherit;font-size:14px;padding:6px 8px 6px 34px;border-radius:8px;cursor:pointer;position:relative;color:var(--ink)}
+ol#stepList button::before{content:counter(s);position:absolute;left:6px;color:var(--muted);font-size:12px;top:8px}
+ol#stepList button.cur{background:#ffe8cc;font-weight:700}
+[hidden]{display:none!important}
+@media (max-width:560px){
+  .brand{font-size:20px}
+  .readout #reading{font-size:32px}
+  #probText{font-size:22px}
+  .bubble .t{font-size:19px}
+  .seg button{font-size:15px}
+  #inpA,#inpX{width:44%} #inpB,#inpY{width:34%}
+}
+</style>
+</head>
+<body class="free">
+<div class="app">
+  <header class="top">
+    <div class="brand">らくたま<span>そろばん</span> <a class="back" href="../roster.html">← 講師ポータル</a></div>
+    <div class="opts">
+      <label><input type="checkbox" id="optSound" checked>音</label>
+      <label id="optVoiceL"><input type="checkbox" id="optVoice" checked>声</label>
+      <label><input type="checkbox" id="optHint" checked>運指</label>
+    </div>
+  </header>
+
+  <div class="seg" role="tablist">
+    <button id="tabFree" class="on" role="tab">① 自由に弾く</button>
+    <button id="tabDemo" role="tab">② 実演</button>
+  </div>
+
+  <section class="card" id="demo" hidden>
+    <div class="seg small" role="tablist">
+      <button data-kind="mitori" class="on">みとり算</button>
+      <button data-kind="mul">かけ算</button>
+      <button data-kind="div">わり算</button>
+    </div>
+
+    <div class="inputrow" id="inMitori">
+      <input id="inpM" inputmode="text" autocomplete="off" placeholder="例：9 + 4 - 8 + 5" aria-label="みとり算の問題">
+    </div>
+    <div class="inputrow" id="inMul" hidden>
+      <input id="inpA" inputmode="numeric" autocomplete="off" placeholder="かけられる数" aria-label="かけられる数">
+      <span class="op">×</span>
+      <input id="inpB" inputmode="numeric" autocomplete="off" placeholder="かける数" aria-label="かける数">
+    </div>
+    <div class="inputrow" id="inDiv" hidden>
+      <input id="inpX" inputmode="numeric" autocomplete="off" placeholder="割られる数" aria-label="割られる数">
+      <span class="op">÷</span>
+      <input id="inpY" inputmode="numeric" autocomplete="off" placeholder="割る数" aria-label="割る数">
+    </div>
+    <div class="inputrow">
+      <button class="btn primary big" id="btnStart">実演スタート</button>
+      <button class="btn" id="btnRandom">ランダムな問題</button>
+    </div>
+    <div class="err" id="err" role="alert"></div>
+    <div class="chipsT">講師マニュアルのロープレ問題</div>
+    <div class="chips" id="chips"></div>
+
+  </section>
+
+  <section class="card">
+    <div class="readout"><div id="problem" hidden><span class="lbl">問題</span><span id="probText"></span></div><span class="lbl" id="readLbl">いまの数</span><span id="reading">0</span></div>
+    <div id="boardWrap"><svg id="board" viewBox="0 0 814 319" role="img" aria-label="そろばん"></svg></div>
+    <div class="legend" id="legend"><span><i style="background:rgba(47,158,68,.45)"></i>答え（商）の場所</span><span><i style="background:rgba(232,89,12,.4)"></i>割られる数・あまりの場所</span></div>
+    <div class="board-actions">
+      <button class="btn primary big" id="btnReset">ご破算</button>
+      <div class="note" id="boardNote">珠をタップして弾こう。ご破算で全部0にもどるよ。ビームの上の点をタップすると、一の位を変えられるよ。</div>
+    </div>
+  </section>
+
+  <section class="card" id="stage" hidden>
+      <div class="bubble" aria-live="polite">
+        <div class="t" id="bText"></div>
+        <div class="p" id="bPoint"></div>
+        <div class="h" id="bHint"></div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="cFirst" title="最初から" aria-label="最初から">⏮</button>
+        <button class="btn" id="cPrev" title="ひとつ戻る" aria-label="ひとつ戻る">◀</button>
+        <button class="btn primary" id="cPlay" aria-label="再生・一時停止">▶ 再生</button>
+        <button class="btn" id="cNext" title="次へ" aria-label="次へ">▶|</button>
+        <select id="cSpeed" aria-label="速さ">
+          <option value="0.6">ゆっくり</option>
+          <option value="1" selected>ふつう</option>
+          <option value="1.6">はやい</option>
+        </select>
+        <div class="prog"><input type="range" id="cRange" min="0" max="0" value="0" aria-label="ステップ"><span id="cCount">0 / 0</span></div>
+      </div>
+      <details><summary>ぜんぶのステップを見る</summary><ol id="stepList"></ol></details>
+  </section>
+</div>
+
+<script src="engine.js"></script>
+<script>
+(function () {
+  'use strict';
+  var S = window.Soroban, NR = S.NR;
+  var $ = function (id) { return document.getElementById(id); };
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  /* ---------- 設定（localStorage は使えない環境でも動くように） ---------- */
+  var opt = { sound: true, voice: true, hint: true };
+  try { var sv = JSON.parse(localStorage.getItem('rakutama-soroban-opt') || '{}'); for (var k in sv) if (k in opt) opt[k] = !!sv[k]; } catch (e) {}
+  function saveOpt() { try { localStorage.setItem('rakutama-soroban-opt', JSON.stringify(opt)); } catch (e) {} }
+
+  var speechOK = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  if (!speechOK) { opt.voice = false; $('optVoice').disabled = true; $('optVoiceL').className = 'dis'; $('optVoiceL').title = 'このブラウザは声に対応していません'; }
+  $('optSound').checked = opt.sound; $('optVoice').checked = opt.voice; $('optHint').checked = opt.hint;
+  $('optSound').onchange = function () { opt.sound = this.checked; saveOpt(); };
+  $('optVoice').onchange = function () { opt.voice = this.checked; saveOpt(); if (!opt.voice && speechOK) speechSynthesis.cancel(); };
+  $('optHint').onchange = function () { opt.hint = this.checked; saveOpt(); if (demo.res) showBubble(demo.res.steps[demo.i]); };
+
+  /* ---------- 音 ---------- */
+  var ac = null;
+  function tick() {
+    if (!opt.sound) return;
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      var t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'square';
+      o.frequency.setValueAtTime(1100, t); o.frequency.exponentialRampToValueAtTime(260, t + .05);
+      g.gain.setValueAtTime(.09, t); g.gain.exponentialRampToValueAtTime(.001, t + .07);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + .08);
+    } catch (e) {}
+  }
+
+  /* ---------- そろばん盤（SVG） ---------- */
+  var svg = $('board');
+  var FX = 10, FY = 34, FW = 794, FH = 211, IX = 26, IY = 48, IW = 762, IH = 183;
+  var RW = IW / NR, BEAM_Y = 94, BEAM_H = 18;
+  var UP_OFF = 64, UP_ON = 79;
+  function rodX(r) { return IX + RW * (NR - 1 - r) + RW / 2; }
+  function lowOn(k) { return 127 + 24 * k; }
+  function lowOff(k) { return 142 + 24 * k; }
+
+  var zones = [], fls = [], ups = [], lows = [], dots = [], labs = [], fg;
+  var onBead = function () {}, onDot = function () {};
+
+  (function build() {
+    var defs = el('defs', {}, svg);
+    function grad(id, stops) {
+      var g = el('linearGradient', { id: id, x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+      stops.forEach(function (s) { el('stop', { offset: s[0], 'stop-color': s[1] }, g); });
+    }
+    grad('gLow', [[0, '#c68a4d'], [1, '#6b4118']]);
+    grad('gFrame', [[0, '#b9803f'], [1, '#6e4520']]);
+    grad('gBeam', [[0, '#8a5a2b'], [1, '#5b3a1a']]);
+
+    el('rect', { x: FX, y: FY, width: FW, height: FH, rx: 16, fill: 'url(#gFrame)' }, svg);
+    el('rect', { x: IX, y: IY, width: IW, height: IH, rx: 6, fill: '#fbf0d9' }, svg);
+    var zl = el('g', {}, svg);
+    for (var r = 0; r < NR; r++) {
+      zones[r] = el('rect', { x: rodX(r) - RW / 2, y: IY, width: RW, height: IH, class: 'zone' }, zl);
+    }
+    for (r = 0; r < NR; r++) el('line', { x1: rodX(r), x2: rodX(r), y1: IY, y2: IY + IH, stroke: '#7a5a3a', 'stroke-width': 4 }, svg);
+    el('rect', { x: IX, y: BEAM_Y, width: IW, height: BEAM_H, fill: 'url(#gBeam)' }, svg);
+    for (r = 0; r < NR; r += 3) {
+      dots[r] = el('circle', { cx: rodX(r), cy: BEAM_Y + BEAM_H / 2, r: 4.5, class: 'dot' }, svg);
+    }
+    var bl = el('g', {}, svg);
+    function mkBead(cls, r, handler) {
+      var g = el('g', { class: 'bead ' + cls }, bl);
+      el('rect', { x: -RW / 2 + 2, y: -13, width: RW - 4, height: 26, fill: 'transparent' }, g);
+      el('path', { d: 'M-24,0 L-14,-12 L14,-12 L24,0 L14,12 L-14,12 Z' }, g);
+      g.addEventListener('click', handler);
+      return g;
+    }
+    for (r = 0; r < NR; r++) {
+      (function (r) {
+        ups[r] = mkBead('up', r, function () { onBead(r, 'up', 0); });
+        lows[r] = [];
+        for (var k = 0; k < 4; k++) (function (k) { lows[r][k] = mkBead('low', r, function () { onBead(r, 'low', k); }); })(k);
+      })(r);
+    }
+    for (r = 0; r < NR; r++) {
+      fls[r] = el('rect', { x: rodX(r) - RW / 2, y: IY, width: RW, height: IH, class: 'fl' }, svg);
+    }
+    for (r = 0; r < NR; r += 3) {
+      (function (r) {
+        var h = el('rect', { x: rodX(r) - RW / 2, y: BEAM_Y - 2, width: RW, height: BEAM_H + 4, class: 'dothit' }, svg);
+        h.addEventListener('click', function () { onDot(r); });
+      })(r);
+    }
+    for (r = 0; r < NR; r++) labs[r] = el('text', { x: rodX(r), y: 269, class: 'lab' }, svg);
+    fg = el('g', { id: 'fg', style: 'opacity:0;transform:translate(' + rodX(3) + 'px,0px)' }, svg);
+    el('path', { d: 'M0,275 L-10,287 L10,287 Z', fill: '#e8590c' }, fg);
+    el('rect', { x: -30, y: 287, width: 60, height: 26, rx: 13, fill: '#e8590c' }, fg);
+    var ft = el('text', { x: 0, y: 305, 'text-anchor': 'middle', fill: '#fff', 'font-size': 15, 'font-weight': 700 }, fg);
+    ft.textContent = '左手';
+  })();
+
+  function setBeads(digits) {
+    for (var r = 0; r < NR; r++) {
+      var d = digits[r], x = rodX(r), up = d >= 5, low = d % 5;
+      ups[r].style.transform = 'translate(' + x + 'px,' + (up ? UP_ON : UP_OFF) + 'px)';
+      for (var k = 0; k < 4; k++) {
+        lows[r][k].style.transform = 'translate(' + x + 'px,' + (k < low ? lowOn(k) : lowOff(k)) + 'px)';
+      }
+    }
+  }
+
+  function render(digits, o) {
+    o = o || {};
+    setBeads(digits);
+    var lab = o.labels;
+    for (var r = 0; r < NR; r++) {
+      var t = '';
+      if (lab) {
+        if (lab.type === 'place') t = r >= lab.P ? (S.PLACE[r - lab.P] || '') : '';
+        else { var n = r - lab.P + lab.base, mn = lab.base === 1 ? 1 : 0; t = n >= mn ? String(n) : ''; }
+      }
+      labs[r].textContent = t;
+      zones[r].setAttribute('class', 'zone' + (o.qFrom != null ? (r >= o.qFrom ? ' zq' : ' zr') : ''));
+      if (dots[r]) dots[r].setAttribute('class', 'dot' + (lab && r === lab.P ? ' unit' : ''));
+    }
+    if (o.finger == null) { fg.style.opacity = 0; }
+    else { fg.style.opacity = 1; fg.style.transform = 'translate(' + rodX(o.finger) + 'px,0px)'; }
+    (o.hi || []).forEach(function (r) {
+      if (r < 0 || r >= NR) return;
+      var f = fls[r]; f.setAttribute('class', 'fl'); void f.getBoundingClientRect(); f.setAttribute('class', 'fl go');
+    });
+    $('legend').style.display = o.qFrom != null ? 'flex' : 'none';
+  }
+
+  function readDigits(d, unit) {
+    var ip = '', fp = '', r;
+    for (r = NR - 1; r >= unit; r--) ip += d[r];
+    ip = ip.replace(/^0+(?=\d)/, '');
+    for (r = unit - 1; r >= 0; r--) fp += d[r];
+    fp = fp.replace(/0+$/, '');
+    ip = ip.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return fp ? ip + '.' + fp : ip;
+  }
+
+  /* ---------- ① 自由に弾くモード ---------- */
+  var mode = 'free';
+  var free = { digits: new Array(NR).fill(0), unit: 3 };
+  function freeLabels() { return { type: 'place', P: free.unit }; }
+  function renderFree(hi) {
+    render(free.digits, { labels: freeLabels(), hi: hi });
+    $('reading').textContent = readDigits(free.digits, free.unit);
+  }
+  onBead = function (r, kind, k) {
+    if (mode !== 'free') return;
+    var d = free.digits[r], up = d >= 5, low = d % 5;
+    if (kind === 'up') up = !up; else low = (k < low) ? k : k + 1;
+    free.digits[r] = (up ? 5 : 0) + low;
+    tick(); renderFree();
+  };
+  onDot = function (r) {
+    if (mode !== 'free') return;
+    free.unit = r; renderFree();
+  };
+
+  $('btnReset').onclick = function () {
+    if (mode === 'free') {
+      var any = free.digits.some(function (d) { return d; });
+      free.digits = new Array(NR).fill(0);
+      if (any) tick();
+      renderFree();
+    } else {
+      pause();
+      if (demo.res) {
+        demo.i = 0; lastVal = '0';
+        render(new Array(NR).fill(0), { labels: demo.res.labels });
+        $('reading').textContent = '0';
+        $('bText').textContent = '盤を0にもどしたよ。「再生」で最初から実演するよ。';
+        $('bPoint').textContent = ''; $('bHint').textContent = '';
+        $('cRange').value = 0; $('cCount').textContent = '0 / ' + demo.res.steps.length;
+        updatePlayBtn();
+      }
+    }
+  };
+
+  /* ---------- ② 実演モード ---------- */
+  var demo = { kind: 'mitori', res: null, i: 0, playing: false, speed: 1, timer: null, token: 0 };
+
+  function setMode(m) {
+    mode = m;
+    document.body.className = m;
+    $('tabFree').className = m === 'free' ? 'on' : '';
+    $('tabDemo').className = m === 'demo' ? 'on' : '';
+    $('demo').hidden = m !== 'demo';
+    $('problem').hidden = !(m === 'demo' && demo.res);
+    $('stage').hidden = !(m === 'demo' && demo.res);
+    if (m === 'free') {
+      pause(); cancelSpeech();
+      $('readLbl').textContent = 'いまの数';
+      $('boardNote').textContent = '珠をタップして弾こう。ご破算で全部0にもどるよ。ビームの上の点をタップすると、一の位を変えられるよ。';
+      renderFree();
+    } else {
+      $('readLbl').textContent = '答え';
+      $('boardNote').textContent = '「ご破算」で最初にもどるよ。';
+      if (demo.res) goto(demo.i, { speak: false });
+      else { render(new Array(NR).fill(0), { labels: { type: 'place', P: 3 } }); $('reading').textContent = '0'; }
+    }
+  }
+  $('tabFree').onclick = function () { setMode('free'); };
+  $('tabDemo').onclick = function () { setMode('demo'); };
+
+  var kindBtns = document.querySelectorAll('#demo .seg button');
+  Array.prototype.forEach.call(kindBtns, function (b) {
+    b.onclick = function () { setKind(b.getAttribute('data-kind')); };
+  });
+  function setKind(k) {
+    demo.kind = k;
+    Array.prototype.forEach.call(kindBtns, function (b) { b.className = b.getAttribute('data-kind') === k ? 'on' : ''; });
+    $('inMitori').hidden = k !== 'mitori'; $('inMul').hidden = k !== 'mul'; $('inDiv').hidden = k !== 'div';
+    $('err').textContent = '';
+    buildChips();
+  }
+
+  function buildChips() {
+    var box = $('chips'); box.innerHTML = '';
+    var list = S.SAMPLES[demo.kind];
+    list.forEach(function (p, i) {
+      var b = document.createElement('button');
+      if (demo.kind === 'mitori') { b.textContent = '(' + (i + 1) + ')'; b.title = p.map(function (v, j) { return j ? (v < 0 ? '- ' : '+ ') + Math.abs(v) : v; }).join(' '); }
+      else if (demo.kind === 'mul') b.textContent = p[0] + '×' + p[1];
+      else b.textContent = p[0] + '÷' + p[1];
+      b.onclick = function () { fillInputs(p); start(); };
+      box.appendChild(b);
+    });
+  }
+
+  function mitoriStr(nums) { return nums.map(function (v, j) { return j ? (v < 0 ? '- ' : '+ ') + Math.abs(v) : String(v); }).join(' '); }
+  function fillInputs(p) {
+    if (demo.kind === 'mitori') $('inpM').value = mitoriStr(p);
+    else if (demo.kind === 'mul') { $('inpA').value = p[0]; $('inpB').value = p[1]; }
+    else { $('inpX').value = p[0]; $('inpY').value = p[1]; }
+  }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function randomProblem() {
+    if (demo.kind === 'mitori') {
+      var len = rnd(4, 6), nums = [rnd(1, 9)], run = nums[0];
+      for (var i = 1; i < len; i++) {
+        var v = Math.random() < 0.2 ? rnd(10, 40) : rnd(1, 9);
+        if (Math.random() < 0.45 && run - v >= 0) v = -v;
+        nums.push(v); run += v;
+      }
+      return nums;
+    }
+    if (demo.kind === 'mul') return [rnd(12, 999), rnd(2, 99)];
+    var y = rnd(2, 99), q = rnd(2, 999); return [y * q, y];
+  }
+  $('btnRandom').onclick = function () { fillInputs(randomProblem()); start(); };
+  $('btnStart').onclick = function () { start(); };
+  ['inpM', 'inpA', 'inpB', 'inpX', 'inpY'].forEach(function (id) {
+    $(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') start(); });
+  });
+
+  function toNum(s) { return parseInt(String(s || '').normalize('NFKC').replace(/[,\s]/g, ''), 10); }
+
+  function start() {
+    pause(); cancelSpeech();
+    var res;
+    try {
+      if (demo.kind === 'mitori') {
+        var p = S.parseMitori($('inpM').value);
+        res = p.ok ? S.genMitori(p.nums) : p;
+      } else if (demo.kind === 'mul') res = S.genMul(toNum($('inpA').value), toNum($('inpB').value));
+      else res = S.genDiv(toNum($('inpX').value), toNum($('inpY').value));
+    } catch (e) { res = { ok: false, error: e.message }; }
+    if (!res.ok) { $('err').textContent = res.error; return; }
+    $('err').textContent = '';
+    demo.res = res; demo.i = 0;
+    $('probText').textContent = res.title; $('problem').hidden = false;
+    $('stage').hidden = false;
+    var list = $('stepList'); list.innerHTML = '';
+    res.steps.forEach(function (st, i) {
+      var li = document.createElement('li'), b = document.createElement('button');
+      b.textContent = st.text; b.onclick = function () { pause(); goto(i, {}); };
+      li.appendChild(b); list.appendChild(li);
+    });
+    $('cRange').max = res.steps.length - 1;
+    demo.playing = true; updatePlayBtn();
+    goto(0, {});
+    $('boardWrap').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  var lastVal = '0';
+  function showBubble(st) {
+    $('bText').textContent = st.text;
+    $('bPoint').textContent = st.point ? 'ポイント：' + st.point : '';
+    $('bHint').textContent = (opt.hint && st.hint) ? '運指：' + st.hint : '';
+  }
+
+  function goto(i, o) {
+    o = o || {};
+    var res = demo.res, st = res.steps[i];
+    clearTimeout(demo.timer); demo.token++;
+    cancelSpeech();
+    demo.i = i;
+    render(st.digits, { labels: res.labels, finger: st.finger, qFrom: st.qFrom, hi: st.hi });
+    if (st.val !== undefined) lastVal = String(st.val).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (i === 0) lastVal = st.val !== undefined ? lastVal : '0';
+    $('reading').textContent = lastVal;
+    showBubble(st);
+    $('cRange').value = i; $('cCount').textContent = (i + 1) + ' / ' + res.steps.length;
+    var items = $('stepList').children;
+    for (var k = 0; k < items.length; k++) items[k].firstChild.className = k === i ? 'cur' : '';
+    if (items[i] && $('stepList').parentNode.open) items[i].scrollIntoView({ block: 'nearest' });
+    var n = Math.min(3, st.hi.length);
+    for (k = 0; k < n; k++) setTimeout(tick, 60 + k * 110);
+    var speakIt = o.speak !== false && opt.voice && speechOK;
+    if (demo.playing) schedule(st, speakIt);
+    else if (speakIt) speakText(st.say, null);
+  }
+
+  function schedule(st, speakIt) {
+    var my = demo.token, sp = demo.speed;
+    function adv() {
+      if (demo.token !== my || !demo.playing) return;
+      if (demo.i < demo.res.steps.length - 1) goto(demo.i + 1, {});
+      else { demo.playing = false; updatePlayBtn(); }
+    }
+    var base = (900 + st.text.length * 65) / sp;
+    if (speakIt) {
+      demo.timer = setTimeout(adv, base * 3 + 3000);
+      speakText(st.say, function () {
+        if (demo.token !== my) return;
+        clearTimeout(demo.timer);
+        demo.timer = setTimeout(adv, 500 / sp);
+      });
+    } else {
+      demo.timer = setTimeout(adv, base);
+    }
+  }
+
+  function pause() { demo.playing = false; clearTimeout(demo.timer); demo.token++; cancelSpeech(); updatePlayBtn(); }
+  function updatePlayBtn() {
+    var atEnd = demo.res && demo.i >= demo.res.steps.length - 1;
+    $('cPlay').textContent = demo.playing ? '⏸ 一時停止' : (atEnd ? '↺ もう一度' : '▶ 再生');
+  }
+
+  var voiceJa = null;
+  function speakText(text, onend) {
+    if (!speechOK) { if (onend) onend(); return; }
+    try {
+      if (!voiceJa) { voiceJa = speechSynthesis.getVoices().filter(function (v) { return /^ja/i.test(v.lang); })[0] || null; }
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ja-JP'; if (voiceJa) u.voice = voiceJa;
+      u.rate = Math.min(1.5, 0.95 * Math.pow(demo.speed, 0.7));
+      if (onend) { u.onend = onend; u.onerror = onend; }
+      speechSynthesis.speak(u);
+    } catch (e) { if (onend) onend(); }
+  }
+  function cancelSpeech() { if (speechOK) { try { speechSynthesis.cancel(); } catch (e) {} } }
+  if (speechOK) { speechSynthesis.onvoiceschanged = function () { voiceJa = null; }; }
+
+  $('cPlay').onclick = function () {
+    if (!demo.res) return;
+    if (demo.playing) { pause(); return; }
+    var atEnd = demo.i >= demo.res.steps.length - 1;
+    demo.playing = true; updatePlayBtn();
+    goto(atEnd ? 0 : demo.i, {});
+  };
+  $('cNext').onclick = function () { if (!demo.res) return; pause(); goto(Math.min(demo.i + 1, demo.res.steps.length - 1), {}); updatePlayBtn(); };
+  $('cPrev').onclick = function () { if (!demo.res) return; pause(); goto(Math.max(demo.i - 1, 0), {}); updatePlayBtn(); };
+  $('cFirst').onclick = function () { if (!demo.res) return; pause(); goto(0, {}); updatePlayBtn(); };
+  $('cRange').oninput = function () { if (!demo.res) return; pause(); goto(+this.value, { speak: false }); updatePlayBtn(); };
+  $('cSpeed').onchange = function () { demo.speed = parseFloat(this.value); };
+
+  /* ---------- 起動 ---------- */
+  buildChips();
+  setMode('free');
+  window.__soroban = { free: free, demo: demo, setMode: setMode, start: start };
+})();
+</script>
+</body>
+</html>
