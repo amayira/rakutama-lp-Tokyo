@@ -216,11 +216,33 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
   $('optHint').onchange = function () { opt.hint = this.checked; saveOpt(); if (demo.res) showBubble(demo.res.steps[demo.i]); };
 
   /* ---------- 音 ---------- */
-  var ac = null;
+  var ac = null, unlocked = false;
+  // スマホは「画面をタップした時」にだけ音を許可する。最初のタップで音の通り道を開けておく。
+  function unlockAudio() {
+    if (unlocked) return;
+    unlocked = true;
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+      // iPhoneのマナーモードでも鳴るように、無音の音声をループ再生しておく
+      var a = document.createElement('audio');
+      a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';
+      a.loop = true; a.setAttribute('playsinline', '');
+      var pr = a.play(); if (pr && pr.catch) pr.catch(function () {});
+      window.__silentAudio = a;
+    } catch (e) {}
+    if (speechOK) {
+      try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+    }
+  }
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(function (ev) {
+    document.addEventListener(ev, unlockAudio, { passive: true });
+  });
   function tick() {
     if (!opt.sound) return;
     try {
       ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
       var t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
       o.type = 'square';
       o.frequency.setValueAtTime(1100, t); o.frequency.exponentialRampToValueAtTime(260, t + .05);
@@ -547,7 +569,9 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
       u.lang = 'ja-JP'; if (voiceJa) u.voice = voiceJa;
       u.rate = Math.min(1.5, 0.95 * Math.pow(demo.speed, 0.7));
       if (onend) { u.onend = onend; u.onerror = onend; }
-      speechSynthesis.speak(u);
+      window.__utt = u; // 読み上げ中に破棄されて止まるのを防ぐ
+      // cancel直後のspeakはスマホで無視されることがあるので少し待つ
+      setTimeout(function () { try { speechSynthesis.speak(u); } catch (e) { if (onend) onend(); } }, 90);
     } catch (e) { if (onend) onend(); }
   }
   function cancelSpeech() { if (speechOK) { try { speechSynthesis.cancel(); } catch (e) {} } }
