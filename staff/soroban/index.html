@@ -219,7 +219,7 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
   $('optHint').onchange = function () { opt.hint = this.checked; saveOpt(); if (demo.res) showBubble(demo.res.steps[demo.i]); };
 
   /* ---------- 音 ---------- */
-  var ac = null, speechPrimed = false;
+  var ac = null;
   // 1秒・8kHz・8bitの無音WAV
   function silentWavUrl() {
     var n = 8000, b = new ArrayBuffer(44 + n), v = new DataView(b);
@@ -247,9 +247,6 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
       if (navigator.audioSession) { try { navigator.audioSession.type = 'playback'; } catch (e) {} }
       if (window.__silentAudio.paused) { var pr = window.__silentAudio.play(); if (pr && pr.catch) pr.catch(function () {}); }
     } catch (e) {}
-    if (speechOK && !speechPrimed) {
-      try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); speechPrimed = true; } catch (e) {}
-    }
   }
   ['touchend', 'click', 'keydown'].forEach(function (ev) {
     document.addEventListener(ev, unlockAudio, { passive: true });
@@ -270,23 +267,19 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
 
   $('btnSoundTest').onclick = function () {
     unlockAudio();
-    var vs = [];
+    var vs = [], vst = '未確認';
     tick();
     if (speechOK) {
-      try {
-        vs = speechSynthesis.getVoices().filter(function (v) { return /^ja/i.test(v.lang); });
-        speechSynthesis.cancel();
-        var u = new SpeechSynthesisUtterance('音のテストです');
-        u.lang = 'ja-JP'; if (vs[0]) u.voice = vs[0];
-        u.onerror = function (e) { $('soundStat').textContent += ' ／ 声のエラー：' + (e.error || ''); };
-        window.__utt = u; speechSynthesis.speak(u);
-      } catch (e) {}
+      vs = speechSynthesis.getVoices().filter(function (v) { return /^ja/i.test(v.lang); });
+      speakText('音のテストです', function () {}, function (s) { vst = s; show(); });
     }
-    setTimeout(function () {
+    function show() {
+      var v = pickVoice();
       $('soundStat').textContent = '珠の音：' + (ac ? (ac.state === 'running' ? 'OK' : '許可待ち(' + ac.state + ')') : '非対応') +
-        ' ／ 声：' + (speechOK ? '対応（日本語の声 ' + vs.length + '個）' : 'このブラウザでは使えません') +
+        ' ／ 声：' + (speechOK ? vst + '（日本語の声 ' + vs.length + '個・使用：' + (v ? v.name : '端末の標準') + '）' : 'このブラウザでは使えません') +
         ' ／ 鳴らない時は、マナーモード解除・音量アップ・「音」「声」のチェックを確認してね。LINEの中で開いている場合は、Safari／Chromeで開き直してね。';
-    }, 500);
+    }
+    setTimeout(show, 500);
   };
 
   /* ---------- そろばん盤（SVG） ---------- */
@@ -608,26 +601,50 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
     $('cPlay').textContent = demo.playing ? '⏸ 一時停止' : (atEnd ? '↺ もう一度' : '▶ 再生');
   }
 
-  var voiceJa = null;
-  function speakText(text, onend) {
+  // iPhoneは一覧にあっても未ダウンロードで鳴らない声があるので、端末に入っている声だけ使う。
+  // 見つからなければ声は指定せず、lang=ja-JP で端末の標準の声に任せる。
+  var voiceJa;
+  function pickVoice() {
+    if (voiceJa !== undefined) return voiceJa;
+    var ja = speechSynthesis.getVoices().filter(function (v) { return /^ja/i.test(v.lang) && v.localService !== false; });
+    voiceJa = ja.filter(function (v) { return v.default; })[0] ||
+      ja.filter(function (v) { return /Kyoko|O-Ren|Otoya|Hattori|Google/i.test(v.name); })[0] || null;
+    return voiceJa;
+  }
+  function speakText(text, onend, onstat) {
     if (!speechOK) { if (onend) onend(); return; }
     try {
-      if (!voiceJa) { voiceJa = speechSynthesis.getVoices().filter(function (v) { return /^ja/i.test(v.lang); })[0] || null; }
-      var u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ja-JP'; if (voiceJa) u.voice = voiceJa;
-      u.rate = Math.min(1.5, 0.95 * Math.pow(demo.speed, 0.7));
-      if (onend) { u.onend = onend; u.onerror = onend; }
-      window.__utt = u; // 読み上げ中に破棄されて止まるのを防ぐ
-      var busy = speechSynthesis.speaking || speechSynthesis.pending;
-      if (!busy) { speechSynthesis.speak(u); }
-      else { // cancel直後のspeakはスマホで無視されることがあるので少し待つ
-        speechSynthesis.cancel();
-        setTimeout(function () { try { speechSynthesis.speak(u); } catch (e) { if (onend) onend(); } }, 90);
-      }
+      var started = false, done = false, retried = false;
+      var mk = function () {
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = 'ja-JP';
+        var v = pickVoice(); if (v) u.voice = v;
+        u.rate = Math.min(1.5, 0.95 * Math.pow(demo.speed, 0.7));
+        u.onstart = function () { started = true; if (onstat) onstat('OK（読み上げ開始）'); };
+        u.onend = function () { if (done) return; done = true; if (onend) onend(); };
+        u.onerror = function (e) {
+          if (onstat) onstat('エラー：' + (e.error || '不明'));
+          if (e.error === 'canceled' || e.error === 'interrupted') return;
+          if (done) return; done = true; if (onend) onend();
+        };
+        window.__utt = u; // 読み上げ中に破棄されて止まるのを防ぐ
+        return u;
+      };
+      // iPhoneはタップの処理の中でspeakしないと声が出ないので、待たずにその場で呼ぶ
+      speechSynthesis.cancel();
+      if (speechSynthesis.paused) speechSynthesis.resume();
+      speechSynthesis.speak(mk());
+      // cancel直後のspeakが無視される端末があるので、始まらなければ1回だけやり直す
+      setTimeout(function () {
+        if (started || done || retried || speechSynthesis.speaking) return;
+        retried = true;
+        speechSynthesis.cancel(); speechSynthesis.speak(mk());
+        setTimeout(function () { if (!started && onstat) onstat('始まらない（端末側でブロック）'); }, 1500);
+      }, 400);
     } catch (e) { if (onend) onend(); }
   }
   function cancelSpeech() { if (speechOK) { try { speechSynthesis.cancel(); } catch (e) {} } }
-  if (speechOK) { speechSynthesis.onvoiceschanged = function () { voiceJa = null; }; }
+  if (speechOK) { speechSynthesis.onvoiceschanged = function () { voiceJa = undefined; }; }
 
   $('cPlay').onclick = function () {
     if (!demo.res) return;
