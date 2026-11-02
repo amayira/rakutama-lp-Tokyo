@@ -48,7 +48,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .bead path{stroke-linejoin:round;stroke-width:3}
 .bead path{fill:url(#gLow);stroke:#3f230c}
 body.demo .bead{cursor:default}
-.zone{fill:transparent;transition:fill .3s}
+.zone{fill:transparent}
 .zone.zq{fill:rgba(47,158,68,.17)}
 .zone.zr{fill:rgba(232,89,12,.12)}
 .fl{fill:#ffd43b;opacity:0;pointer-events:none}
@@ -220,18 +220,31 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
 
   /* ---------- 音 ---------- */
   var ac = null, speechPrimed = false;
+  // 1秒・8kHz・8bitの無音WAV
+  function silentWavUrl() {
+    var n = 8000, b = new ArrayBuffer(44 + n), v = new DataView(b);
+    function s(o, t) { for (var i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); }
+    s(0, 'RIFF'); v.setUint32(4, 36 + n, true); s(8, 'WAVE'); s(12, 'fmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true);
+    s(36, 'data'); v.setUint32(40, n, true);
+    new Uint8Array(b, 44).fill(128);
+    return URL.createObjectURL(new Blob([b], { type: 'audio/wav' }));
+  }
   // スマホは「タップした時」にだけ音を許可する。許可されるまで、タップのたびにやり直す。
   function unlockAudio() {
     try {
       ac = ac || new (window.AudioContext || window.webkitAudioContext)();
       if (ac.state !== 'running') ac.resume();
       // iPhoneのマナーモードでも鳴るように、無音の音声をループ再生しておく
+      // ※長さ0秒の音声をループすると巻き戻しが1秒に数万回走って重くなるので、1秒の無音を作って使う
       if (!window.__silentAudio) {
         var a = document.createElement('audio');
-        a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';
+        a.src = silentWavUrl();
         a.loop = true; a.setAttribute('playsinline', '');
         window.__silentAudio = a;
       }
+      if (navigator.audioSession) { try { navigator.audioSession.type = 'playback'; } catch (e) {} }
       if (window.__silentAudio.paused) { var pr = window.__silentAudio.play(); if (pr && pr.catch) pr.catch(function () {}); }
     } catch (e) {}
     if (speechOK && !speechPrimed) {
@@ -341,15 +354,20 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
     ft.textContent = '左手';
   })();
 
+  // 動く珠だけ書き換える（毎回65個ぜんぶ触ると描き直しが重い）
+  function moveBead(g, x, y) {
+    var t = 'translate(' + x + 'px,' + y + 'px)';
+    if (g.__t !== t) { g.__t = t; g.style.transform = t; }
+  }
   function setBeads(digits) {
     for (var r = 0; r < NR; r++) {
       var d = digits[r], x = rodX(r), up = d >= 5, low = d % 5;
-      ups[r].style.transform = 'translate(' + x + 'px,' + (up ? UP_ON : UP_OFF) + 'px)';
-      for (var k = 0; k < 4; k++) {
-        lows[r][k].style.transform = 'translate(' + x + 'px,' + (k < low ? lowOn(k) : lowOff(k)) + 'px)';
-      }
+      moveBead(ups[r], x, up ? UP_ON : UP_OFF);
+      for (var k = 0; k < 4; k++) moveBead(lows[r][k], x, k < low ? lowOn(k) : lowOff(k));
     }
   }
+  function setCls(e, c) { if (e.__c !== c) { e.__c = c; e.setAttribute('class', c); } }
+  function setTxt(e, t) { if (e.textContent !== t) e.textContent = t; }
 
   function render(digits, o) {
     o = o || {};
@@ -361,17 +379,22 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
         if (lab.type === 'place') t = r >= lab.P ? (S.PLACE[r - lab.P] || '') : '';
         else { var n = r - lab.P + lab.base, mn = lab.base === 1 ? 1 : 0; t = n >= mn ? String(n) : ''; }
       }
-      labs[r].textContent = t;
-      zones[r].setAttribute('class', 'zone' + (o.qFrom != null ? (r >= o.qFrom ? ' zq' : ' zr') : ''));
-      if (dots[r]) dots[r].setAttribute('class', 'dot' + (lab && r === lab.P ? ' unit' : ''));
+      setTxt(labs[r], t);
+      setCls(zones[r], 'zone' + (o.qFrom != null ? (r >= o.qFrom ? ' zq' : ' zr') : ''));
+      if (dots[r]) setCls(dots[r], 'dot' + (lab && r === lab.P ? ' unit' : ''));
     }
-    if (o.finger == null) { fg.style.opacity = 0; }
-    else { fg.style.opacity = 1; fg.style.transform = 'translate(' + rodX(o.finger) + 'px,0px)'; }
+    if (o.finger == null) { if (fg.style.opacity !== '0') fg.style.opacity = 0; }
+    else { fg.style.opacity = 1; moveBead(fg, rodX(o.finger), 0); }
     (o.hi || []).forEach(function (r) {
       if (r < 0 || r >= NR) return;
-      var f = fls[r]; f.setAttribute('class', 'fl'); void f.getBoundingClientRect(); f.setAttribute('class', 'fl go');
+      var f = fls[r];
+      if (f.animate) { // レイアウト再計算なしで光らせる
+        if (f.__a) f.__a.cancel();
+        f.__a = f.animate([{ opacity: .7 }, { opacity: 0 }], { duration: 1100, easing: 'ease-out' });
+      } else { f.setAttribute('class', 'fl'); void f.getBoundingClientRect(); f.setAttribute('class', 'fl go'); }
     });
-    $('legend').style.display = o.qFrom != null ? 'flex' : 'none';
+    var lg = o.qFrom != null ? 'flex' : 'none';
+    if ($('legend').style.display !== lg) $('legend').style.display = lg;
   }
 
   function readDigits(d, unit) {
