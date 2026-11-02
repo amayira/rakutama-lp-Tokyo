@@ -1711,11 +1711,18 @@ async function handleStaffKentei(params, env) {
 }
 
 /**
- * 指定日時点で在籍中とみなせるか（作成日時が対象日以前 かつ 退会日が空または対象日以降）
+ * 生徒の入会日（初回授業日。未入力の旧レコードは作成日時で代用）
+ */
+function enrolledDate(rec) {
+  return rec["初回授業日"]?.value || (rec["作成日時"]?.value ?? "").slice(0, 10);
+}
+
+/**
+ * 指定日時点で在籍中とみなせるか（入会日が対象日以前 かつ 退会日が空または対象日以降）
  */
 function isActiveAt(rec, dateStr) {
-  const created = (rec["作成日時"]?.value ?? "").slice(0, 10);
-  if (created && created > dateStr) return false;
+  const enrolled = enrolledDate(rec);
+  if (enrolled && enrolled > dateStr) return false;
   const withdrawn = rec["退会日"]?.value ?? "";
   if (withdrawn && withdrawn < dateStr) return false;
   return true;
@@ -1725,7 +1732,7 @@ function isActiveAt(rec, dateStr) {
  * GET /api/staff/stats
  * Returns KPI stats:
  *   - seito_count: { total, 早宮校, 氷川台校, 中村校, 平和台校 }
- *   - prev_month_total: 前月末時点の在籍数（作成日時・退会日から都度算出。スナップショット不要）
+ *   - prev_month_total: 前月末時点の在籍数（入会日＝初回授業日・退会日から都度算出。スナップショット不要）
  *   - monthly: [ { month: "2026-06", 全体: {taiken, nyukai}, 早宮校: {...}, ... } ]
  *   - schools: 集計対象の校名配列（フロントはこれを元にカード・表・絞り込みを描画する）
  *   - seito_trend: [ { month: "2026-06", 全体: N, 早宮校: N, ... } ] 各月末時点（当月は今日時点）の在籍数
@@ -1785,11 +1792,11 @@ async function handleStaffStats(env) {
     }
   }
 
-  // サブ番号（"-"含む）を除外して入会数を集計
+  // サブ番号（"-"含む）を除外して入会数を集計（入会日＝初回授業日の月で数える）
   for (const rec of countableRecs) {
-    const date = rec["作成日時"]?.value ?? "";
-    if (!date) continue;
-    const month = date.slice(0, 7); // "2026-06T..." → "2026-06"
+    const date = enrolledDate(rec);
+    if (!date || date > todayStr) continue; // 入会予定（初回授業日が未来）はまだ数えない
+    const month = date.slice(0, 7);
     const school = rec["教室名"]?.value ?? "";
     monthSet.add(month);
     const keys = [`${month}_全体`, `${month}_${school}`];
@@ -1812,7 +1819,7 @@ async function handleStaffStats(env) {
   // ── 在籍生徒数の推移（各月末時点。当月は今日時点）────────────────────
   const seitoTrend = [];
   const enrollMonths = countableRecs
-    .map(r => (r["作成日時"]?.value ?? "").slice(0, 7))
+    .map(r => enrolledDate(r).slice(0, 7))
     .filter(Boolean)
     .sort();
   if (enrollMonths.length > 0) {
