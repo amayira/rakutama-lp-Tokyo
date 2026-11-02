@@ -212,6 +212,9 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
   function saveOpt() { try { localStorage.setItem('rakutama-soroban-opt', JSON.stringify(opt)); } catch (e) {} }
 
   var speechOK = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  // iPhone／iPadの声はマナーモードだと鳴らない（ページ側では回避できない）
+  var isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var IOS_NOTE = isIOS ? '（iPhone・iPadはマナーモードだと声が出ないよ。マナーモードを解除してね）' : '';
   if (!speechOK) { opt.voice = false; $('optVoice').disabled = true; $('optVoiceL').className = 'dis'; $('optVoiceL').title = 'このブラウザは声に対応していません'; }
   $('optSound').checked = opt.sound; $('optVoice').checked = opt.voice; $('optHint').checked = opt.hint;
   $('optSound').onchange = function () { opt.sound = this.checked; saveOpt(); };
@@ -233,9 +236,11 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
   }
   // スマホは「タップした時」にだけ音を許可する。許可されるまで、タップのたびにやり直す。
   function unlockAudio() {
+    // 読み上げ中に音を鳴らし直すと、iPhoneは声が止まる（スクロールの指を離した時など）
+    if (speechOK && speechSynthesis.speaking) return;
     try {
       ac = ac || new (window.AudioContext || window.webkitAudioContext)();
-      if (ac.state !== 'running') ac.resume();
+      if (ac.state === 'suspended') ac.resume();
       // iPhoneのマナーモードでも鳴るように、無音の音声をループ再生しておく
       // ※長さ0秒の音声をループすると巻き戻しが1秒に数万回走って重くなるので、1秒の無音を作って使う
       if (!window.__silentAudio) {
@@ -245,7 +250,12 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
         window.__silentAudio = a;
       }
       if (navigator.audioSession) { try { navigator.audioSession.type = 'playback'; } catch (e) {} }
-      if (window.__silentAudio.paused) { var pr = window.__silentAudio.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      // 一度再生できたら、その後は再生し直さない
+      var sa = window.__silentAudio;
+      if (!sa.__ok && sa.paused) {
+        var pr = sa.play();
+        if (pr && pr.then) pr.then(function () { sa.__ok = true; }, function () {}); else sa.__ok = true;
+      }
     } catch (e) {}
   }
   ['touchend', 'click', 'keydown'].forEach(function (ev) {
@@ -277,7 +287,7 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
       var v = pickVoice();
       $('soundStat').textContent = '珠の音：' + (ac ? (ac.state === 'running' ? 'OK' : '許可待ち(' + ac.state + ')') : '非対応') +
         ' ／ 声：' + (speechOK ? vst + '（日本語の声 ' + vs.length + '個・使用：' + (v ? v.name : '端末の標準') + '）' : 'このブラウザでは使えません') +
-        ' ／ 鳴らない時は、マナーモード解除・音量アップ・「音」「声」のチェックを確認してね。LINEの中で開いている場合は、Safari／Chromeで開き直してね。';
+        ' ／ 鳴らない時は、マナーモード解除（iPhoneの声はマナーモードだと鳴らない）・音量アップ・「音」「声」のチェックを確認してね。LINEの中で開いている場合は、Safari／Chromeで開き直してね。';
     }
     setTimeout(show, 500);
   };
@@ -458,7 +468,7 @@ ol#stepList button.cur{background:#ffe8cc;font-weight:700}
       renderFree();
     } else {
       $('readLbl').textContent = '答え';
-      $('boardNote').textContent = '「ご破算」で最初にもどるよ。';
+      $('boardNote').textContent = '「ご破算」で最初にもどるよ。' + IOS_NOTE;
       if (demo.res) goto(demo.i, { speak: false });
       else { render(new Array(NR).fill(0), { labels: { type: 'place', P: 3 } }); $('reading').textContent = '0'; }
     }
