@@ -1792,11 +1792,11 @@ async function handleStaffStats(env) {
     }
   }
 
-  // サブ番号（"-"含む）を除外して入会数を集計（入会日＝初回授業日の月で数える）
+  // サブ番号（"-"含む）を除外して入会数を集計（入会率の分子なので申込＝作成日時の月で数える。在籍推移とは基準が違う）
   for (const rec of countableRecs) {
-    const date = enrolledDate(rec);
-    if (!date || date > todayStr) continue; // 入会予定（初回授業日が未来）はまだ数えない
-    const month = date.slice(0, 7);
+    const date = rec["作成日時"]?.value ?? "";
+    if (!date) continue;
+    const month = date.slice(0, 7); // "2026-06T..." → "2026-06"
     const school = rec["教室名"]?.value ?? "";
     monthSet.add(month);
     const keys = [`${month}_全体`, `${month}_${school}`];
