@@ -534,7 +534,7 @@
             <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}${note ? bikoMark() : ''}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${r.フリガナ || ''}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.学年 || '―'}</td>
-            <td class="px-4 py-3 whitespace-nowrap">${experienceBadge(r.そろばん経験)}</td>
+            <td class="px-4 py-3 whitespace-nowrap">${experienceBadge(r.そろばん経験, r['級・段'])}</td>
             <td class="px-4 py-3 whitespace-nowrap">${bikoCell(r)}</td>
           </tr>`;
         }).join('');
@@ -898,9 +898,10 @@
       document.getElementById('bikoModal').classList.add('hidden');
     }
 
-    function experienceBadge(val) {
+    function experienceBadge(val, level) {
       if (val === 'あり') {
-        return `<span class="inline-block text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">あり</span>`;
+        const lv = level ? `（${level}）` : '';
+        return `<span class="inline-block text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">あり${lv}</span>`;
       }
       return `<span class="inline-block text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">なし</span>`;
     }

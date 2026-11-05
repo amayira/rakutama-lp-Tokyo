@@ -1589,6 +1589,7 @@ async function handleStaffTaiken(params, env) {
     フリガナ: rec["フリガナ"]?.value ?? "",
     学年: rec["学年"]?.value ?? "",
     そろばん経験: rec["そろばん経験"]?.value ?? "",
+    級・段: rec["級・段"]?.value ?? "",
     教室名: rec["教室名"]?.value ?? "",
     備考: rec["備考"]?.value ?? "",
   }));
