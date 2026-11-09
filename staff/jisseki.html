@@ -137,11 +137,11 @@
       <!-- ②-2 体験申込数の日次推移（移動平均） -->
       <div class="bg-white rounded-2xl shadow-sm p-4">
         <p class="text-sm font-bold text-gray-700">体験申込数の推移（移動平均）<span class="jk-sfx"></span></p>
-        <p class="text-xs text-gray-400 mb-3">その日までの直近の申込件数。短期＝7日あたり、長期＝28日あたり（移動平均×7／×28）</p>
+        <p class="text-xs text-gray-400 mb-3">その日までの直近の申込件数。短期＝直近7日の平均、長期＝直近28日の平均。どちらも28日あたりの件数に換算</p>
         <div id="apply-legend" class="jk-legend mb-2"></div>
         <div id="apply-chart" class="jk-chart"></div>
         <p id="apply-summary" class="text-sm text-gray-700 mt-3"></p>
-        <p class="jk-note">申込日は体験参加日ではなく、申込フォームから入力された日です。2回目の体験は除きます。7日・28日分の日数が揃った日から表示します。申込が少ない校は1件で線が大きく動きます。</p>
+        <p class="jk-note">申込日は体験参加日ではなく、申込フォームから入力された日です。2回目の体験は除きます。7日・28日分の日数が揃った日から表示します（短期は28日換算のため、実際の7日の件数の4倍です）。申込が少ない校は1件で線が大きく動きます。</p>
       </div>
 
       <!-- ③ 入会率の推移 -->
@@ -511,12 +511,12 @@
         return;
       }
       const dates = ap.dates;
-      // 移動平均を7日・28日あたりの件数に換算（平均×窓の日数＝窓内の合計）
-      const short = movingAverage(counts, MA_SHORT).map(v => v === null ? null : v * MA_SHORT);
+      // 短期・長期とも「28日あたりの件数」に換算（1日あたり平均×28）
+      const short = movingAverage(counts, MA_SHORT).map(v => v === null ? null : v * 28);
       const long = movingAverage(counts, MA_LONG).map(v => v === null ? null : v * MA_LONG);
       legend.innerHTML =
-        `<span><span class="jk-dot" style="background:${MA_SHORT_COLOR}"></span>短期（7日あたり）</span>` +
-        `<span><span class="jk-dot" style="background:${MA_LONG_COLOR}"></span>長期（28日あたり）</span>`;
+        `<span><span class="jk-dot" style="background:${MA_SHORT_COLOR}"></span>短期（直近7日の平均を28日換算）</span>` +
+        `<span><span class="jk-dot" style="background:${MA_LONG_COLOR}"></span>長期（直近28日の平均）</span>`;
 
       const H = 220, padL = 30, padR = 10, padT = 18, padB = 36;
       const chartW = CHART_W - padL - padR, chartH = H - padT - padB;
@@ -527,7 +527,7 @@
       const xAt = i => padL + slot * i + slot / 2;
       const yAt = v => padT + chartH * (1 - v / yMax);
 
-      let svg = svgOpen(H, `${label === '全体' ? '全校' : label}の体験申込数（7日あたり・28日あたり）の推移`);
+      let svg = svgOpen(H, `${label === '全体' ? '全校' : label}の体験申込数（28日あたり換算）の推移`);
       // 目盛りは小数になりうるので専用に描く
       for (let i = 0; i <= ticks; i++) {
         const val = step * i, y = yAt(val);
@@ -558,7 +558,7 @@
 
       const last = n - 1, s = short[last], l = long[last];
       const f = v => v === null ? '―' : (Math.round(v * 10) / 10).toString();
-      summary.innerHTML = `直近（${esc(dates[last].replace(/-/g, '/'))}時点）：短期 <b style="color:${MA_SHORT_COLOR}">${f(s)}件／7日</b>、長期 <b style="color:${MA_LONG_COLOR}">${f(l)}件／28日</b>`;
+      summary.innerHTML = `直近（${esc(dates[last].replace(/-/g, '/'))}時点）：短期 <b style="color:${MA_SHORT_COLOR}">${f(s)}件／28日</b>、長期 <b style="color:${MA_LONG_COLOR}">${f(l)}件／28日</b>`;
     }
 
     // ── ③ 入会率の推移（開業からの累積で計算） ─────────────────────
