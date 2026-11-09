@@ -1744,6 +1744,14 @@ function enrolledDate(rec) {
 }
 
 /**
+ * 月謝（円）。退会時に「月謝」が0円に書き換わるため、基本の月謝である「月謝のみ」を優先する。
+ * 過去月の平均も現在の月謝で計算する（コース変更の履歴は持っていない）。
+ */
+function monthlyFee(rec) {
+  return Number(rec["月謝のみ"]?.value) || Number(rec["月謝"]?.value) || 0;
+}
+
+/**
  * 指定日時点で在籍中とみなせるか（入会日が対象日以前 かつ 退会日が空または対象日以降）
  */
 function isActiveAt(rec, dateStr) {
@@ -1764,6 +1772,9 @@ function isActiveAt(rec, dateStr) {
  *   - seito_trend: [ { month: "2026-06", 全体: N, 早宮校: N, ... } ] 各月末時点（当月は今日時点）の在籍数
  *   - grade_dist: { 全体: { "小1": N, ... }, 早宮校: {...} } 現在在籍の学年別人数
  *   - media: { 全体: [ { media, taiken, nyukai } ], 早宮校: [...] } 反響媒体別の体験数・入会確定数
+ *   - course_dist: { 全体: { "週1回コース": N, ... }, 早宮校: {...} } 現在在籍のコース別人数
+ *   - fee_trend: [ { month, 全体: { sum, n }, 早宮校: {...} } ] 各月末在籍者の月謝合計・人数（平均＝sum/n）
+ *   - movement: [ { month, 全体: { nyukai, taikai }, 早宮校: {...} } ] 入会（初回授業日の月）・退会（退会日の月）の人数
  *   - taiken_apply: { dates: ["2026-04-15", ...], 全体: [N, ...], 早宮校: [N, ...] } 申込日（作成日時のJST日付）ごとの体験申込数。最初の申込日〜今日まで毎日
  */
 async function handleStaffStats(env) {
@@ -1845,6 +1856,7 @@ async function handleStaffStats(env) {
 
   // ── 在籍生徒数の推移（各月末時点。当月は今日時点）────────────────────
   const seitoTrend = [];
+  const feeTrend = [];
   const enrollMonths = countableRecs
     .map(r => enrolledDate(r).slice(0, 7))
     .filter(Boolean)
@@ -1862,8 +1874,49 @@ async function handleStaffStats(env) {
         row[school] = active.filter(r => r["教室名"]?.value === school).length;
       }
       seitoTrend.push(row);
+      // 月謝の推移用（各月末在籍者の月謝合計と人数。0円・未入力は平均から除く）
+      const feeRow = { month: monthStr };
+      for (const label of ["全体", ...SCHOOLS]) {
+        const group = label === "全体" ? active : active.filter(r => r["教室名"]?.value === label);
+        const fees = group.map(monthlyFee).filter(v => v > 0);
+        feeRow[label] = { sum: fees.reduce((a, b) => a + b, 0), n: fees.length };
+      }
+      feeTrend.push(feeRow);
       m++;
       if (m > 12) { m = 1; y++; }
+    }
+  }
+
+  // ── 入会・退会の月別人数（入会＝初回授業日の月、退会＝退会日の月。未来日の退会予定は数えない）────
+  const movement = seitoTrend.map(t => {
+    const row = { month: t.month };
+    for (const label of ["全体", ...SCHOOLS]) row[label] = { nyukai: 0, taikai: 0 };
+    return row;
+  });
+  const movementByMonth = Object.fromEntries(movement.map(r => [r.month, r]));
+  for (const rec of countableRecs) {
+    const school = rec["教室名"]?.value ?? "";
+    const enrolledMonth = enrolledDate(rec).slice(0, 7);
+    const wd = rec["退会日"]?.value ?? "";
+    const events = [[enrolledMonth, "nyukai"]];
+    if (wd && wd <= todayStr) events.push([wd.slice(0, 7), "taikai"]);
+    for (const [month, kind] of events) {
+      const row = movementByMonth[month];
+      if (!row) continue;
+      row["全体"][kind]++;
+      if (row[school]) row[school][kind]++;
+    }
+  }
+
+  // ── コース別の在籍人数（現在在籍のみ）────────────────────────────────
+  const courseDist = { 全体: {} };
+  for (const school of SCHOOLS) courseDist[school] = {};
+  for (const rec of activeNow) {
+    const course = rec["コース名"]?.value || "不明";
+    const school = rec["教室名"]?.value ?? "";
+    for (const key of ["全体", school]) {
+      if (!courseDist[key]) continue;
+      courseDist[key][course] = (courseDist[key][course] ?? 0) + 1;
     }
   }
 
@@ -1943,6 +1996,9 @@ async function handleStaffStats(env) {
     grade_dist: gradeDist,
     media,
     taiken_apply: taikenApply,
+    course_dist: courseDist,
+    fee_trend: feeTrend,
+    movement,
   };
 }
 

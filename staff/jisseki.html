@@ -114,7 +114,7 @@
 
       <!-- 校の絞り込み -->
       <div>
-        <p class="text-xs text-gray-400 mb-2">校を選ぶと、下の6つのグラフがその校の数字に切り替わります</p>
+        <p class="text-xs text-gray-400 mb-2">校を選ぶと、下の9つのグラフがその校の数字に切り替わります</p>
         <div id="schoolChips" class="jk-chips"></div>
       </div>
 
@@ -152,6 +152,19 @@
         <p class="jk-note">横軸は週の開始日（月曜）。薄い棒は今週で、まだ途中のため増える可能性があります。2回目の体験は除きます。</p>
       </div>
 
+      <!-- ②-4 入会・退会の月別人数 -->
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <p class="text-sm font-bold text-gray-700">入会・退会の月別人数<span class="jk-sfx"></span></p>
+        <p class="text-xs text-gray-400 mb-3">入会＝初回授業日の月、退会＝退会日の月</p>
+        <div class="jk-legend mb-2">
+          <span><span class="jk-dot" style="background:#22c55e"></span>入会</span>
+          <span><span class="jk-dot" style="background:#fb923c"></span>退会</span>
+        </div>
+        <div id="move-chart" class="jk-chart"></div>
+        <p id="move-summary" class="text-sm text-gray-700 mt-3"></p>
+        <p class="jk-note">上の「体験・入会 月別推移」の入会数は申込（作成日時）の月、ここは実際に通い始めた月で数えているため、月がずれることがあります。</p>
+      </div>
+
       <!-- ③ 入会率の推移 -->
       <div class="bg-white rounded-2xl shadow-sm p-4">
         <p class="text-sm font-bold text-gray-700">入会率の推移<span class="jk-sfx"></span></p>
@@ -169,6 +182,25 @@
         </div>
         <p class="text-xs text-gray-400 mb-2">現在在籍している生徒の人数</p>
         <div id="grade-chart"></div>
+      </div>
+
+      <!-- ④-2 コース別の構成 -->
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <div class="flex items-baseline justify-between mb-1">
+          <p class="text-sm font-bold text-gray-700">コース別の割合<span class="jk-sfx"></span></p>
+          <p class="text-xs text-gray-400" id="course-total"></p>
+        </div>
+        <p class="text-xs text-gray-400 mb-2">現在在籍している生徒の週あたりの通塾回数</p>
+        <div id="course-chart"></div>
+      </div>
+
+      <!-- ④-3 平均月謝の推移 -->
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <p class="text-sm font-bold text-gray-700">平均月謝の推移<span class="jk-sfx"></span></p>
+        <p class="text-xs text-gray-400 mb-3">各月末に在籍していた生徒1人あたりの月謝（円）</p>
+        <div id="fee-legend" class="jk-legend mb-2"></div>
+        <div id="fee-chart" class="jk-chart"></div>
+        <p class="jk-note">月謝は現在の登録額で計算しているため、過去にコースを変えた生徒は変更前の月も今の額で入っています。縦軸は変化が見えるよう途中から始まっています。</p>
       </div>
 
       <!-- ⑤ 反響媒体別 -->
@@ -314,6 +346,9 @@
       renderWeeklyApplyChart(currentLabel);
       renderRateChart(statsData.monthly, currentLabel);
       renderGradeChart(currentLabel);
+      renderCourseChart(currentLabel);
+      renderFeeChart(currentLabel);
+      renderMoveChart(currentLabel);
       renderMediaChart(currentLabel);
     }
 
@@ -709,6 +744,134 @@
           <span class="jk-bar-val">${v}名</span>
         </div>`;
       }).join('');
+    }
+
+    // ── ④-2 コース別の割合（横棒） ─────────────────────────────────
+    const COURSE_ORDER = ['週1回コース', '週2回コース', '週3回コース'];
+    function renderCourseChart(label) {
+      const container = document.getElementById('course-chart');
+      const totalEl = document.getElementById('course-total');
+      const all = (statsData.course_dist || {})['全体'] || {};
+      const d = (statsData.course_dist || {})[label] || {};
+      const total = Object.values(d).reduce((a, b) => a + b, 0);
+      totalEl.textContent = total ? `計 ${total}名` : '';
+      if (total === 0) {
+        container.innerHTML = '<p class="jk-empty">在籍生徒がいません</p>';
+        return;
+      }
+      const keys = Object.keys({ ...all, ...d });
+      const rows = [...COURSE_ORDER.filter(c => keys.includes(c)), ...keys.filter(c => !COURSE_ORDER.includes(c))];
+      const color = schoolColor(label);
+      container.innerHTML = rows.map(c => {
+        const v = d[c] || 0;
+        const pct = v / total * 100;
+        return `<div class="jk-bar-row">
+          <span class="jk-bar-label" style="width:5.6em">${esc(c.replace('コース', ''))}</span>
+          <div class="jk-bar-track"><div class="jk-bar-fill" style="width:${pct.toFixed(1)}%;background:${color}"></div></div>
+          <span class="jk-bar-val" style="min-width:6.2em">${v}名（${Math.round(pct)}%）</span>
+        </div>`;
+      }).join('');
+    }
+
+    // ── ④-3 平均月謝の推移（折れ線） ───────────────────────────────
+    function feeSeries(label) {
+      return (statsData.fee_trend || []).map(r => {
+        const g = r[label];
+        return g && g.n > 0 ? Math.round(g.sum / g.n) : null;
+      });
+    }
+    function renderFeeChart(label) {
+      const container = document.getElementById('fee-chart');
+      const legend = document.getElementById('fee-legend');
+      const trend = statsData.fee_trend || [];
+      if (trend.length === 0) {
+        legend.innerHTML = '';
+        container.innerHTML = '<p class="jk-empty">データがありません</p>';
+        return;
+      }
+      const series = [{ label, color: schoolColor(label), dashed: false, data: feeSeries(label) }];
+      if (label !== '全体') series.push({ label: '全校', color: '#9ca3af', dashed: true, data: feeSeries('全体') });
+      legend.innerHTML = series.map(sr =>
+        `<span><span class="jk-dot" style="background:${sr.color}"></span>${esc(sr.label === '全体' ? '全校' : sr.label)}</span>`).join('');
+
+      const vals = series.flatMap(sr => sr.data.filter(v => v !== null));
+      if (vals.length === 0) {
+        container.innerHTML = '<p class="jk-empty">データがありません</p>';
+        return;
+      }
+      // 縦軸は500円刻みで、最小〜最大を少し余裕を持って囲む（0円始まりだと変化が見えない）
+      const yMin = Math.floor((Math.min(...vals) - 100) / 500) * 500;
+      const yMax = Math.max(yMin + 500, Math.ceil((Math.max(...vals) + 100) / 500) * 500);
+      const ticks = Math.round((yMax - yMin) / 500);
+      const tickStep = ticks > 5 ? 1000 : 500;
+      const H = 210, padL = 44, padR = 14, padT = 22, padB = 40;
+      const chartW = CHART_W - padL - padR, chartH = H - padT - padB;
+      const groupW = chartW / trend.length;
+      const xAt = i => padL + groupW * i + groupW / 2;
+      const yAt = v => padT + chartH * (1 - (v - yMin) / (yMax - yMin));
+
+      let svg = svgOpen(H, `${label === '全体' ? '全校' : label}の平均月謝の推移`);
+      for (let v = yMin; v <= yMax; v += tickStep) {
+        const y = yAt(v);
+        svg += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${padL + chartW}" y2="${y.toFixed(1)}" stroke="#f0f0f0" stroke-width="1"/>`;
+        svg += `<text x="${padL - 5}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="#9ca3af">${v.toLocaleString()}</text>`;
+      }
+      trend.forEach((row, i) => { svg += monthLabel(row.month, i, xAt(i), H); });
+      [...series].reverse().forEach(sr => {
+        let path = '';
+        sr.data.forEach((v, i) => {
+          if (v === null) return;
+          path += `${path && sr.data[i - 1] !== null ? 'L' : 'M'}${xAt(i).toFixed(1)},${yAt(v).toFixed(1)} `;
+        });
+        if (path) svg += `<path d="${path}" fill="none" stroke="${sr.color}" stroke-width="${sr.dashed ? 1.8 : 2.6}" ${sr.dashed ? 'stroke-dasharray="5 4"' : ''} stroke-linejoin="round" stroke-linecap="round"/>`;
+        sr.data.forEach((v, i) => {
+          if (v === null) return;
+          svg += `<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(v).toFixed(1)}" r="${sr.dashed ? 3 : 4}" fill="${sr.dashed ? '#fff' : sr.color}" stroke="${sr.color}" stroke-width="2"/>`;
+          const showLabel = trend.length <= 8 || (trend.length - 1 - i) % 3 === 0;
+          if (!sr.dashed && showLabel) svg += `<text x="${xAt(i).toFixed(1)}" y="${(yAt(v) - 9).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="${sr.color}">${v.toLocaleString()}</text>`;
+        });
+      });
+      svg += '</svg>';
+      container.innerHTML = svg;
+    }
+
+    // ── ②-4 入会・退会の月別人数（棒） ─────────────────────────────
+    function renderMoveChart(label) {
+      const container = document.getElementById('move-chart');
+      const summary = document.getElementById('move-summary');
+      const rows = statsData.movement || [];
+      if (rows.length === 0) {
+        container.innerHTML = '<p class="jk-empty">データがありません</p>';
+        summary.textContent = '';
+        return;
+      }
+      const get = row => row[label] ?? { nyukai: 0, taikai: 0 };
+      const H = 210, padL = 30, padR = 10, padT = 22, padB = 40;
+      const chartW = CHART_W - padL - padR, chartH = H - padT - padB;
+      const { step, n, yMax } = niceScale(Math.max(...rows.map(r => Math.max(get(r).nyukai, get(r).taikai)), 1));
+      const groupW = chartW / rows.length;
+      const barW = Math.max(6, Math.min(22, groupW * 0.34));
+      const gap = barW * 0.3;
+      const fs = rows.length > 8 ? 9 : 12;
+
+      let svg = svgOpen(H, `${label === '全体' ? '全校' : label}の入会・退会の月別人数`);
+      svg += gridLines(padL, padT, chartW, chartH, step, n, yMax);
+      rows.forEach((row, i) => {
+        const { nyukai, taikai } = get(row);
+        const cx = padL + groupW * i + groupW / 2;
+        [[nyukai, cx - gap / 2 - barW, '#22c55e', '#16a34a'], [taikai, cx + gap / 2, '#fb923c', '#ea580c']].forEach(([v, x, fill, txt]) => {
+          const h = v / yMax * chartH, y = padT + chartH - h;
+          svg += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${fill}" rx="2"/>`;
+          if (v > 0) svg += `<text x="${(x + barW / 2).toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="${txt}">${v}</text>`;
+        });
+        svg += monthLabel(row.month, i, cx, H);
+      });
+      svg += '</svg>';
+      container.innerHTML = svg;
+
+      const tot = rows.reduce((a, r) => ({ n: a.n + get(r).nyukai, t: a.t + get(r).taikai }), { n: 0, t: 0 });
+      const net = tot.n - tot.t;
+      summary.textContent = `期間合計：入会 ${tot.n}名、退会 ${tot.t}名（純増 ${net >= 0 ? '+' : ''}${net}名）`;
     }
 
     // ── ⑤ 反響媒体別の体験数と入会確定数 ───────────────────────────
