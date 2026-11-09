@@ -227,7 +227,7 @@
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
         <div class="px-4 pt-4 pb-2 flex items-center justify-between">
           <p class="text-sm font-bold text-gray-700">月別入会率</p>
-          <p class="text-xs text-gray-400">入会者数 ÷ 体験参加者数（2回目除く）</p>
+          <p class="text-xs text-gray-400">入会者数 ÷ 体験参加者数（2回目除く）／月別は直近12か月、通期累積は全期間</p>
         </div>
         <table class="w-full text-sm border-collapse" id="statsTable">
           <thead>
@@ -274,6 +274,18 @@
     const KNOWN_SCHOOL_COLORS = { '早宮校': '#3b82f6', '氷川台校': '#14b8a6', '中村校': '#a855f7', '平和台校': '#f59e0b', '富士見台校': '#ec4899', '東武練馬校': '#65a30d' };
     const FALLBACK_COLORS = ['#ef4444', '#0ea5e9', '#84cc16', '#ec4899', '#64748b'];
     const GRADE_ORDER = ['年少', '年中', '年長', '小1', '小2', '小3', '小4', '小5', '小6', '中1', '中2', '中3', 'その他'];
+    // 時系列グラフは直近12か月（当月を含む）までを表示する。データが増えても横に詰まらないように
+    const MAX_MONTHS = 12;
+    const lastMonths = arr => arr.slice(-MAX_MONTHS);
+    // 表示範囲の開始日（YYYY-MM-01）。直近の月から数えて12か月前の月初
+    function chartCutoff() {
+      const trend = statsData.seito_trend || [];
+      const latest = (trend.length ? trend[trend.length - 1].month : (statsData.monthly || []).slice(-1)[0]?.month) || '';
+      if (!latest) return '0000-00-00';
+      let y = Number(latest.slice(0, 4)), m = Number(latest.slice(5)) - (MAX_MONTHS - 1);
+      while (m < 1) { m += 12; y--; }
+      return `${y}-${String(m).padStart(2, '0')}-01`;
+    }
     // グラフの横幅はカードの幅いっぱいに合わせる（viewBoxを実寸にして文字サイズを保つ）
     let CHART_W = 360;
     function fitChartWidth() {
@@ -437,7 +449,7 @@
         ${renderRateCells(cumulative)}
       </tr>`;
 
-      const monthlyRows = monthly.map((row, i) => {
+      const monthlyRows = lastMonths(monthly).map((row, i) => {
         const bg = i % 2 === 0 ? 'bg-white' : 'bg-gray-50';
         return `<tr class="${bg} hover:bg-blue-50 transition">
           <td class="px-4 py-2 whitespace-nowrap text-gray-700">${row.month.replace('-', '/')}</td>
@@ -482,7 +494,7 @@
     function renderEnrollChart() {
       const container = document.getElementById('enroll-chart');
       const legend = document.getElementById('enroll-legend');
-      const trend = statsData.seito_trend || [];
+      const trend = lastMonths(statsData.seito_trend || []);
       if (trend.length === 0) {
         legend.innerHTML = '';
         container.innerHTML = '<p class="jk-empty">データがありません</p>';
@@ -521,6 +533,7 @@
 
     // ── ② 体験・入会 月別推移（選択した校） ────────────────────────
     function renderChart(monthly, label) {
+      monthly = monthly ? lastMonths(monthly) : monthly;
       const container = document.getElementById('chart-container');
       if (!monthly || monthly.length === 0) {
         container.innerHTML = '<p class="jk-empty">データがありません</p>';
@@ -578,10 +591,13 @@
         container.innerHTML = '<p class="jk-empty">データがありません</p>';
         return;
       }
-      const dates = ap.dates;
+      // 移動平均は全期間で計算してから、直近12か月分だけ表示する（表示の最初の日から線が途切れないように）
+      const cut = chartCutoff();
+      const from = Math.max(0, ap.dates.findIndex(d => d >= cut));
+      const dates = ap.dates.slice(from);
       // 短期・長期とも「28日あたりの件数」に換算（1日あたり平均×28）
-      const short = movingAverage(counts, MA_SHORT).map(v => v === null ? null : v * 28);
-      const long = movingAverage(counts, MA_LONG).map(v => v === null ? null : v * MA_LONG);
+      const short = movingAverage(counts, MA_SHORT).map(v => v === null ? null : v * 28).slice(from);
+      const long = movingAverage(counts, MA_LONG).map(v => v === null ? null : v * MA_LONG).slice(from);
       legend.innerHTML =
         `<span><span class="jk-dot" style="background:${MA_SHORT_COLOR}"></span>短期（直近7日の平均を28日換算）</span>` +
         `<span><span class="jk-dot" style="background:${MA_LONG_COLOR}"></span>長期（直近28日の平均）</span>`;
@@ -650,6 +666,11 @@
         if (!weeks.length || weeks[weeks.length - 1].start !== m) weeks.push({ start: m, n: 0 });
         weeks[weeks.length - 1].n += counts[i];
       });
+      // 直近12か月に入る週だけ表示（週の終わりが表示開始日以降）
+      const cutW = new Date(chartCutoff() + 'T00:00:00Z');
+      cutW.setUTCDate(cutW.getUTCDate() - 6);
+      const cutWStr = cutW.toISOString().slice(0, 10);
+      while (weeks.length > 1 && weeks[0].start < cutWStr) weeks.shift();
       const lastIdx = weeks.length - 1;
       // 最終週が日曜までそろっていなければ「途中」
       const lastDate = new Date(ap.dates[ap.dates.length - 1] + 'T00:00:00Z');
@@ -697,7 +718,8 @@
         return t > 0 ? { rate: Math.round(n / t * 100), n, t } : null;
       });
     }
-    function renderRateChart(monthly, label) {
+    function renderRateChart(fullMonthly, label) {
+      const monthly = lastMonths(fullMonthly || []);
       const container = document.getElementById('rate-chart');
       const legend = document.getElementById('rate-legend');
       if (!monthly || monthly.length === 0) {
@@ -705,8 +727,8 @@
         container.innerHTML = '<p class="jk-empty">データがありません</p>';
         return;
       }
-      const series = [{ label, color: schoolColor(label), dashed: false, data: cumulativeRates(monthly, label) }];
-      if (label !== '全体') series.push({ label: '全校', color: '#9ca3af', dashed: true, data: cumulativeRates(monthly, '全体') });
+      const series = [{ label, color: schoolColor(label), dashed: false, data: lastMonths(cumulativeRates(fullMonthly, label)) }];
+      if (label !== '全体') series.push({ label: '全校', color: '#9ca3af', dashed: true, data: lastMonths(cumulativeRates(fullMonthly, '全体')) });
       legend.innerHTML = series.map(s =>
         `<span><span class="jk-dot" style="background:${s.color}"></span>${esc(s.label === '全体' ? '全校' : s.label)}</span>`).join('');
 
@@ -856,7 +878,7 @@
 
     // ── ④-3 平均月謝の推移（折れ線） ───────────────────────────────
     function feeSeries(label) {
-      return (statsData.fee_trend || []).map(r => {
+      return lastMonths(statsData.fee_trend || []).map(r => {
         const g = r[label];
         return g && g.n > 0 ? Math.round(g.sum / g.n) : null;
       });
@@ -864,7 +886,7 @@
     function renderFeeChart(label) {
       const container = document.getElementById('fee-chart');
       const legend = document.getElementById('fee-legend');
-      const trend = statsData.fee_trend || [];
+      const trend = lastMonths(statsData.fee_trend || []);
       if (trend.length === 0) {
         legend.innerHTML = '';
         container.innerHTML = '<p class="jk-empty">データがありません</p>';
@@ -920,7 +942,7 @@
     function renderMoveChart(label) {
       const container = document.getElementById('move-chart');
       const summary = document.getElementById('move-summary');
-      const rows = statsData.movement || [];
+      const rows = lastMonths(statsData.movement || []);
       if (rows.length === 0) {
         container.innerHTML = '<p class="jk-empty">データがありません</p>';
         summary.textContent = '';
