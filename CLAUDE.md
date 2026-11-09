@@ -359,6 +359,8 @@ kintone教室マスタへの登録だけでは**フォーム側は自動反映�
 - `form/worker.js` の `SCHOOLS` 配列（実績タブAPI）に追加。※これは`wrangler deploy`が必要（①②と違ってHPリポジトリのpushでは反映される他ページと違い、worker.js全般と同じ扱い）
 - `staff/roster.html`：タブボタン（`data-school`属性・`onclick="switchSchool(...)"`）、スケジュール配列、カラー設定（`bg-*`/`text-*`）に追加
 - `staff/jisseki.html`：`KNOWN_SCHOOL_COLORS`とフォールバック用`schools`配列に追加
+- **校カラーの決め方（新教室追加のたびに必ず実施）**：既存校と色相が被らない色を1色選び、roster.htmlの`SCHOOL_COLORS`（Tailwindの`bg-◯-100`/`text-◯-700`〜800）とjisseki.htmlの`KNOWN_SCHOOL_COLORS`（同系色の600番台のHEX）に**同じ色相**で入れる。使用済み: 早宮=blue / 氷川台=teal / 中村=purple / 平和台=amber / 富士見台=pink / 東武練馬=lime（次の候補: cyan・orange・rose系は既存と近いので避け、slate・emerald・fuchsia等から選ぶ）。「green」は振替済みバッジ、「red」はエラー表示で使用中のため避ける
+- ⚠️ **色クラスを追加したら必ず `npm run build:css` で `tailwind.css` を再ビルドして一緒にcommit/pushする**。やらないと、JSで動的に出すクラス（`bg-pink-100`等）がCSSに入らず、名簿の校バッジが無色（黒文字）になる。2026-11-09に富士見台・東武練馬で発生した実績あり（コード上は色指定済みだったのにCSS未ビルドで無色だった）
 
 ### ④ kintone側（前提。ここが起点）
 
