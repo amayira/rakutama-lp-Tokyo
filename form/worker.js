@@ -1773,6 +1773,7 @@ function isActiveAt(rec, dateStr) {
  *   - grade_dist: { 全体: { "小1": N, ... }, 早宮校: {...} } 現在在籍の学年別人数
  *   - media: { 全体: [ { media, taiken, nyukai } ], 早宮校: [...] } 反響媒体別の体験数・入会確定数
  *   - course_dist: { 全体: { "週1回コース": N, ... }, 早宮校: {...} } 現在在籍のコース別人数
+ *   - slot_dist: { 全体: { "月17": N, ... }, 早宮校: {...} } 現在在籍の曜日・コマ別の延べ人数（週2回の生徒は2枠に数える）
  *   - fee_trend: [ { month, 全体: { sum, n }, 早宮校: {...} } ] 各月末在籍者の月謝合計・人数（平均＝sum/n）
  *   - movement: [ { month, 全体: { nyukai, taikai }, 早宮校: {...} } ] 入会（初回授業日の月）・退会（退会日の月）の人数
  *   - taiken_apply: { dates: ["2026-04-15", ...], 全体: [N, ...], 早宮校: [N, ...] } 申込日（作成日時のJST日付）ごとの体験申込数。最初の申込日〜今日まで毎日
@@ -1920,6 +1921,21 @@ async function handleStaffStats(env) {
     }
   }
 
+  // ── 曜日・コマ別の在籍人数（現在在籍のみ。コマ1〜5の値は「月17」＝月曜17時の枠）────
+  // 週2回の生徒は2つの枠に1人ずつ数える（延べ人数）。
+  const slotDist = { 全体: {} };
+  for (const school of SCHOOLS) slotDist[school] = {};
+  for (const rec of activeNow) {
+    const school = rec["教室名"]?.value ?? "";
+    const slots = new Set(["コマ1", "コマ2", "コマ3", "コマ4", "コマ5"].map(f => rec[f]?.value).filter(Boolean));
+    for (const slot of slots) {
+      for (const key of ["全体", school]) {
+        if (!slotDist[key]) continue;
+        slotDist[key][slot] = (slotDist[key][slot] ?? 0) + 1;
+      }
+    }
+  }
+
   // ── 学年別の在籍人数（現在在籍のみ）────────────────────────────────
   const gradeDist = { 全体: {} };
   for (const school of SCHOOLS) gradeDist[school] = {};
@@ -1997,6 +2013,7 @@ async function handleStaffStats(env) {
     media,
     taiken_apply: taikenApply,
     course_dist: courseDist,
+    slot_dist: slotDist,
     fee_trend: feeTrend,
     movement,
   };
