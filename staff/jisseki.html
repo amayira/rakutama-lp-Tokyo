@@ -196,10 +196,10 @@
 
       <!-- ④-4 曜日・コマ別の在籍人数 -->
       <div class="bg-white rounded-2xl shadow-sm p-4">
-        <p class="text-sm font-bold text-gray-700">曜日・コマ別の在籍人数<span class="jk-sfx"></span></p>
-        <p class="text-xs text-gray-400 mb-3">現在在籍している生徒の、通っている曜日と時間帯ごとの人数</p>
+        <p class="text-sm font-bold text-gray-700">曜日・コマ別の充足率<span class="jk-sfx"></span></p>
+        <p class="text-xs text-gray-400 mb-3">現在在籍している生徒数 ÷ 定員（1コマ10名）。曜日と時間帯ごとの充足率</p>
         <div id="slot-chart"></div>
-        <p class="jk-note">週2回の生徒は2つの枠に1人ずつ数えているため、合計は在籍人数より多くなります。校を選ぶと、その校で開講している枠だけに色がつきます。</p>
+        <p class="jk-note">週2回の生徒は2つのコマに1人ずつ数えています（延べ人数）。1コマの定員は10名として計算し、開講していない曜日は「―」です。</p>
       </div>
 
       <!-- ④-3 平均月謝の推移 -->
@@ -832,8 +832,17 @@
       container.innerHTML = `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 36px;padding:6px 0">${svg}<div>${legend}</div></div>`;
     }
 
-    // ── ④-4 曜日・コマ別の在籍人数（ヒートマップ表） ───────────────
+    // ── ④-4 曜日・コマ別の充足率（ヒートマップ表） ─────────────────
+    // 各校の開講曜日（roster.htmlのGRID_COLSと同じ）。時間帯は全校 16時・17時の2コマ
+    const SLOT_DAYS = {
+      '早宮校': ['火', '金'], '氷川台校': ['月', '水'], '中村校': ['月', '木'], '平和台校': ['月', '木'],
+      '富士見台校': ['火', '木'], '東武練馬校': ['火', '金'],
+    };
+    const SLOT_TIMES = ['16', '17'];
+    const SLOT_CAPACITY = 10;           // 1コマの定員（名）
     const DAY_ORDER = ['月', '火', '水', '木', '金', '土', '日'];
+    // 新規校は開校直後の立ち上がり期間のため、この日から全校の充足率（分母・分子）に含める
+    const SLOT_AGG_FROM = { '富士見台校': '2026-12-01', '東武練馬校': '2026-12-01' };
     function hexA(hex, a) {
       const n = parseInt(hex.slice(1), 16);
       return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
@@ -841,38 +850,52 @@
     function renderSlotChart(label) {
       const container = document.getElementById('slot-chart');
       const dist = statsData.slot_dist || {};
-      const all = dist['全体'] || {};
-      const d = dist[label] || {};
-      const parse = k => { const m = /^(.)(\d+)$/.exec(k); return m ? { day: m[1], time: m[2] } : null; };
-      const slots = Object.keys(all).map(parse).filter(Boolean);
-      if (slots.length === 0) {
-        container.innerHTML = '<p class="jk-empty">データがありません</p>';
-        return;
-      }
-      // 校を切り替えても枠の並びが変わらないよう、全校で人数のある曜日・時間帯を常に並べる
-      const days = DAY_ORDER.filter(x => slots.some(s => s.day === x));
-      const times = [...new Set(slots.map(s => s.time))].sort((a, b) => Number(a) - Number(b));
-      const val = (day, time) => d[day + time] || 0;
-      const max = Math.max(...days.flatMap(x => times.map(t => val(x, t))), 1);
+      const t = new Date();
+      const today = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+      const inAgg = s => !SLOT_AGG_FROM[s] || today >= SLOT_AGG_FROM[s];
+      const targets = label === '全体' ? schools.filter(inAgg) : [label];
+      const days = DAY_ORDER.filter(x => Object.values(SLOT_DAYS).some(ds => ds.includes(x)));
+      // 曜日×時間帯ごとの {人数, 定員}
+      const cell = (day, time) => targets.reduce((a, sc) => {
+        if (!(SLOT_DAYS[sc] || []).includes(day)) return a;
+        return { n: a.n + ((dist[sc] || {})[day + time] || 0), cap: a.cap + SLOT_CAPACITY };
+      }, { n: 0, cap: 0 });
+      const sumCells = cells => cells.reduce((a, c) => ({ n: a.n + c.n, cap: a.cap + c.cap }), { n: 0, cap: 0 });
+      const pct = c => c.cap ? Math.round(c.n / c.cap * 100) : null;
       const color = schoolColor(label);
       const th = 'padding:8px 6px;font-weight:500;color:#6b7280;font-size:0.82rem';
+
       let html = `<table style="width:100%;border-collapse:separate;border-spacing:4px;text-align:center"><thead><tr><th></th>`;
-      html += times.map(t => `<th style="${th}">${esc(t)}時</th>`).join('') + `<th style="${th}">計</th></tr></thead><tbody>`;
+      html += SLOT_TIMES.map(tm => `<th style="${th}">${tm}時</th>`).join('') + `<th style="${th}">計</th></tr></thead><tbody>`;
       days.forEach(day => {
-        const rowSum = times.reduce((a, t) => a + val(day, t), 0);
-        html += `<tr><th style="${th};text-align:right;width:3em">${esc(day)}曜</th>`;
-        html += times.map(t => {
-          const v = val(day, t);
-          const bg = v > 0 ? hexA(color, 0.12 + 0.78 * v / max) : '#f8fafc';
-          const fg = v > 0 && v / max > 0.6 ? '#fff' : v > 0 ? '#374151' : '#cbd5e1';
-          return `<td style="background:${bg};color:${fg};border-radius:8px;padding:14px 6px;font-size:1.15rem;font-weight:700;font-variant-numeric:tabular-nums">${v > 0 ? v : '―'}</td>`;
-        }).join('');
-        html += `<td style="padding:14px 6px;color:#374151;font-weight:700">${rowSum || '―'}</td></tr>`;
+        html += `<tr><th style="${th};text-align:right;width:3em">${day}曜</th>`;
+        SLOT_TIMES.forEach(tm => {
+          const c = cell(day, tm), p = pct(c);
+          if (p === null) {
+            html += `<td style="background:#f8fafc;color:#cbd5e1;border-radius:8px;padding:14px 6px;font-size:1.05rem">―</td>`;
+            return;
+          }
+          const ratio = Math.min(c.n / c.cap, 1);
+          const bg = hexA(color, 0.10 + 0.80 * ratio);
+          const fg = ratio > 0.6 ? '#fff' : '#374151';
+          html += `<td style="background:${bg};color:${fg};border-radius:8px;padding:10px 6px;line-height:1.25;font-variant-numeric:tabular-nums">
+            <div style="font-size:1.2rem;font-weight:700">${p}%</div><div style="font-size:0.75rem;opacity:.85">${c.n}/${c.cap}名</div></td>`;
+        });
+        const rc = sumCells(SLOT_TIMES.map(tm => cell(day, tm)));
+        html += `<td style="padding:10px 6px;color:#374151;font-weight:700">${rc.cap ? pct(rc) + '%' : '―'}</td></tr>`;
       });
       html += `<tr><th style="${th};text-align:right">計</th>` +
-        times.map(t => `<td style="padding:8px 6px;color:#374151;font-weight:700">${days.reduce((a, x) => a + val(x, t), 0) || '―'}</td>`).join('') +
-        `<td style="padding:8px 6px;color:#6b7280;font-weight:700">${days.reduce((a, x) => a + times.reduce((b, t) => b + val(x, t), 0), 0)}</td></tr>`;
-      html += '</tbody></table>';
+        SLOT_TIMES.map(tm => {
+          const c = sumCells(days.map(day => cell(day, tm)));
+          return `<td style="padding:8px 6px;color:#374151;font-weight:700">${c.cap ? pct(c) + '%' : '―'}</td>`;
+        }).join('');
+      const all = sumCells(days.flatMap(day => SLOT_TIMES.map(tm => cell(day, tm))));
+      html += `<td style="padding:8px 6px;color:#16a34a;font-weight:700">${all.cap ? pct(all) + '%' : '―'}</td></tr></tbody></table>`;
+      html += `<p class="text-sm text-gray-700 mt-3">${label === '全体' ? '全校' : esc(label)}の充足率：<b>${all.n}名 ÷ ${all.cap}名（定員）＝ ${all.cap ? pct(all) : '―'}%</b></p>`;
+      const excluded = label === '全体' ? schools.filter(s => !inAgg(s)) : [];
+      if (excluded.length) {
+        html += `<p class="jk-note">${excluded.map(esc).join('・')}は開校直後のため、${(([y, m, d]) => `${y}年${Number(m)}月${Number(d)}日`)(SLOT_AGG_FROM[excluded[0]].split('-'))}から全校の充足率に含めます（各校を選ぶと単独の充足率は見られます）。</p>`;
+      }
       container.innerHTML = html;
     }
 
