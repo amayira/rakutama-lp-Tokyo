@@ -1456,6 +1456,15 @@ async function handleGakuhi(params, env) {
   return { success: true, fees };
 }
 
+/** JST基準の「翌週月曜日」（今日が月曜でも+7日）を YYYY-MM-DD で返す。フォーム側 nextMondayDate() と同じ規則。 */
+function nextMondayJST() {
+  const jst = new Date(Date.now() + 9 * 60 * 60 * 1000); // UTC getter で JST の暦日を読む
+  const day = jst.getUTCDay(); // 0=Sun … 6=Sat
+  const add = (8 - day) % 7 || 7;
+  jst.setUTCDate(jst.getUTCDate() + add);
+  return jst.toISOString().slice(0, 10);
+}
+
 /**
  * POST /api/class-change
  * Creates a record in the class-change kintone app.
@@ -1463,6 +1472,22 @@ async function handleGakuhi(params, env) {
  */
 async function handleClassChange(body, env) {
   if (!(await fillStudentFromRoster(body, env))) return STUDENT_NOT_FOUND;
+
+  // クラス変更は翌週月曜以降のみ受付（フォーム側の検証をすり抜けた分をサーバーでも弾く）。
+  // 希望変更時期が YYYY-MM-DD 形式の時だけ判定（旧キャッシュ版の自由記述は従来通り通す）。
+  if (body["変更種別"] === "クラス変更") {
+    const timing = String(body["希望変更時期"] ?? body["希望時期"] ?? "");
+    if (/^\d{4}-\d{2}-\d{2}$/.test(timing)) {
+      const minYMD = nextMondayJST();
+      if (timing < minYMD) {
+        return {
+          success: false,
+          error: `クラス変更は翌週月曜日（${minYMD.replace(/-/g, "/")}）以降の日付を選択してください。`,
+          status: 400,
+        };
+      }
+    }
+  }
 
   const token =[env.TOKEN_CLASS_CHANGE, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
 

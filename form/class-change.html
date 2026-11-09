@@ -280,6 +280,13 @@
       if (!studentData) errors.push('生徒番号を検索してください');
       if (!changeRequest) errors.push('変更希望内容を入力してください');
       if (!desiredTiming) errors.push('希望変更時期を選択してください');
+      // novalidate のため min 属性が効かない。手入力・ピッカー経由の過去日をここで弾く
+      if (desiredTiming && changeType === 'クラス変更') {
+        const minYMD = toYMD(nextMondayDate());
+        if (desiredTiming < minYMD) {
+          errors.push(`クラス変更は翌週月曜日（${minYMD.replace(/-/g, '/')}）以降の日付を選択してください`);
+        }
+      }
 
       if (errors.length > 0) {
         errorBox.innerHTML = errors.join('<br />');
