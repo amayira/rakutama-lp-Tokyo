@@ -1175,6 +1175,10 @@ video {
   resize: vertical;
 }
 
+.resize {
+  resize: both;
+}
+
 .list-inside {
   list-style-position: inside;
 }

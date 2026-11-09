@@ -29,7 +29,13 @@ async function loadClassroomsInto(selectId) {
     const current = sel.value;
     sel.innerHTML = '<option value="">選択してください</option>';
     classroomOpenDates = {};
-    data.classrooms.forEach(c => {
+    // 表示順はサイト全体の基準順に揃える（API はレコード番号順で返すため）。基準外の教室は末尾に元の順で並ぶ
+    const ORDER = ['早宮校', '氷川台校', '中村校', '平和台校', '富士見台校', '東武練馬校'];
+    const rank = name => { const i = ORDER.indexOf(name); return i === -1 ? ORDER.length : i; };
+    const sorted = data.classrooms.map((c, i) => ({ c, i }))
+      .sort((a, b) => rank(a.c.name) - rank(b.c.name) || a.i - b.i)
+      .map(x => x.c);
+    sorted.forEach(c => {
       const opt = document.createElement('option');
       opt.textContent = c.name;
       sel.appendChild(opt);
