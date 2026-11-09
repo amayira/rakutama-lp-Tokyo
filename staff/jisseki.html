@@ -114,7 +114,7 @@
 
       <!-- 校の絞り込み -->
       <div>
-        <p class="text-xs text-gray-400 mb-2">校を選ぶと、下の4つのグラフがその校の数字に切り替わります</p>
+        <p class="text-xs text-gray-400 mb-2">校を選ぶと、下の5つのグラフがその校の数字に切り替わります</p>
         <div id="schoolChips" class="jk-chips"></div>
       </div>
 
@@ -132,6 +132,16 @@
           </div>
         </div>
         <div id="chart-container" class="jk-chart"></div>
+      </div>
+
+      <!-- ②-2 体験申込数の日次推移（移動平均） -->
+      <div class="bg-white rounded-2xl shadow-sm p-4">
+        <p class="text-sm font-bold text-gray-700">体験申込数の推移（移動平均）<span class="jk-sfx"></span></p>
+        <p class="text-xs text-gray-400 mb-3">申込のあった日ごとの件数。短期＝直近7日、長期＝直近28日の1日あたり平均</p>
+        <div id="apply-legend" class="jk-legend mb-2"></div>
+        <div id="apply-chart" class="jk-chart"></div>
+        <p id="apply-summary" class="text-sm text-gray-700 mt-3"></p>
+        <p class="jk-note">申込日は体験参加日ではなく、申込フォームから入力された日です。2回目の体験は除きます。移動平均は窓の日数が揃った日から表示します。申込が少ない校は1件で線が大きく動きます。</p>
       </div>
 
       <!-- ③ 入会率の推移 -->
@@ -292,6 +302,7 @@
       const sfx = currentLabel === '全体' ? '' : `（${currentLabel}）`;
       document.querySelectorAll('.jk-sfx').forEach(el => { el.textContent = sfx; });
       renderChart(statsData.monthly, currentLabel);
+      renderApplyChart(currentLabel);
       renderRateChart(statsData.monthly, currentLabel);
       renderGradeChart(currentLabel);
       renderMediaChart(currentLabel);
@@ -474,6 +485,86 @@
       });
       svg += '</svg>';
       container.innerHTML = svg;
+    }
+
+    // ── ②-2 体験申込数の日次推移（短期・長期の移動平均） ───────────
+    const MA_SHORT = 7, MA_LONG = 28;
+    const MA_SHORT_COLOR = '#f59e0b', MA_LONG_COLOR = '#2563eb';
+    // 直近 win 日の平均。窓が揃う前の日は null（少ない日数の平均で線がブレるのを避ける）
+    function movingAverage(counts, win) {
+      return counts.map((_, i) => {
+        if (i < win - 1) return null;
+        let sum = 0;
+        for (let j = i - win + 1; j <= i; j++) sum += counts[j];
+        return sum / win;
+      });
+    }
+    function renderApplyChart(label) {
+      const container = document.getElementById('apply-chart');
+      const legend = document.getElementById('apply-legend');
+      const summary = document.getElementById('apply-summary');
+      const ap = statsData.taiken_apply;
+      const counts = ap && ap[label];
+      if (!ap || !ap.dates || ap.dates.length === 0 || !counts) {
+        legend.innerHTML = ''; summary.textContent = '';
+        container.innerHTML = '<p class="jk-empty">データがありません</p>';
+        return;
+      }
+      const dates = ap.dates;
+      const short = movingAverage(counts, MA_SHORT);
+      const long = movingAverage(counts, MA_LONG);
+      legend.innerHTML =
+        `<span><span class="jk-dot" style="background:#e2e8f0"></span>日々の申込数</span>` +
+        `<span><span class="jk-dot" style="background:${MA_SHORT_COLOR}"></span>短期（直近${MA_SHORT}日平均）</span>` +
+        `<span><span class="jk-dot" style="background:${MA_LONG_COLOR}"></span>長期（直近${MA_LONG}日平均）</span>`;
+
+      const H = 220, padL = 30, padR = 10, padT = 18, padB = 36;
+      const chartW = CHART_W - padL - padR, chartH = H - padT - padB;
+      const n = dates.length;
+      const maxVal = Math.max(...counts, ...short.filter(v => v !== null), ...long.filter(v => v !== null), 1);
+      const { step, n: ticks, yMax } = niceScale(Math.max(1, Math.ceil(maxVal * 1.1 * 2) / 2));
+      const slot = chartW / n;
+      const xAt = i => padL + slot * i + slot / 2;
+      const yAt = v => padT + chartH * (1 - v / yMax);
+
+      let svg = svgOpen(H, `${label === '全体' ? '全校' : label}の体験申込数の日次推移と移動平均`);
+      // 目盛りは小数になりうるので専用に描く
+      for (let i = 0; i <= ticks; i++) {
+        const val = step * i, y = yAt(val);
+        svg += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${padL + chartW}" y2="${y.toFixed(1)}" stroke="#f0f0f0" stroke-width="1"/>`;
+        svg += `<text x="${padL - 5}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="#9ca3af">${val}</text>`;
+      }
+      // 日々の申込数（薄い棒）
+      counts.forEach((v, i) => {
+        if (!v) return;
+        const h = v / yMax * chartH;
+        svg += `<rect x="${(xAt(i) - Math.max(slot * 0.4, 0.5)).toFixed(2)}" y="${(padT + chartH - h).toFixed(1)}" width="${Math.max(slot * 0.8, 1).toFixed(2)}" height="${h.toFixed(1)}" fill="#e2e8f0"/>`;
+      });
+      // 月ラベル（各月1日の位置。1月と最初の月は年も出す）
+      dates.forEach((d, i) => {
+        if (!d.endsWith('-01') && i !== 0) return;
+        const m = d.slice(0, 7);
+        svg += `<line x1="${xAt(i).toFixed(1)}" y1="${padT + chartH}" x2="${xAt(i).toFixed(1)}" y2="${padT + chartH + 4}" stroke="#d1d5db"/>`;
+        svg += `<text x="${xAt(i).toFixed(1)}" y="${H - 20}" text-anchor="middle" font-size="12" fill="#6b7280">${Number(m.slice(5))}月</text>`;
+        if (i === 0 || d.endsWith('-01') && m.endsWith('-01')) {
+          svg += `<text x="${xAt(i).toFixed(1)}" y="${H - 7}" text-anchor="middle" font-size="10" fill="#9ca3af">${m.slice(0, 4)}</text>`;
+        }
+      });
+      // 移動平均の線（長期を先に、短期を上に重ねる）
+      [[long, MA_LONG_COLOR, 2.6], [short, MA_SHORT_COLOR, 2]].forEach(([series, color, w]) => {
+        let path = '';
+        series.forEach((v, i) => {
+          if (v === null) return;
+          path += `${path ? 'L' : 'M'}${xAt(i).toFixed(1)},${yAt(v).toFixed(1)} `;
+        });
+        if (path) svg += `<path d="${path}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"/>`;
+      });
+      svg += '</svg>';
+      container.innerHTML = svg;
+
+      const last = n - 1, s = short[last], l = long[last];
+      const f = v => v === null ? '―' : v.toFixed(2);
+      summary.innerHTML = `直近（${esc(dates[last].replace(/-/g, '/'))}時点）：短期 <b style="color:${MA_SHORT_COLOR}">${f(s)}件/日</b>（週あたり約${s === null ? '―' : (s * 7).toFixed(1)}件）／長期 <b style="color:${MA_LONG_COLOR}">${f(l)}件/日</b>（週あたり約${l === null ? '―' : (l * 7).toFixed(1)}件）`;
     }
 
     // ── ③ 入会率の推移（開業からの累積で計算） ─────────────────────

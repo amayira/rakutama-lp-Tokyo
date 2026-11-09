@@ -1764,6 +1764,7 @@ function isActiveAt(rec, dateStr) {
  *   - seito_trend: [ { month: "2026-06", 全体: N, 早宮校: N, ... } ] 各月末時点（当月は今日時点）の在籍数
  *   - grade_dist: { 全体: { "小1": N, ... }, 早宮校: {...} } 現在在籍の学年別人数
  *   - media: { 全体: [ { media, taiken, nyukai } ], 早宮校: [...] } 反響媒体別の体験数・入会確定数
+ *   - taiken_apply: { dates: ["2026-04-15", ...], 全体: [N, ...], 早宮校: [N, ...] } 申込日（作成日時のJST日付）ごとの体験申込数。最初の申込日〜今日まで毎日
  */
 async function handleStaffStats(env) {
   const SCHOOLS = ["早宮校", "氷川台校", "中村校", "平和台校", "富士見台校", "東武練馬校"];
@@ -1902,6 +1903,36 @@ async function handleStaffStats(env) {
     media[key] = Object.values(byMedia).sort((a, b) => b.taiken - a.taiken || b.nyukai - a.nyukai);
   }
 
+  // ── 体験申込数の日次推移（申込日ベース）───────────────────────────────
+  // 申込日＝体験名簿レコードの作成日時（UTC保存なのでJSTに直して日付化）。
+  // 体験参加日ベースの月別集計と違い、欠席・参加日が未来のものも「申込」として数える。2回目は除く。
+  // 移動平均はフロント側で計算する（短期・長期の窓幅を画面側で決められるように日次の生数だけ返す）。
+  const applyAll = await kintoneGet(
+    APP.TAIKEN,
+    `所属組織 in ("アルファーブレイン") order by 作成日時 asc limit 500`,
+    env.TOKEN_TAIKEN
+  );
+  const applyDates = {}; // { "2026-11-08": { 全体: N, 早宮校: N, ... } }
+  for (const rec of applyAll.records ?? []) {
+    const created = rec["作成日時"]?.value ?? "";
+    if ((rec["反響媒体"]?.value ?? "").includes("2回目") || !created) continue;
+    const day = new Date(Date.parse(created) + 9 * 3600 * 1000).toISOString().slice(0, 10);
+    const school = rec["教室名"]?.value ?? "";
+    const row = applyDates[day] ?? (applyDates[day] = {});
+    for (const key of ["全体", school]) row[key] = (row[key] ?? 0) + 1;
+  }
+  const taikenApply = { dates: [] };
+  for (const label of ["全体", ...SCHOOLS]) taikenApply[label] = [];
+  const firstDay = Object.keys(applyDates).sort()[0];
+  if (firstDay) {
+    const end = Date.parse(todayStr + "T00:00:00Z");
+    for (let t = Date.parse(firstDay + "T00:00:00Z"); t <= end; t += 86400000) {
+      const day = new Date(t).toISOString().slice(0, 10);
+      taikenApply.dates.push(day);
+      for (const label of ["全体", ...SCHOOLS]) taikenApply[label].push(applyDates[day]?.[label] ?? 0);
+    }
+  }
+
   return {
     success: true,
     schools: SCHOOLS,
@@ -1911,6 +1942,7 @@ async function handleStaffStats(env) {
     seito_trend: seitoTrend,
     grade_dist: gradeDist,
     media,
+    taiken_apply: taikenApply,
   };
 }
 
