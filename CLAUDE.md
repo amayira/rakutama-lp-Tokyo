@@ -307,7 +307,7 @@ GTMスニペットは `<head>` 内（同期）と `<body>` 直後（`<noscript>`
 | 媒体 | ランディングページ |
 |------|------------------|
 | Google 広告 | `https://rakutama-tokyo.com/`（トップページ） |
-| Meta 広告（Facebook/Instagram） | `https://rakutama-tokyo.com/LP/trial.html` |
+| Meta 広告（Facebook/Instagram） | 2026-11 新2校テスト：`/LP/fujimidai.html`・`/LP/tobunerima.html`（教室固定・フォーム埋め込み・Meta Pixel PageView設置。Leadはtrial-thanksで発火。kintone体験名簿の備考に「【流入】Meta広告LP（校名）／utm_content」を自動記入）。旧 `/LP/trial.html` は trial.html へのリダイレクト |
 
 ---
 
