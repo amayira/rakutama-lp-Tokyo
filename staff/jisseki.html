@@ -99,6 +99,7 @@
             <p class="text-3xl font-bold text-gray-800" id="st-total">—</p>
             <p class="text-sm text-gray-400 mb-0.5">名</p>
           </div>
+          <div id="st-pending" class="text-xs text-gray-400"></div>
           <div id="st-trend" class="mt-1 text-xs font-medium"></div>
         </div>
         <div id="schoolCards" style="display:contents"></div>
@@ -107,7 +108,7 @@
       <!-- ① 在籍生徒数の推移 -->
       <div class="bg-white rounded-2xl shadow-sm p-4">
         <p class="text-sm font-bold text-gray-700">在籍生徒数の推移</p>
-        <p class="text-xs text-gray-400 mb-3">各月末時点の人数（今月は現在）</p>
+        <p class="text-xs text-gray-400 mb-3">各月末時点の人数（今月は月末までの入会予定を含む。来月以降の入会は含まない）</p>
         <div id="enroll-legend" class="jk-legend mb-2"></div>
         <div id="enroll-chart" class="jk-chart"></div>
       </div>
@@ -180,7 +181,7 @@
           <p class="text-sm font-bold text-gray-700">学年別の生徒構成<span class="jk-sfx"></span></p>
           <p class="text-xs text-gray-400" id="grade-total"></p>
         </div>
-        <p class="text-xs text-gray-400 mb-2">現在在籍している生徒の人数</p>
+        <p class="text-xs text-gray-400 mb-2">現在在籍している生徒の人数（入会予定を含む）</p>
         <div id="grade-chart"></div>
       </div>
 
@@ -190,14 +191,14 @@
           <p class="text-sm font-bold text-gray-700">コース別の割合<span class="jk-sfx"></span></p>
           <p class="text-xs text-gray-400" id="course-total"></p>
         </div>
-        <p class="text-xs text-gray-400 mb-2">現在在籍している生徒の週あたりの通塾回数</p>
+        <p class="text-xs text-gray-400 mb-2">現在在籍している生徒の週あたりの通塾回数（入会予定を含む）</p>
         <div id="course-chart"></div>
       </div>
 
       <!-- ④-4 曜日・コマ別の在籍人数 -->
       <div class="bg-white rounded-2xl shadow-sm p-4">
         <p class="text-sm font-bold text-gray-700">曜日・コマ別の充足率<span class="jk-sfx"></span></p>
-        <p class="text-xs text-gray-400 mb-3">現在在籍している生徒数 ÷ 定員（1コマ10名）。曜日と時間帯ごとの充足率</p>
+        <p class="text-xs text-gray-400 mb-3">現在在籍している生徒数（入会予定を含む）÷ 定員（1コマ10名）。曜日と時間帯ごとの充足率</p>
         <div id="slot-chart"></div>
         <p class="jk-note">週2回の生徒は2つのコマに1人ずつ数えています（延べ人数）。1コマの定員は10名として計算し、開講していない曜日は「―」です。</p>
       </div>
@@ -340,7 +341,9 @@
       schools = data.schools || ['早宮校', '氷川台校', '中村校', '平和台校', '富士見台校', '東武練馬校'];
       if (currentLabel !== '全体' && !schools.includes(currentLabel)) currentLabel = '全体';
 
+      const pend = data.seito_pending || {};
       document.getElementById('st-total').textContent = seito_count.total;
+      document.getElementById('st-pending').textContent = pend.total ? `うち入会予定 ${pend.total}名（初回授業日が未来）` : '';
       document.getElementById('schoolCards').innerHTML = schools.map(s => `
         <div class="bg-white rounded-2xl shadow-sm p-4">
           <p class="text-xs mb-1" style="color:${schoolColor(s)}">${esc(s)}</p>
@@ -348,6 +351,7 @@
             <p class="text-2xl font-bold text-gray-800">${seito_count[s] ?? 0}</p>
             <p class="text-xs text-gray-400 mb-0.5">名</p>
           </div>
+          ${pend[s] ? `<p class="text-xs text-gray-400">うち入会予定 ${pend[s]}名</p>` : ''}
         </div>`).join('');
 
       // 先月末比

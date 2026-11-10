@@ -1753,10 +1753,12 @@ function monthlyFee(rec) {
 
 /**
  * 指定日時点で在籍中とみなせるか（入会日が対象日以前 かつ 退会日が空または対象日以降）
+ * enrolledUntil を渡すと、入会日の上限だけ対象日と別の日にできる
+ * （入会予定＝初回授業日が未来の生徒を含めたい時に、対象日より先の日付を指定する）。
  */
-function isActiveAt(rec, dateStr) {
+function isActiveAt(rec, dateStr, enrolledUntil = dateStr) {
   const enrolled = enrolledDate(rec);
-  if (enrolled && enrolled > dateStr) return false;
+  if (enrolled && enrolled > enrolledUntil) return false;
   const withdrawn = rec["退会日"]?.value ?? "";
   if (withdrawn && withdrawn < dateStr) return false;
   return true;
@@ -1766,6 +1768,7 @@ function isActiveAt(rec, dateStr) {
  * GET /api/staff/stats
  * Returns KPI stats:
  *   - seito_count: { total, 早宮校, 氷川台校, 中村校, 平和台校 }
+ *   - seito_pending: { total, 早宮校, ... } seito_count のうち入会予定（初回授業日が未来）の人数
  *   - prev_month_total: 前月末時点の在籍数（入会日＝初回授業日・退会日から都度算出。スナップショット不要）
  *   - monthly: [ { month: "2026-06", 全体: {taiken, nyukai}, 早宮校: {...}, ... } ]
  *   - schools: 集計対象の校名配列（フロントはこれを元にカード・表・絞り込みを描画する）
@@ -1803,10 +1806,14 @@ async function handleStaffStats(env) {
     const no = String(r["生徒番号"]?.value ?? "");
     return !no.includes("-") && no !== "A0000";
   });
-  const activeNow = countableRecs.filter(r => isActiveAt(r, todayStr));
+  // 現在の在籍＝入会予定（初回授業日が未来）も含める。内訳は seito_pending で返す
+  const activeNow = countableRecs.filter(r => isActiveAt(r, todayStr, "9999-12-31"));
+  const pendingNow = activeNow.filter(r => enrolledDate(r) > todayStr);
   const seitoCount = { total: activeNow.length };
+  const seitoPending = { total: pendingNow.length };
   for (const school of SCHOOLS) {
     seitoCount[school] = activeNow.filter(r => r["教室名"]?.value === school).length;
+    seitoPending[school] = pendingNow.filter(r => r["教室名"]?.value === school).length;
   }
   const prevMonthTotal = countableRecs.filter(r => isActiveAt(r, prevMonthEndStr)).length;
 
@@ -1866,10 +1873,11 @@ async function handleStaffStats(env) {
     let [y, m] = enrollMonths[0].split("-").map(Number);
     while (y < ty || (y === ty && m <= tm)) {
       const monthStr = `${y}-${String(m).padStart(2, "0")}`;
-      const asOf = (y === ty && m === tm)
-        ? todayStr
-        : `${monthStr}-${String(lastDayOfMonth(y, m)).padStart(2, "0")}`;
-      const active = countableRecs.filter(r => isActiveAt(r, asOf));
+      const monthEnd = `${monthStr}-${String(lastDayOfMonth(y, m)).padStart(2, "0")}`;
+      // 当月は、退会は今日時点で判定し、入会は月末までの予定（月内の未来の初回授業日）を含める。翌月以降の入会は含めない
+      const isCurrent = y === ty && m === tm;
+      const asOf = isCurrent ? todayStr : monthEnd;
+      const active = countableRecs.filter(r => isActiveAt(r, asOf, monthEnd));
       const row = { month: monthStr, 全体: active.length };
       for (const school of SCHOOLS) {
         row[school] = active.filter(r => r["教室名"]?.value === school).length;
@@ -2006,6 +2014,7 @@ async function handleStaffStats(env) {
     success: true,
     schools: SCHOOLS,
     seito_count: seitoCount,
+    seito_pending: seitoPending,
     prev_month_total: prevMonthTotal,
     monthly,
     seito_trend: seitoTrend,
