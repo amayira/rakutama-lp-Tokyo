@@ -14,6 +14,11 @@
     /* 備考あり表示（tailwind.cssはビルド済みのため新規クラスは自前で定義） */
     .biko-mark { display:inline-flex; align-items:center; justify-content:center; margin-left:6px; width:20px; height:20px; border-radius:9999px; background:#dc2626; color:#fff; font-size:12px; font-weight:700; vertical-align:middle; }
     .biko-pill { display:inline-flex; align-items:center; gap:4px; font-size:12px; padding:4px 12px; border-radius:9999px; background:#f43f5e; color:#fff; font-weight:500; box-shadow:0 1px 2px rgba(0,0,0,.15); }
+    /* 変更予定あり（在籍生徒タブ）：青系のバッジ。タップで変更予定日・内容をポップアップ表示 */
+    .henko-pill { display:inline-flex; align-items:center; gap:3px; font-size:11px; padding:2px 8px; border-radius:9999px; background:#0ea5e9; color:#fff; font-weight:500; cursor:pointer; border:0; line-height:1.5; white-space:nowrap; }
+    .henko-pill:hover { background:#0284c7; }
+    .henko-row { cursor:pointer; }
+    .henko-row:hover { background:#f0f9ff; }
     .biko-row { cursor:pointer; }
     .biko-row:hover { background:#fff1f2; }
     .biko-row:active { background:#ffe4e6; }
@@ -573,7 +578,7 @@
           <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition">
             <td class="px-4 py-3 whitespace-nowrap">${schoolBadge(r.教室名)}</td>
             <td class="px-4 py-3 whitespace-nowrap font-mono text-xs text-gray-500">${r.生徒番号 || '―'}</td>
-            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${r.氏} ${r.名} ${henkoBadge(r)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">${r.フリガナ || ''}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.学年 || '―'}</td>
             <td class="px-4 py-3 whitespace-nowrap text-gray-700">${r.クラス || '―'}</td>
@@ -743,6 +748,7 @@
                 <div class="student-grade">${s.学年 || ''}</div>
                 ${s.初回授業日 ? `<div class="student-since">${s.初回授業日.replace(/-/g, '/')}</div>` : ''}
                 ${isWithdrawing ? `<div class="student-withdraw">退会予定 ${s.退会日.replace(/-/g, '/')}</div>` : ''}
+                ${hasHenko(s) ? `<div style="margin-top:4px">${henkoBadge(s)}</div>` : ''}
               </div>`;
             }).join('');
             return `<td><div class="grid-cell">${cards}</div></td>`;
@@ -891,6 +897,23 @@
     function showBiko(btn) {
       document.getElementById('bikoModalName').textContent = btn.dataset.name + ' さんの備考';
       document.getElementById('bikoModalBody').textContent = btn.dataset.note;
+      document.getElementById('bikoModal').classList.remove('hidden');
+    }
+
+    // 在籍生徒の「変更予定」バッジ（変更予定日か変更内容が入っている生徒だけ）。タップでポップアップ
+    function hasHenko(r) {
+      return !!(r.変更予定日 || (r.変更内容 || '').trim());
+    }
+    function henkoBadge(r) {
+      if (!hasHenko(r)) return '';
+      const name = `${r.氏 || ''} ${r.名 || ''}`.trim();
+      return `<button type="button" class="henko-pill" data-name="${escapeHtml(name)}" data-date="${escapeHtml(r.変更予定日 || '')}" data-note="${escapeHtml((r.変更内容 || '').trim())}" onclick="event.stopPropagation();showHenko(this)">変更予定 ›</button>`;
+    }
+    function showHenko(btn) {
+      const date = btn.dataset.date, note = btn.dataset.note;
+      document.getElementById('bikoModalName').textContent = btn.dataset.name + ' さんの変更予定';
+      document.getElementById('bikoModalBody').textContent =
+        `変更予定日：${date ? formatDateWithDay(date) : '未定'}\n\n変更内容：\n${note || '（記載なし）'}`;
       document.getElementById('bikoModal').classList.remove('hidden');
     }
 

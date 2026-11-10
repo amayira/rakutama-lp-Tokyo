@@ -1626,7 +1626,7 @@ async function handleStaffTaiken(params, env) {
  * GET /api/staff/seito?school=all|早宮校|氷川台校|中村校
  * Returns active 生徒名簿 (App 19) records.
  * Excludes records where 退会日 is set and in the past.
- * Fields: 生徒番号, コース名, 氏, 名, フリガナ, 学年, クラス, 初回授業日, 退会日, 教室名
+ * Fields: 生徒番号, コース名, 氏, 名, フリガナ, 学年, クラス, 初回授業日, 退会日, 教室名, コマ1〜5, 変更予定日, 変更内容
  */
 async function handleStaffSeito(params, env) {
   const school = params.get("school") ?? "all";
@@ -1654,6 +1654,8 @@ async function handleStaffSeito(params, env) {
     コマ3: rec["コマ3"]?.value ?? "",
     コマ4: rec["コマ4"]?.value ?? "",
     コマ5: rec["コマ5"]?.value ?? "",
+    変更予定日: rec["変更予定日"]?.value ?? "",
+    変更内容: rec["変更内容"]?.value ?? "",
   }));
 
   return { success: true, records };
