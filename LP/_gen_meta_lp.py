@@ -227,6 +227,15 @@ img{max-width:100%;height:auto;display:block}
 .md-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
 .md-list div{border-left:6px solid var(--sky);background:#F4FAFC;border-radius:6px;padding:8px 10px;font-size:13px}
 .md-list b{display:block;color:var(--teal-d);font-size:15px}
+/* qa */
+.qa{background:#fff;padding:28px 14px 26px}
+.qa .en{text-align:center;color:var(--sky);font-weight:800;letter-spacing:.2em;font-size:13px}
+.qa h2{text-align:center;font-weight:800;font-size:22px;margin-bottom:14px}
+.qa-item{border-bottom:1px solid #e3e3e3;padding:12px 2px}
+.qa-item b{display:block;font-size:14.5px;color:var(--teal-d);margin-bottom:4px}
+.qa-item b:before{content:'Q. ';font-weight:800}
+.qa-item p{font-size:13.5px;line-height:1.8}
+.qa-item p:before{content:'A. ';font-weight:800}
 /* access */
 .ac{background:#efefef;padding:26px 14px 24px;text-align:center}
 .ac .en{font-weight:800;letter-spacing:.2em;font-size:15px;margin-bottom:6px}
@@ -480,6 +489,15 @@ img{max-width:100%;height:auto;display:block}
   </div>
 </section>
 
+<!-- よくある質問 -->
+<section class="qa">
+  <p class="en">Q&amp;A</p>
+  <h2>よくあるご質問</h2>
+  <div class="qa-item"><b>保護者の付き添いは必要ですか？</b><p>お子さまが頑張る姿をぜひ隣で見守ってあげてください。送迎のみでも大丈夫です。</p></div>
+  <div class="qa-item"><b>そろばんを持っていなくても大丈夫ですか？</b><p>持ち物は不要です。体験用のそろばんをご用意しますので、手ぶらでお越しください。</p></div>
+  <div class="qa-item"><b>体験後に入会を勧められますか？</b><p>入会の強制は一切ありません。まずはお子さまに「楽しさ」を体感していただく場です。ご家族でゆっくりご検討ください。</p></div>
+</section>
+
 <!-- アクセス -->
 <section class="ac">
   <p class="en">ACCESS</p>
@@ -510,7 +528,7 @@ img{max-width:100%;height:auto;display:block}
 
   // この広告ページで固定する教室。共通JS（trial-schedule.js）は ?school= で教室を事前選択するため、URLに付けてから初期化する
   const SCHOOL = '__NAME__';
-  const LP_LABEL = 'Meta広告LP（__AREA__）';
+  const LP_LABEL = '広告LP（__AREA__）';
   (function () {
     const p = new URLSearchParams(location.search);
     if (p.get('school') !== SCHOOL) {
@@ -562,8 +580,10 @@ img{max-width:100%;height:auto;display:block}
     }
 
     // 流入元を kintone 体験名簿の備考に残す（広告クリエイティブ別に追えるよう utm_content も付ける）
-    const utmContent = new URLSearchParams(location.search).get('utm_content') || '';
-    const sourceTag = `【流入】${LP_LABEL}${utmContent ? '／' + utmContent : ''}`;
+    const qs = new URLSearchParams(location.search);
+    const utmSource = qs.get('utm_source') || '';
+    const utmContent = qs.get('utm_content') || '';
+    const sourceTag = `【流入】${LP_LABEL}${utmSource ? '／' + utmSource : ''}${utmContent ? '／' + utmContent : ''}`;
     const userNotes = v('notes');
     const notes = userNotes ? `${sourceTag}\n${userNotes}` : sourceTag;
 
