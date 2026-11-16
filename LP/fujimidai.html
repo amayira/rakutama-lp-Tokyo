@@ -74,6 +74,7 @@ img{max-width:100%;height:auto;display:block}
 .ev-ttl span{text-shadow:3px 3px 0 #fff,-3px 3px 0 #fff,3px -3px 0 #fff,-3px -3px 0 #fff}
 .ev-ttl .m,.ev-ttl .m span{text-shadow:none}
 .ev-sub{color:#fff;font-weight:800;font-size:18px;margin:0 0 12px;text-shadow:0 2px 0 rgba(0,0,0,.12)}
+.ev-next{margin:-6px 0 12px;font-size:16px;background:rgba(255,255,255,.22);display:inline-block;border-radius:20px;padding:2px 14px}
 .ev-note{font-size:11px;color:#3a3a3a;margin-top:12px}
 /* trial card */
 .tr{background:#F1F7C9;padding:34px 18px 26px;position:relative}
@@ -254,6 +255,7 @@ img{max-width:100%;height:auto;display:block}
   <p class="ev-ttl"><span class="m"><span class="js-month">11</span>月</span><span class="c1">無</span><span class="c2">料</span><span class="c3">体</span><span class="c4">験</span><span class="c1">会</span></p>
   <div class="ev-g">
     <p class="ev-sub">各コマ限定5名・定員になり次第受付終了！</p>
+    <p class="ev-sub ev-next"><span class="js-next-month">12</span>月分も受付中！</p>
     <a href="#form" class="btn">体験日はコチラ <i>➜</i></a>
   </div>
 </section>
@@ -490,7 +492,7 @@ img{max-width:100%;height:auto;display:block}
 
 <script>
   // 当月表示（体験会タイトル）
-  (function(){var m=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',month:'numeric'}).replace(/\D/g,'');document.querySelectorAll('.js-month').forEach(function(e){e.textContent=m;});})();
+  (function(){var m=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',month:'numeric'}).replace(/\D/g,'');document.querySelectorAll('.js-month').forEach(function(e){e.textContent=m;});var n=(parseInt(m,10)%12)+1;document.querySelectorAll('.js-next-month').forEach(function(e){e.textContent=n;});})();
   // フォームが見えている間は固定ボタンを隠す
   (function(){var f=document.getElementById('form'),c=document.getElementById('fixed-cta');if(!('IntersectionObserver' in window))return;new IntersectionObserver(function(es){c.style.display=es[0].isIntersecting?'none':'';}).observe(f);})();
 
