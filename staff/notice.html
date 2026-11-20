@@ -38,7 +38,7 @@
       <div class="max-w-5xl mx-auto px-4 flex gap-1">
         <a href="notice.html" class="page-nav-link page-nav-active">お知らせ/FAQ</a>
         <a href="roster.html" class="page-nav-link">名簿</a>
-        <a href="jisseki.html" class="page-nav-link">実績</a>
+        <a href="jisseki.html" class="page-nav-link nav-jisseki" style="display:none">実績</a>
         <a href="soroban/index.html" target="_blank" rel="noopener" class="page-nav-link">そろばんアプリ</a>
       </div>
     </div>
@@ -278,8 +278,28 @@
     // ── ログアウト ────────────────────────────────────────────────
     document.getElementById('logoutBtn').addEventListener('click', () => {
       sessionStorage.removeItem('staffKey');
+      sessionStorage.removeItem('staffAdmin');
       location.href = 'index.html';
     });
+
+    // ── 実績タブは有山さんのみ表示（サーバー側も /api/staff/stats を有山さん以外403） ──
+    (async () => {
+      let admin = sessionStorage.getItem('staffAdmin');
+      const key = sessionStorage.getItem('staffKey');
+      if (admin === null && key) {
+        try {
+          const r = await fetch('https://rakutama-kintone.k-ariyama.workers.dev/api/staff/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: key }),
+          });
+          const d = await r.json();
+          if (d.success) { admin = d.isAdmin ? '1' : '0'; sessionStorage.setItem('staffAdmin', admin); }
+        } catch {}
+      }
+      if (admin === '1') document.querySelectorAll('.nav-jisseki').forEach(a => { a.style.display = ''; });
+      else if (location.pathname.endsWith('jisseki.html')) location.href = 'roster.html';
+    })();
   </script>
 </body>
 </html>

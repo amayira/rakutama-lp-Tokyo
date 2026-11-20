@@ -93,6 +93,7 @@
 
         if (data.success) {
           sessionStorage.setItem('staffKey', password);
+          sessionStorage.setItem('staffAdmin', data.isAdmin ? '1' : '0');
           location.href = 'roster.html';
         } else {
           errMsg.classList.remove('hidden');

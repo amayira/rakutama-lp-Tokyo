@@ -1576,18 +1576,33 @@ function isStaffPasswordValid(key, env) {
 
 /** Validate staff password from Authorization: Bearer <password> header */
 function isValidStaffAuth(request, env) {
+  return isStaffPasswordValid(getBearerKey(request), env);
+}
+
+function getBearerKey(request) {
   const auth = request.headers.get("Authorization") ?? "";
-  const key = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  return isStaffPasswordValid(key, env);
+  return auth.startsWith("Bearer ") ? auth.slice(7) : "";
+}
+
+/**
+ * 実績タブ（/api/staff/stats）を見られる講師。STAFF_PASSWORD の講師名キーで判定する。
+ * 2026-11-20 有山さん指示で有山さん限定に変更（講師には経営数値を見せない）。
+ */
+const STAFF_ADMIN_NAMES = ["有山"];
+
+function isStaffAdminKey(key, env) {
+  if (!key) return false;
+  const pw = getStaffPasswords(env);
+  return STAFF_ADMIN_NAMES.some((name) => pw[name] && pw[name] === key);
 }
 
 /**
  * POST /api/staff/auth
- * { password } → { success: true } or 401
+ * { password } → { success: true, isAdmin } or 401（isAdmin＝実績タブ閲覧可）
  */
 async function handleStaffAuth(body, env) {
   if (body.password && isStaffPasswordValid(body.password, env)) {
-    return { success: true };
+    return { success: true, isAdmin: isStaffAdminKey(body.password, env) };
   }
   return { success: false, error: "パスワードが違います", status: 401 };
 }
@@ -2174,6 +2189,9 @@ export default {
         } else if (path === "/api/staff/stats") {
           if (!isValidStaffAuth(request, env)) {
             return jsonResponse({ success: false, error: "認証が必要です" }, 401, origin);
+          }
+          if (!isStaffAdminKey(getBearerKey(request), env)) {
+            return jsonResponse({ success: false, error: "閲覧権限がありません" }, 403, origin);
           }
           result = await handleStaffStats(env);
         } else {
