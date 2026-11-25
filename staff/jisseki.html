@@ -148,7 +148,8 @@
       <!-- ②-3 体験申込数の週次推移 -->
       <div class="bg-white rounded-2xl shadow-sm p-4">
         <p class="text-sm font-bold text-gray-700">体験申込数 週次<span class="jk-sfx"></span></p>
-        <p class="text-xs text-gray-400 mb-3">月曜〜日曜の1週間ごとの申込件数（申込日ベース）</p>
+        <p class="text-xs text-gray-400 mb-3">月曜〜日曜の1週間ごとの申込件数（申込日ベース）。全校表示では教室別に色分け</p>
+        <div id="week-legend" class="jk-legend mb-2"></div>
         <div id="week-chart" class="jk-chart"></div>
         <p class="jk-note">横軸は週の開始日（月曜）。薄い棒は今週で、まだ途中のため増える可能性があります。2回目の体験は除きます。</p>
       </div>
@@ -679,7 +680,13 @@
         container.innerHTML = '<p class="jk-empty">データがありません</p>';
         return;
       }
-      // 日付ごとの件数を、その週の月曜日をキーにして合算
+      // 全校表示は教室別の積み上げ、校を選んだ時はその校のみ
+      const series = label === '全体' ? schools.filter(sc => ap[sc]) : [label];
+      const legend = document.getElementById('week-legend');
+      legend.innerHTML = label === '全体'
+        ? series.map(sc => `<span><span class="jk-dot" style="background:${schoolColor(sc)}"></span>${esc(sc)}</span>`).join('')
+        : '';
+      // 日付ごとの件数を、その週の月曜日をキーにして合算（教室別）
       const mondayOf = d => {
         const t = new Date(d + 'T00:00:00Z');
         t.setUTCDate(t.getUTCDate() - ((t.getUTCDay() + 6) % 7));
@@ -688,8 +695,10 @@
       const weeks = [];
       ap.dates.forEach((d, i) => {
         const m = mondayOf(d);
-        if (!weeks.length || weeks[weeks.length - 1].start !== m) weeks.push({ start: m, n: 0 });
-        weeks[weeks.length - 1].n += counts[i];
+        if (!weeks.length || weeks[weeks.length - 1].start !== m) weeks.push({ start: m, n: 0, by: {} });
+        const w = weeks[weeks.length - 1];
+        series.forEach(sc => { const v = (ap[sc] && ap[sc][i]) || 0; w.by[sc] = (w.by[sc] || 0) + v; });
+        w.n += label === '全体' ? series.reduce((a, sc) => a + ((ap[sc] && ap[sc][i]) || 0), 0) : counts[i];
       });
       // 直近12か月に入る週だけ表示（週の終わりが表示開始日以降）
       const cutW = new Date(chartCutoff() + 'T00:00:00Z');
@@ -707,17 +716,23 @@
       const slot = chartW / weeks.length;
       const barW = Math.max(3, Math.min(30, slot * 0.7));
       const fs = weeks.length > 16 && CHART_W < 600 ? 8 : 11;
-      const color = schoolColor(label);
 
       let svg = svgOpen(H, `${label === '全体' ? '全校' : label}の体験申込数の週次推移`);
       svg += gridLines(padL, padT, chartW, chartH, step, n, yMax);
       weeks.forEach((w, i) => {
         const cx = padL + slot * i + slot / 2;
-        const h = w.n / yMax * chartH, y = padT + chartH - h;
         const partial = partialLast && i === lastIdx;
+        let acc = 0;
+        series.forEach(sc => {
+          const v = w.by[sc] || 0;
+          if (!v) return;
+          const h = v / yMax * chartH, y = padT + chartH * (1 - (acc + v) / yMax);
+          svg += `<rect x="${(cx - barW / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${schoolColor(sc)}" ${partial ? 'fill-opacity="0.4"' : ''} ${label === '全体' ? 'stroke="#fff" stroke-width="0.5"' : 'rx="2"'}/>`;
+          acc += v;
+        });
         if (w.n > 0) {
-          svg += `<rect x="${(cx - barW / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${color}" ${partial ? 'fill-opacity="0.4"' : ''} rx="2"/>`;
-          svg += `<text x="${cx.toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="#4b5563">${w.n}</text>`;
+          const ty = padT + chartH * (1 - w.n / yMax);
+          svg += `<text x="${cx.toFixed(1)}" y="${(ty - 4).toFixed(1)}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="#4b5563">${w.n}</text>`;
         }
         // 4週ごとに開始日ラベル（最終週が近いと重なるので最終週は出さない）
         if (i % 4 === 0 && lastIdx - i >= 2) {
