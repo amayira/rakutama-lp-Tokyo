@@ -1781,27 +1781,42 @@ function isActiveAt(rec, dateStr, enrolledUntil = dateStr) {
   return true;
 }
 
+/** ある月の在籍者から、校別の人数と月謝合計（0円・未入力は平均から除く）を作る */
+function summarizeMonth(month, active, schools) {
+  const seito = { month, 全体: active.length };
+  for (const school of schools) {
+    seito[school] = active.filter(r => r["教室名"]?.value === school).length;
+  }
+  const fee = { month };
+  for (const label of ["全体", ...schools]) {
+    const group = label === "全体" ? active : active.filter(r => r["教室名"]?.value === label);
+    const fees = group.map(monthlyFee).filter(v => v > 0);
+    fee[label] = { sum: fees.reduce((a, b) => a + b, 0), n: fees.length };
+  }
+  return { seito, fee };
+}
+
 /**
- * 月別の粗利。売上＝月末在籍数 × 平均月謝、経費＝講師人件費（1校あたり定額）＋会場費。
+ * 月別の粗利。売上＝月末在籍数 × 平均月謝、経費＝講師人件費（1校あたり定額）＋会場費＋ロイヤリティ（1校あたり定額）。
  * 金額の設定は公開リポジトリに置けないので secret の PL_CONFIG（JSON）から読む:
- *   { "labor": 1校の月額人件費, "schools": { "◯◯校": { "rent": 月額会場費, "from": "YYYY-MM"（開校月） } } }
+ *   { "labor": 1校の月額人件費, "royalty": 1校の月額ロイヤリティ, "schools": { "◯◯校": { "rent": 月額会場費, "from": "YYYY-MM"（開校月） } } }
  * 未設定・壊れている場合は null（実績タブの他の表示は止めない）。
- * 開校前の校は null。全体は開校済み校の合計。会場費・人件費・月謝は現在の額を過去月にも当てる。
+ * 開校前の校は null。全体は開校済み校の合計。会場費・人件費・ロイヤリティ・月謝は現在の額を過去月にも当てる。
+ * forecast は翌月の見立て（今わかっている入会予定・退会予定を反映した翌月末の在籍）。
  */
-function buildPl(configJson, schools, feeTrend, seitoTrend) {
+function buildPl(configJson, schools, feeTrend, seitoTrend, next) {
   let config;
   try {
     config = JSON.parse(configJson);
   } catch {
     return null;
   }
-  if (!config?.schools || !(config.labor >= 0)) return null;
+  if (!config?.schools || !(config.labor >= 0) || !(config.royalty >= 0)) return null;
   const missing = schools.filter(s => !config.schools[s]);
 
-  const months = seitoTrend.map((t, i) => {
-    const fee = feeTrend[i];
+  const buildRow = (t, fee) => {
     const row = { month: t.month };
-    const total = { students: 0, sales: 0, labor: 0, rent: 0, schools: 0 };
+    const total = { students: 0, sales: 0, labor: 0, rent: 0, royalty: 0, schools: 0 };
     for (const school of schools) {
       const c = config.schools[school];
       if (!c || t.month < c.from) { row[school] = null; continue; }
@@ -1810,18 +1825,21 @@ function buildPl(configJson, schools, feeTrend, seitoTrend) {
       const base = fee[school]?.n ? fee[school] : fee["全体"];
       const unit = base?.n ? base.sum / base.n : 0;
       const sales = Math.round(students * unit);
-      row[school] = { students, unit: Math.round(unit), sales, labor: config.labor, rent: c.rent };
+      row[school] = { students, unit: Math.round(unit), sales, labor: config.labor, rent: c.rent, royalty: config.royalty };
       total.students += students;
       total.sales += sales;
       total.labor += config.labor;
       total.rent += c.rent;
+      total.royalty += config.royalty;
       total.schools++;
     }
     total.unit = total.students ? Math.round(total.sales / total.students) : 0;
     row["全体"] = total;
     return row;
-  });
-  return { months, missing };
+  };
+  const months = seitoTrend.map((t, i) => buildRow(t, feeTrend[i]));
+  const forecast = next ? buildRow(next.seito, next.fee) : null;
+  return { months, forecast, missing };
 }
 
 /**
@@ -1938,23 +1956,20 @@ async function handleStaffStats(env) {
       const isCurrent = y === ty && m === tm;
       const asOf = isCurrent ? todayStr : monthEnd;
       const active = countableRecs.filter(r => isActiveAt(r, asOf, monthEnd));
-      const row = { month: monthStr, 全体: active.length };
-      for (const school of SCHOOLS) {
-        row[school] = active.filter(r => r["教室名"]?.value === school).length;
-      }
-      seitoTrend.push(row);
-      // 月謝の推移用（各月末在籍者の月謝合計と人数。0円・未入力は平均から除く）
-      const feeRow = { month: monthStr };
-      for (const label of ["全体", ...SCHOOLS]) {
-        const group = label === "全体" ? active : active.filter(r => r["教室名"]?.value === label);
-        const fees = group.map(monthlyFee).filter(v => v > 0);
-        feeRow[label] = { sum: fees.reduce((a, b) => a + b, 0), n: fees.length };
-      }
-      feeTrend.push(feeRow);
+      const summary = summarizeMonth(monthStr, active, SCHOOLS);
+      seitoTrend.push(summary.seito);
+      feeTrend.push(summary.fee);
       m++;
       if (m > 12) { m = 1; y++; }
     }
   }
+
+  // ── 翌月の見立て（粗利用）。翌月末までに始まる入会予定を含み、翌月末より前の退会予定は除く ──
+  const ny = tm === 12 ? ty + 1 : ty;
+  const nm = tm === 12 ? 1 : tm + 1;
+  const nextMonthStr = `${ny}-${String(nm).padStart(2, "0")}`;
+  const nextEnd = `${nextMonthStr}-${String(lastDayOfMonth(ny, nm)).padStart(2, "0")}`;
+  const nextSummary = summarizeMonth(nextMonthStr, countableRecs.filter(r => isActiveAt(r, nextEnd)), SCHOOLS);
 
   // ── 入会・退会の月別人数（入会＝初回授業日の月、退会＝退会日の月。未来日の退会予定は数えない）────
   const movement = seitoTrend.map(t => {
@@ -2073,7 +2088,7 @@ async function handleStaffStats(env) {
   return {
     success: true,
     schools: SCHOOLS,
-    pl: buildPl(env.PL_CONFIG, SCHOOLS, feeTrend, seitoTrend),
+    pl: buildPl(env.PL_CONFIG, SCHOOLS, feeTrend, seitoTrend, nextSummary),
     seito_count: seitoCount,
     seito_pending: seitoPending,
     prev_month_total: prevMonthTotal,

@@ -26,6 +26,8 @@
     .pl-table th { color: #6b7280; font-weight: 500; font-size: 0.75rem; }
     .pl-table th:first-child, .pl-table td:first-child { text-align: left; position: sticky; left: 0; background: #fff; }
     .pl-table tr.pl-total td { font-weight: 700; border-top: 2px solid #cbd5e1; }
+    .pl-table tr.pl-forecast td { color: #6b7280; font-style: italic; background: #f8fafc; }
+    .pl-table tr.pl-forecast td:first-child { background: #f8fafc; }
     .jk-empty { text-align: center; padding: 32px 0; font-size: 0.85rem; color: #9ca3af; }
 
     /* 校の絞り込みチップ */
@@ -113,14 +115,21 @@
       <!-- 粗利（PL） -->
       <div id="pl-card" class="hidden bg-white rounded-2xl shadow-sm p-4">
         <p class="text-sm font-bold text-gray-700">毎月の粗利<span id="pl-month"></span></p>
-        <p class="text-xs text-gray-400 mb-3">売上（生徒数 × 平均単価）－ 経費（講師人件費 ＋ 会場費）</p>
+        <p class="text-xs text-gray-400 mb-3">売上（生徒数 × 平均単価）－ 経費（講師人件費 ＋ 会場費 ＋ ロイヤリティ）</p>
         <div id="pl-summary" class="grid grid-cols-3 gap-2 mb-4"></div>
         <p class="text-xs font-bold text-gray-500 mb-1">教室別（今月）</p>
         <div class="overflow-x-auto"><table class="pl-table" id="pl-detail"></table></div>
         <p class="text-xs font-bold text-gray-500 mt-5 mb-1">粗利の月別推移</p>
+        <div id="pl-chips" class="jk-chips mb-2"></div>
+        <div class="jk-legend mb-1">
+          <span><span class="jk-dot" style="background:#22c55e"></span>黒字</span>
+          <span><span class="jk-dot" style="background:#ef4444"></span>赤字</span>
+          <span><span class="jk-dot" style="background:#fff;border:1.5px dashed #6b7280"></span>見立て（翌月・実績ではありません）</span>
+        </div>
+        <div id="pl-chart" class="jk-chart mb-2"></div>
         <div class="overflow-x-auto"><table class="pl-table" id="pl-trend"></table></div>
         <p id="pl-warn" class="hidden text-xs text-red-500 mt-2"></p>
-        <p class="jk-note">今月は月末までの入会予定を含みます。平均単価は月謝0円の生徒を除いて計算します。過去の月も現在の月謝・会場費・人件費で計算し、開校前の校は含みません。ロイヤリティ・決済手数料・広告費・教材費・初期費用の売上は入っていません。損益分岐は、その校の粗利が0円以上になる生徒数です。</p>
+        <p class="jk-note">今月は月末までの入会予定を含みます。平均単価は月謝0円の生徒を除いて計算します。過去の月も現在の月謝・会場費・人件費・ロイヤリティで計算し、開校前の校は含みません。見立ては、今わかっている入会予定・退会予定を反映した翌月末の生徒数で計算します（これから増える分は含みません）。決済手数料・広告費・教材費・初期費用の売上は入っていません。損益分岐は、その校の粗利が0円以上になる生徒数です。</p>
       </div>
 
       <!-- ① 在籍生徒数の推移 -->
@@ -339,7 +348,7 @@
         if (!statsData) return;
         const before = CHART_W;
         fitChartWidth();
-        if (CHART_W !== before) { renderEnrollChart(); renderFiltered(); }
+        if (CHART_W !== before) { renderEnrollChart(); renderPlChart(); renderFiltered(); }
       }, 150);
     });
 
@@ -419,12 +428,75 @@
 
     // ── 粗利（PL） ────────────────────────────────────────────────
     const yen = v => `${v < 0 ? '▲' : ''}${Math.abs(Math.round(v)).toLocaleString()}円`;
-    const profitOf = d => d.sales - d.labor - d.rent;
+    const profitOf = d => d.sales - d.labor - d.rent - d.royalty;
     const profitCell = d => {
       if (!d) return '<td class="text-gray-300">―</td>';
       const p = profitOf(d);
       return `<td class="${p < 0 ? 'text-red-500' : 'text-gray-800'}">${yen(p)}</td>`;
     };
+
+    // 実績の月（直近12か月）＋翌月の見立て
+    const plRows = pl => [...lastMonths(pl.months), ...(pl.forecast ? [{ ...pl.forecast, isForecast: true }] : [])];
+
+    let plLabel = '全体';
+    function renderPlChips() {
+      if (plLabel !== '全体' && !schools.includes(plLabel)) plLabel = '全体';
+      const box = document.getElementById('pl-chips');
+      box.innerHTML = ['全体', ...schools].map(label => {
+        const active = label === plLabel;
+        return `<button type="button" class="jk-chip${active ? ' jk-chip-active' : ''}" style="${active ? `background:${schoolColor(label)}` : ''}" data-label="${esc(label)}">${esc(label === '全体' ? '全校' : label)}</button>`;
+      }).join('');
+      box.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+        plLabel = btn.dataset.label;
+        renderPlChips();
+        renderPlChart();
+      }));
+    }
+
+    // 粗利の棒グラフ。赤字は0の線から下に伸ばし、見立ての月は薄い塗り＋点線の枠にする
+    function renderPlChart() {
+      const container = document.getElementById('pl-chart');
+      if (!statsData?.pl) return;
+      // 選んだ校の開校前の月は軸に出さない
+      const rows = plRows(statsData.pl).filter(r => r[plLabel]);
+      if (rows.length === 0) {
+        container.innerHTML = '<p class="jk-empty">データがありません</p>';
+        return;
+      }
+      const values = rows.map(r => profitOf(r[plLabel]));
+      const hi = Math.max(0, ...values), lo = Math.min(0, ...values);
+      const rough = (hi - lo) / 4 || 10000;
+      const mag = 10 ** Math.floor(Math.log10(rough));
+      const step = [1, 2, 2.5, 5, 10].map(k => k * mag).find(s => s >= rough);
+      const yMax = Math.ceil(hi / step) * step, yMin = Math.floor(lo / step) * step;
+      const H = 252, padL = 46, padR = 10, padT = 20, padB = 68;
+      const chartW = CHART_W - padL - padR, chartH = H - padT - padB;
+      const groupW = chartW / rows.length;
+      const barW = Math.min(44, groupW * 0.62);
+      const yAt = v => padT + chartH * (yMax - v) / ((yMax - yMin) || 1);
+      const man = v => `${v < 0 ? '▲' : ''}${(Math.abs(v) / 10000).toFixed(1)}`;
+
+      let svg = svgOpen(H, `${plLabel === '全体' ? '全校' : plLabel}の粗利の推移`);
+      for (let v = yMin; v <= yMax + 1; v += step) {
+        const y = yAt(v).toFixed(1);
+        svg += `<line x1="${padL}" y1="${y}" x2="${padL + chartW}" y2="${y}" stroke="${v === 0 ? '#9ca3af' : '#f0f0f0'}" stroke-width="1"/>`;
+        svg += `<text x="${padL - 5}" y="${(Number(y) + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="#9ca3af">${v === 0 ? '0' : `${v < 0 ? '▲' : ''}${Math.abs(v) / 10000}万`}</text>`;
+      }
+      rows.forEach((row, i) => {
+        const v = values[i];
+        const cx = padL + groupW * i + groupW / 2;
+        const color = v < 0 ? '#ef4444' : '#22c55e';
+        const top = Math.min(yAt(v), yAt(0)), h = Math.max(1, Math.abs(yAt(v) - yAt(0)));
+        const look = row.isForecast ? `fill="${color}" fill-opacity="0.18" stroke="${color}" stroke-width="1.8" stroke-dasharray="5 3"` : `fill="${color}"`;
+        svg += `<rect x="${(cx - barW / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="2" ${look}/>`;
+        const ty = v < 0 ? yAt(v) + 14 : yAt(v) - 6;
+        svg += `<text x="${cx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">${man(v)}</text>`;
+        svg += monthLabel(row.month, i, cx, H - 14);
+        if (row.isForecast) svg += `<text x="${cx.toFixed(1)}" y="${i === 0 || row.month.endsWith('-01') ? H - 8 : H - 22}" text-anchor="middle" font-size="11" fill="#6b7280">見立て</text>`;
+      });
+      svg += '</svg>';
+      container.innerHTML = svg;
+    }
 
     function renderPl(pl) {
       const card = document.getElementById('pl-card');
@@ -436,7 +508,7 @@
       document.getElementById('pl-month').textContent = `（${Number(cur.month.slice(5))}月）`;
       document.getElementById('pl-summary').innerHTML = [
         ['売上', yen(total.sales), `${total.students}名 × ${yen(total.unit)}`, 'text-gray-800'],
-        ['経費', yen(total.labor + total.rent), `${total.schools}校分`, 'text-gray-800'],
+        ['経費', yen(total.labor + total.rent + total.royalty), `${total.schools}校分`, 'text-gray-800'],
         ['粗利', yen(profitOf(total)), `粗利率 ${margin(total)}`, profitOf(total) < 0 ? 'text-red-500' : 'text-green-600'],
       ].map(([name, value, sub, color]) => `
         <div class="rounded-xl bg-slate-50 p-3">
@@ -447,20 +519,23 @@
 
       const detailRow = (label, d, isTotal) => {
         // 損益分岐の生徒数。全体行は校ごとの合算ではなく全校の平均単価で出す
-        const breakeven = d.unit > 0 ? `${Math.ceil((d.labor + d.rent) / d.unit)}名` : '―';
+        const breakeven = d.unit > 0 ? `${Math.ceil((d.labor + d.rent + d.royalty) / d.unit)}名` : '―';
         const name = isTotal ? '全校' : `<span style="color:${schoolColor(label)}">${esc(label)}</span>`;
-        return `<tr class="${isTotal ? 'pl-total' : ''}"><td>${name}</td>${profitCell(d)}<td>${margin(d)}</td><td>${d.students}名</td><td>${breakeven}</td><td>${d.unit ? yen(d.unit) : '―'}</td><td>${yen(d.sales)}</td><td>${yen(d.labor)}</td><td>${yen(d.rent)}</td></tr>`;
+        return `<tr class="${isTotal ? 'pl-total' : ''}"><td>${name}</td>${profitCell(d)}<td>${margin(d)}</td><td>${d.students}名</td><td>${breakeven}</td><td>${d.unit ? yen(d.unit) : '―'}</td><td>${yen(d.sales)}</td><td>${yen(d.labor)}</td><td>${yen(d.rent)}</td><td>${yen(d.royalty)}</td></tr>`;
       };
       document.getElementById('pl-detail').innerHTML =
-        `<thead><tr>${['教室', '粗利', '粗利率', '生徒', '損益分岐', '平均単価', '売上', '人件費', '会場費'].map(t => `<th>${t}</th>`).join('')}</tr></thead><tbody>` +
+        `<thead><tr>${['教室', '粗利', '粗利率', '生徒', '損益分岐', '平均単価', '売上', '人件費', '会場費', 'ロイヤリティ'].map(t => `<th>${t}</th>`).join('')}</tr></thead><tbody>` +
         schools.filter(s => cur[s]).map(s => detailRow(s, cur[s], false)).join('') +
         detailRow('全体', total, true) + '</tbody>';
 
       const labels = ['全体', ...schools];
       document.getElementById('pl-trend').innerHTML =
         `<thead><tr>${['月', ...labels.map(l => l === '全体' ? '全校' : l)].map(t => `<th>${esc(t)}</th>`).join('')}</tr></thead><tbody>` +
-        lastMonths(pl.months).reverse().map(row =>
-          `<tr><td>${esc(row.month.replace('-', '/'))}</td>${labels.map(l => profitCell(row[l])).join('')}</tr>`).join('') + '</tbody>';
+        plRows(pl).reverse().map(row =>
+          `<tr class="${row.isForecast ? 'pl-forecast' : ''}"><td>${esc(row.month.replace('-', '/'))}${row.isForecast ? '（見立て）' : ''}</td>${labels.map(l => profitCell(row[l])).join('')}</tr>`).join('') + '</tbody>';
+
+      renderPlChips();
+      renderPlChart();
 
       const warn = document.getElementById('pl-warn');
       warn.classList.toggle('hidden', !pl.missing.length);
