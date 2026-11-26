@@ -1782,6 +1782,49 @@ function isActiveAt(rec, dateStr, enrolledUntil = dateStr) {
 }
 
 /**
+ * 月別の粗利。売上＝月末在籍数 × 平均月謝、経費＝講師人件費（1校あたり定額）＋会場費。
+ * 金額の設定は公開リポジトリに置けないので secret の PL_CONFIG（JSON）から読む:
+ *   { "labor": 1校の月額人件費, "schools": { "◯◯校": { "rent": 月額会場費, "from": "YYYY-MM"（開校月） } } }
+ * 未設定・壊れている場合は null（実績タブの他の表示は止めない）。
+ * 開校前の校は null。全体は開校済み校の合計。会場費・人件費・月謝は現在の額を過去月にも当てる。
+ */
+function buildPl(configJson, schools, feeTrend, seitoTrend) {
+  let config;
+  try {
+    config = JSON.parse(configJson);
+  } catch {
+    return null;
+  }
+  if (!config?.schools || !(config.labor >= 0)) return null;
+  const missing = schools.filter(s => !config.schools[s]);
+
+  const months = seitoTrend.map((t, i) => {
+    const fee = feeTrend[i];
+    const row = { month: t.month };
+    const total = { students: 0, sales: 0, labor: 0, rent: 0, schools: 0 };
+    for (const school of schools) {
+      const c = config.schools[school];
+      if (!c || t.month < c.from) { row[school] = null; continue; }
+      const students = t[school] ?? 0;
+      // 平均単価は月謝0円・未入力を除いて出す。校内に1人もいなければ全校平均で代用
+      const base = fee[school]?.n ? fee[school] : fee["全体"];
+      const unit = base?.n ? base.sum / base.n : 0;
+      const sales = Math.round(students * unit);
+      row[school] = { students, unit: Math.round(unit), sales, labor: config.labor, rent: c.rent };
+      total.students += students;
+      total.sales += sales;
+      total.labor += config.labor;
+      total.rent += c.rent;
+      total.schools++;
+    }
+    total.unit = total.students ? Math.round(total.sales / total.students) : 0;
+    row["全体"] = total;
+    return row;
+  });
+  return { months, missing };
+}
+
+/**
  * GET /api/staff/stats
  * Returns KPI stats:
  *   - seito_count: { total, 早宮校, 氷川台校, 中村校, 平和台校 }
@@ -2030,6 +2073,7 @@ async function handleStaffStats(env) {
   return {
     success: true,
     schools: SCHOOLS,
+    pl: buildPl(env.PL_CONFIG, SCHOOLS, feeTrend, seitoTrend),
     seito_count: seitoCount,
     seito_pending: seitoPending,
     prev_month_total: prevMonthTotal,

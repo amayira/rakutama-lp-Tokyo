@@ -28,4 +28,5 @@
   // APIトークン等（TOKEN_* / RESEND_API_KEY* / STAFF_PASSWORD）はすべて secret。
   // `wrangler secret put` で管理し、値をこのファイルに書かない（公開リポジトリのため）。
   // STAFF_PASSWORD の元データは ~/.claude/secrets/staff_passwords.json。
+  // PL_CONFIG（実績タブの粗利計算用の会場費・人件費）の元データは ~/.claude/secrets/pl_config.json。
 }
