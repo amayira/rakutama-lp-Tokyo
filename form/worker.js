@@ -1466,6 +1466,97 @@ function nextMondayJST() {
 }
 
 /**
+ * POST /api/mantoman
+ * マンツーマン（個別指導）コース申し込み。受講の方法で登録先を分ける（2026-11-27 有山さん指示）。
+ *   単発・単発がよければ定期希望 … その他請求(App16)に3,300円を登録
+ *   グループ授業からの変更・併用 … クラス・コース変更申請(App18)に登録
+ * その他請求は項目名しか自由記入欄が無いので、申込内容の全文は控えメールに残る。
+ */
+const MANTOMAN_SINGLE_FEE = 3300;
+const MANTOMAN_SINGLE_METHODS = ["単発", "単発がよければ定期希望"];
+const MANTOMAN_CHANGE_METHODS = ["グループ授業からの変更を希望", "グループ授業との併用を希望"];
+
+async function handleMantoman(body, env) {
+  const method = String(body["受講の方法"] ?? "");
+  const isSingle = MANTOMAN_SINGLE_METHODS.includes(method);
+  if (!isSingle && !MANTOMAN_CHANGE_METHODS.includes(method)) {
+    return { success: false, error: "受講の方法を選択してください。", status: 400 };
+  }
+  const startDate = String(body["開始希望日"] ?? "");
+  const missing = ["現在のテキスト", "希望日時", "希望内容"].filter((k) => !String(body[k] ?? "").trim());
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) missing.push("開始希望日");
+  if (missing.length) {
+    return { success: false, error: `未入力の項目があります：${missing.join("、")}`, status: 400 };
+  }
+  if (!(await fillStudentFromRoster(body, env))) return STUDENT_NOT_FOUND;
+
+  const rows = [
+    ["受講の方法", method],
+    ["現在のテキスト", body["現在のテキスト"]],
+    ["希望日時", body["希望日時"]],
+    ["開始希望日", startDate],
+    ["希望講師", body["希望講師"] || "指定なし"],
+    ["希望内容", body["希望内容"]],
+  ];
+
+  let appId, token, record;
+  if (isSingle) {
+    const [, m, d] = startDate.split("-").map(Number);
+    const teiki = method === "単発がよければ定期希望" ? "・定期希望あり" : "";
+    appId = APP.SONOTA;
+    // 生徒番号はルックアップ型のため TOKEN_SEITO_NEW も併せて渡す
+    token = [env.TOKEN_SONOTA, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
+    record = buildRecord({
+      生徒番号: body["生徒番号"],
+      請求基準日: flashBillingBaseDate(),
+      項目名: `マンツーマン単発（開始希望日${m}/${d}${teiki}）`,
+      金額: MANTOMAN_SINGLE_FEE,
+    });
+  } else {
+    appId = APP.CLASS_CHANGE;
+    token = [env.TOKEN_CLASS_CHANGE, env.TOKEN_SEITO_NEW].filter(Boolean).join(",");
+    record = buildRecord({
+      生徒番号: body["生徒番号"],
+      教室名: body["教室名"] ?? "",
+      氏: body["氏"],
+      名: body["名"],
+      変更希望内容: [
+        `【マンツーマン】${method}`,
+        `現在のテキスト：${body["現在のテキスト"]}`,
+        `希望日時：${body["希望日時"]}`,
+        `希望講師：${body["希望講師"] || "指定なし"}`,
+        `希望内容：${body["希望内容"]}`,
+      ].join("\n"),
+      希望変更時期: startDate,
+    });
+  }
+
+  try {
+    await kintonePost(appId, record, token);
+  } catch (err) {
+    await sendAdminEmail({
+      subject: `【要対応】マンツーマン申込のkintone登録失敗：${body["氏"]} ${body["名"]}`,
+      intro: `マンツーマン申込のkintone登録（App${appId}）に失敗しました。レコードは作成されていません。\n以下の内容を元に手動で登録・対応してください。\n\nエラー内容：${err.message}`,
+      fields: { 生徒番号: body["生徒番号"], 教室名: body["教室名"], ...Object.fromEntries(rows) },
+      env,
+    });
+    throw err;
+  }
+
+  await sendStudentReceipt({
+    studentNumber: body["生徒番号"],
+    familyName: body["氏"],
+    givenName: body["名"],
+    subject: "【マンツーマンコース申込受付】",
+    lead: "マンツーマン（個別指導）コースのお申し込みを受け付けました。講師の空き状況を確認の上、担当者よりご連絡いたします。",
+    rows,
+    env,
+  });
+
+  return { success: true };
+}
+
+/**
  * POST /api/class-change
  * Creates a record in the class-change kintone app.
  * Gracefully no-ops if CLASS_CHANGE_APP_ID is not configured.
@@ -2305,6 +2396,9 @@ export default {
           break;
         case "/api/furikae-cancel":
           result = await handleFurikaeCancel(body, env);
+          break;
+        case "/api/mantoman":
+          result = await handleMantoman(body, env);
           break;
         case "/api/flash-anzan":
           result = await handleFlashAnzan(body, env);

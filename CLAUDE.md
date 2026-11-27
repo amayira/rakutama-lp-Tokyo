@@ -113,7 +113,8 @@ Cloudflare Workers が静的 GitHub Pages と Kintone の間の API Proxy とし
 | POST | `/api/kesseki` | 欠席報告登録 | App 14 |
 | POST | `/api/kentei` | 検定申込登録 | App 12（検定申込） |
 | POST | `/api/class-change` | クラス変更申込登録 | App 18 |
-| POST | `/api/flash-anzan` | フラッシュ暗算申込登録 | App 16 |
+| POST | `/api/flash-anzan` | フラッシュ暗算申込登録 | App 21 |
+| POST | `/api/mantoman` | マンツーマン申込（フォームは rakutama-form の mantoman.html）。単発系＝その他請求に3,300円（請求基準日はフラッシュと同じ締め）／変更・併用＝クラス変更申請。要 `TOKEN_SONOTA` | App 16 / 18 |
 
 ### 環境変数（Cloudflare Workers の Wrangler で管理）
 
