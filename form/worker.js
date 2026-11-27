@@ -1483,7 +1483,7 @@ async function handleOnlineTeachers(env) {
  * マンツーマン（個別指導）コース申し込み。受講の方法で登録先を分ける（2026-11-27 有山さん指示）。
  *   単発・単発がよければ定期希望 … その他請求(App16)に3,300円を登録
  *   グループ授業からの変更・併用 … クラス・コース変更申請(App18)に登録
- * その他請求は項目名しか自由記入欄が無いので、申込内容の全文は控えメールに残る。
+ * その他請求は申込内容の全項目を「備考」に入れる（項目名は請求の見出し用に短くする）。
  */
 const MANTOMAN_SINGLE_FEE = 3300;
 const MANTOMAN_SINGLE_METHODS = ["単発", "単発がよければ定期希望"];
@@ -1524,6 +1524,7 @@ async function handleMantoman(body, env) {
       請求基準日: flashBillingBaseDate(),
       項目名: `マンツーマン単発（開始希望日${m}/${d}${teiki}）`,
       金額: MANTOMAN_SINGLE_FEE,
+      備考: [["所属教室", body["教室名"] ?? ""], ...rows].map(([k, v]) => `${k}：${v}`).join("\n"),
     });
   } else {
     appId = APP.CLASS_CHANGE;
