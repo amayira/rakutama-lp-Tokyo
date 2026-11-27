@@ -17,6 +17,7 @@ const APP = {
   FLASH: 21,       // フラッシュ暗算申込（専用アプリ）
   KYOSHITSU: 5,    // 教室マスタ
   FC_LEAD: 20,     // FC説明会リード（加盟店募集サイト）
+  ONLINE_KOSHI: 22, // オンライン講師マスタ
 };
 
 const ALLOWED_ORIGINS = [
@@ -1466,6 +1467,18 @@ function nextMondayJST() {
 }
 
 /**
+ * GET /api/online-teachers
+ * オンライン講師マスタ(App22)の「有効」な講師名を登録順で返す（マンツーマン申込の希望講師）。
+ * 講師の増減は App22 を直すだけでフォームに反映される。
+ */
+async function handleOnlineTeachers(env) {
+  const query = '有効フラグ in ("有効") order by $id asc limit 500';
+  const data = await kintoneGet(APP.ONLINE_KOSHI, query, env.TOKEN_ONLINE_KOSHI);
+  const names = (data.records ?? []).map((r) => (r["講師名"]?.value ?? "").trim()).filter(Boolean);
+  return { success: true, teachers: [...new Set(names)] };
+}
+
+/**
  * POST /api/mantoman
  * マンツーマン（個別指導）コース申し込み。受講の方法で登録先を分ける（2026-11-27 有山さん指示）。
  *   単発・単発がよければ定期希望 … その他請求(App16)に3,300円を登録
@@ -2286,6 +2299,8 @@ export default {
       try {
         if (path === "/api/jugyo") {
           result = await handleJugyo(params, env);
+        } else if (path === "/api/online-teachers") {
+          result = await handleOnlineTeachers(env);
         } else if (path === "/api/active-classrooms") {
           result = await handleActiveClassrooms(env);
         } else if (path === "/api/all-classrooms") {

@@ -114,6 +114,7 @@ Cloudflare Workers が静的 GitHub Pages と Kintone の間の API Proxy とし
 | POST | `/api/kentei` | 検定申込登録 | App 12（検定申込） |
 | POST | `/api/class-change` | クラス変更申込登録 | App 18 |
 | POST | `/api/flash-anzan` | フラッシュ暗算申込登録 | App 21 |
+| GET | `/api/online-teachers` | オンライン講師の一覧（有効フラグ＝有効のみ・登録順）。マンツーマン申込の希望講師。講師の増減はApp22を直すだけ。要 `TOKEN_ONLINE_KOSHI` | App 22 |
 | POST | `/api/mantoman` | マンツーマン申込（フォームは rakutama-form の mantoman.html）。単発系＝その他請求に3,300円（請求基準日はフラッシュと同じ締め）／変更・併用＝クラス変更申請。要 `TOKEN_SONOTA` | App 16 / 18 |
 
 ### 環境変数（Cloudflare Workers の Wrangler で管理）
@@ -284,6 +285,7 @@ TOKEN_GAKUHI
 | 17 | 体験参加名簿 |
 | 18 | クラス変更申込 |
 | 19 | 生徒名簿（統合版・現行） |
+| 22 | オンライン講師マスタ（講師名・有効フラグ） |
 
 ---
 
